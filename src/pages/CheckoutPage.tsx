@@ -1,0 +1,223 @@
+import { Link } from "react-router-dom";
+import { Truck, Store, Package, Minus, Plus, Trash2, ShieldCheck, CreditCard, MapPin, ChevronRight } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+
+export default function CheckoutPage() {
+  const {
+    items, updateQuantity, removeItem, totalPrice,
+    fulfillmentMethod, setFulfillmentMethod, selectedStore,
+  } = useCart();
+
+  const deliveryFee = fulfillmentMethod === "delivery" ? 5.99 : fulfillmentMethod === "shipping" ? 9.99 : 0;
+  const tax = totalPrice * 0.08875;
+  const grandTotal = totalPrice + deliveryFee + tax;
+
+  if (items.length === 0) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="hmart-container flex flex-col items-center justify-center py-24 text-center">
+          <h1 className="font-display text-3xl font-medium text-foreground">Your cart is empty</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Discover authentic Asian ingredients and start building your meal.</p>
+          <Link to="/products" className="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-105">
+            Continue Shopping
+          </Link>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+
+      <div className="hmart-container py-6">
+        <nav className="mb-6 text-xs text-muted-foreground">
+          <Link to="/" className="hover:text-primary">Home</Link>
+          <span className="mx-2">›</span>
+          <span className="font-medium text-foreground">Checkout</span>
+        </nav>
+
+        <h1 className="mb-8 font-display text-3xl font-medium text-foreground">Checkout</h1>
+
+        <div className="grid gap-8 lg:grid-cols-3">
+          {/* Cart Items & Fulfillment */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Fulfillment Selection */}
+            <div className="rounded-xl border border-border bg-card p-6">
+              <h2 className="mb-4 font-display text-lg font-medium text-foreground">Fulfillment Method</h2>
+              <div className="grid grid-cols-3 gap-3">
+                <button
+                  onClick={() => setFulfillmentMethod("delivery")}
+                  className={`flex flex-col items-center gap-2 rounded-lg border p-4 text-center transition-colors ${fulfillmentMethod === "delivery" ? "border-primary bg-primary/5" : "border-border hover:bg-secondary"}`}
+                >
+                  <Truck className={`h-6 w-6 ${fulfillmentMethod === "delivery" ? "text-primary" : "text-muted-foreground"}`} />
+                  <span className="text-sm font-medium text-foreground">Delivery</span>
+                  <span className="text-[10px] text-muted-foreground">Today 2-4pm · $5.99</span>
+                </button>
+                <button
+                  onClick={() => setFulfillmentMethod("pickup")}
+                  className={`flex flex-col items-center gap-2 rounded-lg border p-4 text-center transition-colors ${fulfillmentMethod === "pickup" ? "border-green-600 bg-green-50" : "border-border hover:bg-secondary"}`}
+                >
+                  <Store className={`h-6 w-6 ${fulfillmentMethod === "pickup" ? "text-green-600" : "text-muted-foreground"}`} />
+                  <span className="text-sm font-medium text-foreground">Pickup</span>
+                  <span className="text-[10px] text-muted-foreground">Ready in 2h · Free</span>
+                </button>
+                <button
+                  onClick={() => setFulfillmentMethod("shipping")}
+                  className={`flex flex-col items-center gap-2 rounded-lg border p-4 text-center transition-colors ${fulfillmentMethod === "shipping" ? "border-blue-600 bg-blue-50" : "border-border hover:bg-secondary"}`}
+                >
+                  <Package className={`h-6 w-6 ${fulfillmentMethod === "shipping" ? "text-blue-600" : "text-muted-foreground"}`} />
+                  <span className="text-sm font-medium text-foreground">Ship</span>
+                  <span className="text-[10px] text-muted-foreground">3-5 days · $9.99</span>
+                </button>
+              </div>
+
+              {fulfillmentMethod !== "shipping" && (
+                <div className="mt-4 flex items-center gap-2 rounded-lg bg-secondary/50 p-3 text-sm">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  <span className="text-muted-foreground">
+                    {fulfillmentMethod === "delivery" ? "Delivering from" : "Pickup at"}{" "}
+                    <span className="font-medium text-foreground">{selectedStore}</span>
+                  </span>
+                  <button className="ml-auto text-xs font-medium text-primary">Change</button>
+                </div>
+              )}
+
+              {fulfillmentMethod === "shipping" && (
+                <div className="mt-4 rounded-lg bg-secondary/50 p-3">
+                  <p className="text-sm font-medium text-foreground">Ship to</p>
+                  <p className="text-xs text-muted-foreground">124 Main St, New York, NY 10001</p>
+                  <button className="mt-1 text-xs font-medium text-primary">Change Address</button>
+                </div>
+              )}
+            </div>
+
+            {/* Cart Items */}
+            <div className="rounded-xl border border-border bg-card p-6">
+              <h2 className="mb-4 font-display text-lg font-medium text-foreground">
+                Your Items ({items.reduce((s, i) => s + i.quantity, 0)})
+              </h2>
+              <div className="divide-y divide-border">
+                {items.map(({ product, quantity }) => (
+                  <div key={product.id} className="flex gap-4 py-4 first:pt-0 last:pb-0">
+                    <Link to={`/product/${product.id}`}>
+                      <img src={product.image} alt={product.name} className="h-20 w-20 rounded-lg object-cover" />
+                    </Link>
+                    <div className="flex flex-1 flex-col justify-between">
+                      <div>
+                        <p className="text-[11px] text-muted-foreground">{product.brand}</p>
+                        <Link to={`/product/${product.id}`} className="text-sm font-medium text-foreground hover:text-primary">
+                          {product.name}
+                        </Link>
+                        <p className="text-[11px] text-muted-foreground">{product.weight}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center rounded border border-border">
+                          <button onClick={() => updateQuantity(product.id, quantity - 1)} className="px-2 py-1 text-muted-foreground hover:text-foreground">
+                            <Minus className="h-3 w-3" />
+                          </button>
+                          <span className="min-w-[1.5rem] text-center text-xs font-semibold">{quantity}</span>
+                          <button onClick={() => updateQuantity(product.id, quantity + 1)} className="px-2 py-1 text-muted-foreground hover:text-foreground">
+                            <Plus className="h-3 w-3" />
+                          </button>
+                        </div>
+                        <button onClick={() => removeItem(product.id)} className="text-muted-foreground hover:text-destructive">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-foreground">${(product.price * quantity).toFixed(2)}</p>
+                      {product.originalPrice && (
+                        <p className="text-[11px] text-muted-foreground line-through">${(product.originalPrice * quantity).toFixed(2)}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Payment */}
+            <div className="rounded-xl border border-border bg-card p-6">
+              <h2 className="mb-4 font-display text-lg font-medium text-foreground">Payment Method</h2>
+              <div className="flex items-center gap-3 rounded-lg border border-border p-3">
+                <CreditCard className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">•••• •••• •••• 4242</p>
+                  <p className="text-[11px] text-muted-foreground">Visa · Expires 12/28</p>
+                </div>
+                <button className="ml-auto text-xs font-medium text-primary">Change</button>
+              </div>
+            </div>
+          </div>
+
+          {/* Order Summary */}
+          <div>
+            <div className="sticky top-28 rounded-xl border border-border bg-card p-6">
+              <h2 className="mb-4 font-display text-lg font-medium text-foreground">Order Summary</h2>
+
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="font-medium text-foreground">${totalPrice.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">
+                    {fulfillmentMethod === "delivery" ? "Delivery Fee" : fulfillmentMethod === "shipping" ? "Shipping" : "Pickup"}
+                  </span>
+                  <span className={`font-medium ${deliveryFee === 0 ? "text-green-600" : "text-foreground"}`}>
+                    {deliveryFee === 0 ? "Free" : `$${deliveryFee.toFixed(2)}`}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Tax</span>
+                  <span className="font-medium text-foreground">${tax.toFixed(2)}</span>
+                </div>
+
+                {totalPrice >= 49 && fulfillmentMethod === "delivery" && (
+                  <div className="rounded-md bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700">
+                    🎉 You qualify for free delivery!
+                  </div>
+                )}
+
+                <div className="border-t border-border pt-2">
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-foreground">Total</span>
+                    <span className="text-xl font-bold text-foreground">${grandTotal.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] active:scale-95">
+                Place Order <ChevronRight className="h-4 w-4" />
+              </button>
+
+              <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Secure checkout · SSL encrypted
+              </div>
+
+              {/* Smart Rewards */}
+              <div className="mt-4 rounded-lg bg-accent/10 p-3">
+                <p className="text-xs font-semibold text-foreground">Smart Rewards</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Earn <span className="font-bold text-accent-foreground">{Math.floor(grandTotal)}</span> points with this purchase
+                </p>
+              </div>
+
+              <Link to="/products" className="mt-4 block text-center text-xs font-medium text-primary hover:underline">
+                ← Continue Shopping
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
+}
