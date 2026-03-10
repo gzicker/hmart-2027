@@ -7,7 +7,7 @@ import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-import heroImg from "@/assets/hero-kimchi.jpg";
+import HeroCarousel from "@/components/HeroCarousel";
 import categoryVeg from "@/assets/category-vegetables.jpg";
 import categoryMeat from "@/assets/category-meat.jpg";
 import categoryPantry from "@/assets/category-pantry.jpg";
@@ -30,40 +30,8 @@ export default function HomePage() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero */}
-      <section className="relative h-[70vh] min-h-[500px] overflow-hidden">
-        <img src={heroImg} alt="Kimchi making" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-hmart-charcoal/80 via-hmart-charcoal/40 to-transparent" />
-        <div className="hmart-container relative flex h-full flex-col justify-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-xl"
-          >
-            <p className="mb-2 font-body text-sm font-medium uppercase tracking-widest text-accent">
-              Your Kitchen, Our Heritage
-            </p>
-            <h1 className="font-display text-5xl font-medium leading-tight text-card md:text-6xl">
-              The taste of home, delivered to yours
-            </h1>
-            <p className="mt-4 font-body text-base leading-relaxed text-card/80">
-              From our stores to your table — fresh produce, premium meats, and authentic ingredients with same-day delivery, curbside pickup, or nationwide shipping.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                to="/products"
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-body text-sm font-semibold text-primary-foreground transition-transform hover:scale-105 active:scale-95"
-              >
-                Start Shopping <ArrowRight className="h-4 w-4" />
-              </Link>
-              <button className="inline-flex items-center gap-2 rounded-lg border border-card/30 bg-card/10 px-6 py-3 font-body text-sm font-medium text-card backdrop-blur-sm transition-colors hover:bg-card/20">
-                Find Your Store
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      {/* Hero Carousel */}
+      <HeroCarousel />
 
       {/* Fulfillment bar */}
       <section className="border-b border-border bg-card">
