@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Truck, Store, Package, Minus, Plus, Trash2, ShieldCheck, CreditCard, MapPin, ChevronRight } from "lucide-react";
+import { Truck, Store, Package, Minus, Plus, Trash2, ShieldCheck, CreditCard, MapPin, ChevronRight, Crown } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -10,9 +11,11 @@ export default function CheckoutPage() {
     fulfillmentMethod, setFulfillmentMethod, selectedStore,
   } = useCart();
 
+  const [hmartPlus, setHmartPlus] = useState(false);
+  const hmartPlusFee = hmartPlus ? 9.99 : 0;
   const deliveryFee = fulfillmentMethod === "delivery" ? 5.99 : fulfillmentMethod === "shipping" ? 9.99 : 0;
-  const tax = totalPrice * 0.08875;
-  const grandTotal = totalPrice + deliveryFee + tax;
+  const tax = (totalPrice + hmartPlusFee) * 0.08875;
+  const grandTotal = totalPrice + deliveryFee + hmartPlusFee + tax;
 
   if (items.length === 0) {
     return (
