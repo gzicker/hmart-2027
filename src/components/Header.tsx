@@ -1,11 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, MapPin, User, ChevronDown } from "lucide-react";
+import { Search, ShoppingCart, User, ChevronDown } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useState } from "react";
 import logoImg from "@/assets/hmart-logo.png";
+import StoreSelector from "@/components/StoreSelector";
 
 export default function Header() {
-  const { totalItems, selectedStore } = useCart();
+  const { totalItems } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
@@ -18,24 +19,22 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur-sm">
-      {/* Top bar */}
-      <div className="border-b border-border bg-secondary/50">
-        <div className="hmart-container flex items-center justify-between py-1.5 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1.5">
-            <MapPin className="h-3.5 w-3.5 text-primary" />
-            <span className="font-medium">{selectedStore}</span>
-            <ChevronDown className="h-3 w-3" />
-          </div>
-          <div className="hidden items-center gap-4 sm:flex">
-            <span>Same-day delivery & pickup available</span>
-            <span>·</span>
-            <span>Smart Rewards</span>
-          </div>
+      {/* Promo bar */}
+      <div className="bg-primary">
+        <div className="hmart-container flex items-center justify-center gap-4 py-1.5 text-xs font-medium text-primary-foreground sm:gap-6">
+          <span>JOIN <strong>H MART PLUS</strong> — FREE SHIPPING on orders $49+</span>
+          <span className="hidden sm:inline">·</span>
+          <span className="hidden sm:inline">Earn 2x Smart Rewards Points</span>
+          <span className="hidden md:inline">·</span>
+          <span className="hidden md:inline">Exclusive Weekly Deals</span>
+          <Link to="/products" className="ml-2 rounded-sm bg-primary-foreground/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider transition-colors hover:bg-primary-foreground/30">
+            Learn More
+          </Link>
         </div>
       </div>
 
       {/* Main header */}
-      <div className="hmart-container flex items-center gap-6 py-3">
+      <div className="hmart-container flex items-center gap-4 py-3 lg:gap-6">
         <Link to="/" className="flex-shrink-0">
           <img src={logoImg} alt="H Mart" className="h-10 w-auto" />
         </Link>
@@ -52,6 +51,8 @@ export default function Header() {
             />
           </div>
         </form>
+
+        <StoreSelector />
 
         <nav className="hidden items-center gap-6 lg:flex">
           <Link to="/products" className="text-sm font-medium text-foreground transition-colors hover:text-primary">
