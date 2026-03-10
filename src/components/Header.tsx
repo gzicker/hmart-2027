@@ -1,9 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight } from "lucide-react";
+import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight, Package, MapPin, CreditCard, LogOut, X } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useState, useRef, useEffect } from "react";
 import logoImg from "@/assets/hmart-logo.png";
 import StoreSelector from "@/components/StoreSelector";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const SITE_TABS: { id: string; label: string; sublabel?: string; icon: typeof Gift | null; active?: boolean }[] = [
   { id: "hmart", label: "H MART", icon: null, active: true },
@@ -168,9 +169,50 @@ export default function Header() {
             <StoreSelector />
 
             <div className="flex items-center gap-3">
-              <button className="rounded-full p-2 transition-colors hover:bg-secondary">
-                <User className="h-5 w-5 text-foreground" />
-              </button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="rounded-full p-2 transition-colors hover:bg-secondary">
+                    <User className="h-5 w-5 text-foreground" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-72 p-0">
+                  <div className="flex items-center justify-between border-b border-border p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                        <User className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-foreground">VINCE COLATRIANO</p>
+                        <p className="text-xs text-muted-foreground">vince@hmart.com</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="px-4 py-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                      <Flame className="h-3 w-3" /> H Mart Plus Member
+                    </span>
+                  </div>
+                  <div className="border-t border-border">
+                    <button className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
+                      <Package className="h-4 w-4 text-muted-foreground" /> Orders
+                      <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
+                    </button>
+                    <button className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
+                      <MapPin className="h-4 w-4 text-muted-foreground" /> Addresses
+                      <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
+                    </button>
+                    <button className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
+                      <CreditCard className="h-4 w-4 text-muted-foreground" /> Cards
+                      <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
+                    </button>
+                  </div>
+                  <div className="border-t border-border p-3">
+                    <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
+                      <LogOut className="h-4 w-4" /> Sign Out
+                    </button>
+                  </div>
+                </PopoverContent>
+              </Popover>
               <Link to="/checkout" className="relative rounded-full p-2 transition-colors hover:bg-secondary">
                 <ShoppingCart className="h-5 w-5 text-foreground" />
                 {totalItems > 0 && (
