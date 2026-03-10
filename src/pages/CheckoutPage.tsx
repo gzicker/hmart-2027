@@ -192,6 +192,12 @@ export default function CheckoutPage() {
                     {deliveryFee === 0 ? "Free" : `$${deliveryFee.toFixed(2)}`}
                   </span>
                 </div>
+                {hmartPlus && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">H Mart Plus</span>
+                    <span className="font-medium text-foreground">$9.99</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Tax</span>
                   <span className="font-medium text-foreground">${tax.toFixed(2)}</span>
