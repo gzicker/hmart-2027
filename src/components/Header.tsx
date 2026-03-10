@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, User, ChevronDown, Gift, Building2 } from "lucide-react";
+import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import logoImg from "@/assets/hmart-logo.png";
 import StoreSelector from "@/components/StoreSelector";
 
@@ -11,10 +11,32 @@ const SITE_TABS: { id: string; label: string; sublabel?: string; icon: typeof Gi
   { id: "b2b", label: "H MART B2B", sublabel: "Wholesale", icon: Building2 },
 ];
 
+const CATEGORIES = [
+  "Rice & Grain",
+  "Ramen & Noodle",
+  "Snacks & Candy & Nuts",
+  "Instant & Quick Food",
+  "Seaweed & Dried Produce",
+  "Oil & Seasoning & Canned Food",
+  "Beverage & Coffee & Tea & Honey",
+  "Paste & Marinade & Sauce",
+  "Flour & Baking",
+  "Meat",
+  "Seafood",
+  "Produce",
+  "Kimchi & Side Dish & Deli",
+  "Dairy & Egg",
+  "Health",
+  "Household & Home",
+  "K-Beauty",
+];
+
 export default function Header() {
   const { totalItems } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("hmart");
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const catRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
@@ -23,6 +45,16 @@ export default function Header() {
       navigate(`/products?q=${encodeURIComponent(searchQuery)}`);
     }
   };
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (catRef.current && !catRef.current.contains(e.target as Node)) {
+        setCategoriesOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-sm">
@@ -89,15 +121,49 @@ export default function Header() {
 
           <StoreSelector />
 
-          <nav className="hidden items-center gap-6 lg:flex">
-            <Link to="/products" className="text-sm font-medium text-foreground transition-colors hover:text-primary">
-              Shop All
+          <nav className="hidden items-center gap-5 lg:flex">
+            {/* Categories dropdown */}
+            <div ref={catRef} className="relative">
+              <button
+                onClick={() => setCategoriesOpen(!categoriesOpen)}
+                className={`flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary ${
+                  categoriesOpen ? "text-primary" : "text-foreground"
+                }`}
+              >
+                Categories <ChevronDown className={`h-3.5 w-3.5 transition-transform ${categoriesOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {categoriesOpen && (
+                <div className="absolute left-0 top-full mt-3 w-72 rounded-xl border border-border bg-card shadow-xl animate-fade-in">
+                  <div className="py-2">
+                    {CATEGORIES.map((cat) => (
+                      <Link
+                        key={cat}
+                        to="/products"
+                        onClick={() => setCategoriesOpen(false)}
+                        className="flex items-center justify-between px-4 py-2.5 text-sm text-primary transition-colors hover:bg-secondary"
+                      >
+                        {cat}
+                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Weekly Deals */}
+            <Link to="/products" className="text-sm font-semibold text-primary transition-colors hover:text-primary/80">
+              Weekly Deals
             </Link>
-            <button className="flex items-center gap-1 text-sm font-medium text-foreground transition-colors hover:text-primary">
-              Categories <ChevronDown className="h-3.5 w-3.5" />
-            </button>
-            <Link to="/products" className="text-sm font-medium text-foreground transition-colors hover:text-primary">
-              Deals
+
+            {/* Trending on TikTok */}
+            <Link
+              to="/products"
+              className="flex items-center gap-1.5 rounded-full bg-foreground px-3.5 py-1.5 text-xs font-bold text-background transition-transform hover:scale-105 active:scale-95"
+            >
+              <Flame className="h-3.5 w-3.5" />
+              Trending on TikTok
             </Link>
           </nav>
 
