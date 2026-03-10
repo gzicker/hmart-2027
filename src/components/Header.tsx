@@ -1,9 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight } from "lucide-react";
+import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight, Package, MapPin, CreditCard, LogOut, X } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useState, useRef, useEffect } from "react";
 import logoImg from "@/assets/hmart-logo.png";
 import StoreSelector from "@/components/StoreSelector";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const SITE_TABS: { id: string; label: string; sublabel?: string; icon: typeof Gift | null; active?: boolean }[] = [
   { id: "hmart", label: "H MART", icon: null, active: true },
