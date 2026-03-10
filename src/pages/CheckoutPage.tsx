@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Truck, Store, Package, Minus, Plus, Trash2, ShieldCheck, CreditCard, MapPin, ChevronRight } from "lucide-react";
+import { Truck, Store, Package, Minus, Plus, Trash2, ShieldCheck, CreditCard, MapPin, ChevronRight, Crown } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -10,9 +11,11 @@ export default function CheckoutPage() {
     fulfillmentMethod, setFulfillmentMethod, selectedStore,
   } = useCart();
 
+  const [hmartPlus, setHmartPlus] = useState(false);
+  const hmartPlusFee = hmartPlus ? 9.99 : 0;
   const deliveryFee = fulfillmentMethod === "delivery" ? 5.99 : fulfillmentMethod === "shipping" ? 9.99 : 0;
-  const tax = totalPrice * 0.08875;
-  const grandTotal = totalPrice + deliveryFee + tax;
+  const tax = (totalPrice + hmartPlusFee) * 0.08875;
+  const grandTotal = totalPrice + deliveryFee + hmartPlusFee + tax;
 
   if (items.length === 0) {
     return (
@@ -153,6 +156,23 @@ export default function CheckoutPage() {
                 <button className="ml-auto text-xs font-medium text-primary">Change</button>
               </div>
             </div>
+
+            {/* H Mart Plus Sign Up */}
+            <div className="rounded-xl border border-border bg-card p-6">
+              <button
+                onClick={() => setHmartPlus(!hmartPlus)}
+                className={`flex w-full items-center gap-3 rounded-lg border p-4 transition-colors ${hmartPlus ? "border-primary bg-primary/5" : "border-border hover:bg-secondary"}`}
+              >
+                <Crown className={`h-5 w-5 ${hmartPlus ? "text-primary" : "text-muted-foreground"}`} />
+                <div className="flex-1 text-left">
+                  <p className="text-sm font-semibold text-foreground">Sign up for H Mart Plus</p>
+                  <p className="text-[11px] text-muted-foreground">Free delivery, 2× rewards, exclusive deals · $9.99/mo</p>
+                </div>
+                <div className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors ${hmartPlus ? "border-primary bg-primary" : "border-muted-foreground"}`}>
+                  {hmartPlus && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                </div>
+              </button>
+            </div>
           </div>
 
           {/* Order Summary */}
@@ -173,6 +193,12 @@ export default function CheckoutPage() {
                     {deliveryFee === 0 ? "Free" : `$${deliveryFee.toFixed(2)}`}
                   </span>
                 </div>
+                {hmartPlus && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">H Mart Plus</span>
+                    <span className="font-medium text-foreground">$9.99</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Tax</span>
                   <span className="font-medium text-foreground">${tax.toFixed(2)}</span>
