@@ -1,9 +1,71 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, User, ChevronDown } from "lucide-react";
+import { Search, ShoppingCart, User, ChevronDown, ChevronLeft, ChevronRight, Sparkles, Tag, Heart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import logoImg from "@/assets/hmart-logo.png";
 import StoreSelector from "@/components/StoreSelector";
+
+const PROMO_BANNERS = [
+  {
+    bg: "bg-primary",
+    content: (
+      <>
+        <span>JOIN <strong>H MART PLUS</strong> — FREE SHIPPING on orders $49+</span>
+        <span className="hidden sm:inline">·</span>
+        <span className="hidden sm:inline">Earn 2x Smart Rewards Points</span>
+        <span className="hidden md:inline">·</span>
+        <span className="hidden md:inline">Exclusive Weekly Deals</span>
+      </>
+    ),
+    cta: "Learn More",
+    link: "/products",
+  },
+  {
+    bg: "bg-[hsl(260,60%,45%)]",
+    content: (
+      <>
+        <Sparkles className="h-3.5 w-3.5" />
+        <span><strong>H MART PLUS</strong> Members save an extra <strong>15%</strong> on all fresh produce</span>
+        <span className="hidden sm:inline">·</span>
+        <span className="hidden sm:inline">Free same-day delivery</span>
+        <span className="hidden md:inline">·</span>
+        <span className="hidden md:inline">Priority checkout lanes</span>
+      </>
+    ),
+    cta: "Join Now",
+    link: "/products",
+  },
+  {
+    bg: "bg-[hsl(145,55%,35%)]",
+    content: (
+      <>
+        <Tag className="h-3.5 w-3.5" />
+        <span>📰 <strong>WEEKLY DEALS</strong> — Up to <strong>40% OFF</strong> on 200+ items</span>
+        <span className="hidden sm:inline">·</span>
+        <span className="hidden sm:inline">New flyer every Thursday</span>
+        <span className="hidden md:inline">·</span>
+        <span className="hidden md:inline">Valid thru Mar 16</span>
+      </>
+    ),
+    cta: "View Flyer",
+    link: "/products",
+  },
+  {
+    bg: "bg-[hsl(330,55%,45%)]",
+    content: (
+      <>
+        <Heart className="h-3.5 w-3.5" />
+        <span>✨ <strong>K-BEAUTY</strong> — Premium skincare & cosmetics now at H Mart</span>
+        <span className="hidden sm:inline">·</span>
+        <span className="hidden sm:inline">Top Korean brands</span>
+        <span className="hidden md:inline">·</span>
+        <span className="hidden md:inline">Buy 2 Get 1 Free</span>
+      </>
+    ),
+    cta: "Shop Beauty",
+    link: "/products",
+  },
+];
 
 export default function Header() {
   const { totalItems } = useCart();
