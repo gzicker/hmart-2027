@@ -5,11 +5,11 @@ import { useState } from "react";
 import logoImg from "@/assets/hmart-logo.png";
 import StoreSelector from "@/components/StoreSelector";
 
-const SITE_TABS = [
+const SITE_TABS: { id: string; label: string; sublabel?: string; icon: typeof Gift | null; active?: boolean }[] = [
   { id: "hmart", label: "H MART", icon: null, active: true },
   { id: "gifts", label: "고국통신", sublabel: "Gifts to Korea", icon: Gift },
   { id: "b2b", label: "H MART B2B", sublabel: "Wholesale", icon: Building2 },
-] as const;
+];
 
 export default function Header() {
   const { totalItems } = useCart();
