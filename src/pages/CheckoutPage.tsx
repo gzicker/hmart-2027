@@ -154,6 +154,7 @@ export default function CheckoutPage() {
                   <p className="text-[11px] text-muted-foreground">Visa · Expires 12/28</p>
                 </div>
                 <button className="ml-auto text-xs font-medium text-primary">Change</button>
+              </div>
             </div>
 
             {/* H Mart Plus Sign Up */}
