@@ -72,7 +72,7 @@
   }
 
   .product-card {
-    @apply group relative overflow-hidden rounded-lg bg-card transition-all duration-300 hover:shadow-lg;
+    @apply relative overflow-hidden rounded-lg bg-card transition-all duration-300 hover:shadow-lg;
   }
 
   .product-card-image {
@@ -80,7 +80,11 @@
   }
 
   .product-card-image img {
-    @apply h-full w-full object-cover transition-transform duration-500 group-hover:scale-105;
+    @apply h-full w-full object-cover transition-transform duration-500;
+  }
+
+  .product-card:hover .product-card-image img {
+    transform: scale(1.05);
   }
 
   .fulfillment-badge {
