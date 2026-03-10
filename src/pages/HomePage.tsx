@@ -153,7 +153,7 @@ export default function HomePage() {
       </section>
 
       {/* Creator Reels / TikTok Shelf */}
-      <section className="hmart-container py-12">
+      <section id="trending-tiktok" className="hmart-container py-12 scroll-mt-32">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Play className="h-5 w-5 text-primary" />
