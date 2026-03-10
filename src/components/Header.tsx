@@ -106,23 +106,8 @@ export default function Header() {
             <img src={logoImg} alt="H Mart" className="h-10 w-auto" />
           </Link>
 
-          <form onSubmit={handleSearch} className="flex flex-1 items-center">
-            <div className="relative w-full max-w-2xl">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search for kimchi, ramen, fresh produce..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background py-2.5 pl-10 pr-4 text-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              />
-            </div>
-          </form>
-
-          <StoreSelector />
-
+          {/* Nav items between logo and search */}
           <nav className="hidden items-center gap-5 lg:flex">
-            {/* Categories dropdown */}
             <div ref={catRef} className="relative">
               <button
                 onClick={() => setCategoriesOpen(!categoriesOpen)}
@@ -134,7 +119,7 @@ export default function Header() {
               </button>
 
               {categoriesOpen && (
-                <div className="absolute left-0 top-full mt-3 w-72 rounded-xl border border-border bg-card shadow-xl animate-fade-in">
+                <div className="absolute left-0 top-full mt-3 w-72 rounded-xl border border-border bg-card shadow-xl animate-fade-in z-50">
                   <div className="py-2">
                     {CATEGORIES.map((cat) => (
                       <Link
@@ -152,12 +137,10 @@ export default function Header() {
               )}
             </div>
 
-            {/* Weekly Deals */}
             <Link to="/products" className="text-sm font-semibold text-primary transition-colors hover:text-primary/80">
               Weekly Deals
             </Link>
 
-            {/* Trending on TikTok */}
             <Link
               to="/products"
               className="flex items-center gap-1.5 rounded-full bg-foreground px-3.5 py-1.5 text-xs font-bold text-background transition-transform hover:scale-105 active:scale-95"
@@ -166,6 +149,23 @@ export default function Header() {
               Trending on TikTok
             </Link>
           </nav>
+
+          {/* Search + Store + User/Cart pushed right */}
+          <div className="ml-auto flex items-center gap-4">
+            <form onSubmit={handleSearch} className="flex items-center">
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search for kimchi, ramen..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full rounded-lg border border-border bg-background py-2.5 pl-10 pr-4 text-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+            </form>
+
+            <StoreSelector />
 
           <div className="flex items-center gap-3">
             <button className="rounded-full p-2 transition-colors hover:bg-secondary">
