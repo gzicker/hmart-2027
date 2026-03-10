@@ -7,7 +7,7 @@ import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-import heroImg from "@/assets/hero-kimchi.jpg";
+import HeroCarousel from "@/components/HeroCarousel";
 import categoryVeg from "@/assets/category-vegetables.jpg";
 import categoryMeat from "@/assets/category-meat.jpg";
 import categoryPantry from "@/assets/category-pantry.jpg";
