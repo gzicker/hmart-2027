@@ -143,7 +143,7 @@ export default function Header() {
             </Link>
 
             <Link
-              to="/products"
+              to="/#trending-tiktok"
               className="flex items-center gap-1.5 rounded-full bg-foreground px-3.5 py-1.5 text-xs font-bold text-background transition-transform hover:scale-105 active:scale-95"
             >
               <Flame className="h-3.5 w-3.5" />
