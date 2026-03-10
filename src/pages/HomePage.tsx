@@ -201,6 +201,8 @@ export default function HomePage() {
             </motion.div>
           ))}
         </div>
+      </section>
+
       {/* Editorial / Recipe Section */}
       <section className="hmart-container py-12">
         <div className="overflow-hidden rounded-xl bg-card">
