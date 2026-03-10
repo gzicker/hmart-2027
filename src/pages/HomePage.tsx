@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Truck, Store, Clock, ArrowRight, Star, ChefHat } from "lucide-react";
+import { Truck, Store, Clock, ArrowRight, Star, ChefHat, Play } from "lucide-react";
 import { products } from "@/data/products";
 import bannerNongshim from "@/assets/banner-nongshim.jpg";
 import bannerCj from "@/assets/banner-cj.jpg";
@@ -15,6 +15,19 @@ import categoryMeat from "@/assets/category-meat.jpg";
 import categoryPantry from "@/assets/category-pantry.jpg";
 import categoryKbeauty from "@/assets/category-kbeauty.jpg";
 import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
+import creator1 from "@/assets/creator-1.jpg";
+import creator2 from "@/assets/creator-2.jpg";
+import creator3 from "@/assets/creator-3.jpg";
+import creator4 from "@/assets/creator-4.jpg";
+import creator5 from "@/assets/creator-5.jpg";
+
+const CREATORS = [
+  { image: creator1, name: "@jieun.eats", handle: "Jieun", caption: "Best ramen hack from H Mart 🍜", views: "1.2M", product: "Shin Ramyun" },
+  { image: creator2, name: "@david.mukbang", handle: "David", caption: "Korean fried chicken taste test!", views: "890K", product: "Korean Fried Chicken" },
+  { image: creator3, name: "@glow.with.mina", handle: "Mina", caption: "K-Beauty haul under $30 ✨", views: "2.1M", product: "K-Beauty Essentials" },
+  { image: creator4, name: "@chef.park", handle: "Chef Park", caption: "Kimchi jjigae in 15 min 🔥", views: "650K", product: "Kimchi Jjigae Kit" },
+  { image: creator5, name: "@snackqueen.amy", handle: "Amy", caption: "H Mart snack haul you NEED", views: "1.8M", product: "Korean Snacks" },
+];
 
 const categoryImages = [
   { name: "Vegetables", nameKo: "채소", image: categoryVeg, link: "/products" },
@@ -136,6 +149,57 @@ export default function HomePage() {
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Creator Reels / TikTok Shelf */}
+      <section className="hmart-container py-12">
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Play className="h-5 w-5 text-primary" />
+            <h2 className="font-display text-2xl font-medium text-foreground">Trending on TikTok</h2>
+          </div>
+          <span className="text-xs font-medium text-muted-foreground">Swipe →</span>
+        </div>
+        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+          {CREATORS.map((creator, i) => (
+            <motion.div
+              key={creator.name}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08, duration: 0.4 }}
+              className="group relative flex-shrink-0 cursor-pointer"
+              style={{ width: 200 }}
+            >
+              <div className="relative overflow-hidden rounded-xl aspect-[9/16]">
+                <img
+                  src={creator.image}
+                  alt={creator.caption}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                {/* Play button overlay */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm">
+                    <Play className="h-5 w-5 fill-foreground text-foreground" />
+                  </div>
+                </div>
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-transparent to-transparent" />
+                {/* Views badge */}
+                <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-foreground/60 px-2 py-0.5 text-[10px] font-bold text-background backdrop-blur-sm">
+                  <Play className="h-2.5 w-2.5 fill-background" /> {creator.views}
+                </span>
+                {/* Bottom info */}
+                <div className="absolute bottom-0 left-0 right-0 p-3">
+                  <p className="text-xs font-bold text-background">{creator.name}</p>
+                  <p className="mt-0.5 line-clamp-2 text-[11px] leading-tight text-background/80">{creator.caption}</p>
+                  <span className="mt-2 inline-block rounded-md bg-primary/90 px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                    Shop {creator.product}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </section>
 
