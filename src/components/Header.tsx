@@ -198,11 +198,11 @@ export default function Header() {
                       <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
                     </button>
                     <button className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
-                      <MapPin className="h-4 w-4 text-muted-foreground" /> Addresses
+                      <Gift className="h-4 w-4 text-muted-foreground" /> Exclusive Offers
                       <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
                     </button>
                     <button className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
-                      <CreditCard className="h-4 w-4 text-muted-foreground" /> Cards
+                      <CreditCard className="h-4 w-4 text-muted-foreground" /> Subscription
                       <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
                     </button>
                   </div>
