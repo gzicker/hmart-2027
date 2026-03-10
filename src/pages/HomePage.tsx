@@ -15,6 +15,19 @@ import categoryMeat from "@/assets/category-meat.jpg";
 import categoryPantry from "@/assets/category-pantry.jpg";
 import categoryKbeauty from "@/assets/category-kbeauty.jpg";
 import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
+import creator1 from "@/assets/creator-1.jpg";
+import creator2 from "@/assets/creator-2.jpg";
+import creator3 from "@/assets/creator-3.jpg";
+import creator4 from "@/assets/creator-4.jpg";
+import creator5 from "@/assets/creator-5.jpg";
+
+const CREATORS = [
+  { image: creator1, name: "@jieun.eats", handle: "Jieun", caption: "Best ramen hack from H Mart 🍜", views: "1.2M", product: "Shin Ramyun" },
+  { image: creator2, name: "@david.mukbang", handle: "David", caption: "Korean fried chicken taste test!", views: "890K", product: "Korean Fried Chicken" },
+  { image: creator3, name: "@glow.with.mina", handle: "Mina", caption: "K-Beauty haul under $30 ✨", views: "2.1M", product: "K-Beauty Essentials" },
+  { image: creator4, name: "@chef.park", handle: "Chef Park", caption: "Kimchi jjigae in 15 min 🔥", views: "650K", product: "Kimchi Jjigae Kit" },
+  { image: creator5, name: "@snackqueen.amy", handle: "Amy", caption: "H Mart snack haul you NEED", views: "1.8M", product: "Korean Snacks" },
+];
 
 const categoryImages = [
   { name: "Vegetables", nameKo: "채소", image: categoryVeg, link: "/products" },
