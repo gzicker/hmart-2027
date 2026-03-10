@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Truck, Store, Clock, ArrowRight, Star, ChefHat } from "lucide-react";
 import { products } from "@/data/products";
+import bannerNongshim from "@/assets/banner-nongshim.jpg";
+import bannerCj from "@/assets/banner-cj.jpg";
 import { useCart } from "@/contexts/CartContext";
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
@@ -82,23 +84,43 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Retail Media Shelf - Sponsored */}
+      {/* Retail Media Shelf - Sponsored Brand Banners */}
       <section className="hmart-container pb-12">
-        <div className="retail-media-shelf">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h2 className="font-display text-xl font-medium text-foreground">Featured Brands</h2>
-              <p className="text-xs text-muted-foreground">Sponsored</p>
-            </div>
-            <Link to="/products" className="text-sm font-medium text-primary hover:underline">
-              View All →
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="font-display text-xl font-medium text-foreground">Featured Brands</h2>
+            <p className="text-xs text-muted-foreground">Sponsored</p>
+          </div>
+          <Link to="/products" className="text-sm font-medium text-primary hover:underline">
+            View All →
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {[
+            { image: bannerNongshim, brand: "Nongshim", tagline: "Korea's #1 Ramen — Now with free shipping", cta: "Shop Nongshim" },
+            { image: bannerCj, brand: "CJ Foods", tagline: "Authentic Korean flavors for every kitchen", cta: "Shop CJ Foods" },
+          ].map((banner) => (
+            <Link
+              key={banner.brand}
+              to="/products"
+              className="group relative block overflow-hidden rounded-xl border border-border transition-shadow hover:shadow-lg"
+            >
+              <div className="aspect-[16/8] overflow-hidden">
+                <img src={banner.image} alt={banner.brand} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              </div>
+              <span className="absolute left-3 top-3 rounded bg-foreground/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-background backdrop-blur-sm">
+                Sponsored
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 p-5">
+                <p className="text-lg font-bold text-background">{banner.brand}</p>
+                <p className="text-sm text-background/80">{banner.tagline}</p>
+                <span className="mt-2 inline-block rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground transition-transform group-hover:scale-105">
+                  {banner.cta}
+                </span>
+              </div>
             </Link>
-          </div>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-            {sponsoredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          ))}
         </div>
       </section>
 
