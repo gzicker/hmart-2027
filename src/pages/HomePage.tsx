@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Truck, Store, Clock, ArrowRight, Star, ChefHat } from "lucide-react";
 import { products } from "@/data/products";
+import bannerNongshim from "@/assets/banner-nongshim.jpg";
+import bannerCj from "@/assets/banner-cj.jpg";
 import { useCart } from "@/contexts/CartContext";
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
