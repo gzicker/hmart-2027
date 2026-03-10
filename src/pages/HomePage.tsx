@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import { Truck, Store, Clock, ArrowRight, Star, ChefHat, Play } from "lucide-react";
 import { products } from "@/data/products";
 import bannerNongshim from "@/assets/banner-nongshim.jpg";
