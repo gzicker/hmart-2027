@@ -99,6 +99,26 @@ export default function CheckoutPage() {
               )}
             </div>
 
+            {/* H Mart Plus Sign Up */}
+            <div className="rounded-xl border border-primary/30 bg-primary/5 p-5">
+              <button
+                onClick={() => setHmartPlus(!hmartPlus)}
+                className={`flex w-full items-center gap-3 rounded-lg border-2 p-4 transition-all ${hmartPlus ? "border-primary bg-primary/10 shadow-sm" : "border-primary/20 bg-card hover:border-primary/40"}`}
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
+                  <Crown className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1 text-left">
+                  <p className="text-sm font-bold text-foreground">Join H Mart Plus</p>
+                  <p className="text-[11px] text-muted-foreground">Free delivery, 2× rewards, exclusive deals</p>
+                </div>
+                <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">$9.99/mo</span>
+                <div className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors ${hmartPlus ? "border-primary bg-primary" : "border-primary/40"}`}>
+                  {hmartPlus && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                </div>
+              </button>
+            </div>
+
             {/* Cart Items */}
             <div className="rounded-xl border border-border bg-card p-6">
               <h2 className="mb-4 font-display text-lg font-medium text-foreground">
@@ -155,23 +175,6 @@ export default function CheckoutPage() {
                 </div>
                 <button className="ml-auto text-xs font-medium text-primary">Change</button>
               </div>
-            </div>
-
-            {/* H Mart Plus Sign Up */}
-            <div className="rounded-xl border border-border bg-card p-6">
-              <button
-                onClick={() => setHmartPlus(!hmartPlus)}
-                className={`flex w-full items-center gap-3 rounded-lg border p-4 transition-colors ${hmartPlus ? "border-primary bg-primary/5" : "border-border hover:bg-secondary"}`}
-              >
-                <Crown className={`h-5 w-5 ${hmartPlus ? "text-primary" : "text-muted-foreground"}`} />
-                <div className="flex-1 text-left">
-                  <p className="text-sm font-semibold text-foreground">Sign up for H Mart Plus</p>
-                  <p className="text-[11px] text-muted-foreground">Free delivery, 2× rewards, exclusive deals · $9.99/mo</p>
-                </div>
-                <div className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors ${hmartPlus ? "border-primary bg-primary" : "border-muted-foreground"}`}>
-                  {hmartPlus && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                </div>
-              </button>
             </div>
           </div>
 
