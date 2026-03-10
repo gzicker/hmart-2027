@@ -196,6 +196,11 @@ export default function CheckoutPage() {
                 Place Order <ChevronRight className="h-4 w-4" />
               </button>
 
+              <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-foreground py-3.5 text-sm font-semibold text-background transition-transform hover:scale-[1.02] active:scale-95">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.72 7.54c-.46.53-1.21.94-1.94.88-.09-.76.28-1.56.72-2.06.46-.53 1.26-.92 1.91-.95.08.79-.23 1.57-.69 2.13zm.69 1.08c-1.07-.06-1.99.61-2.5.61-.51 0-1.29-.58-2.13-.56-1.1.02-2.11.64-2.67 1.62-1.14 1.97-.29 4.89.81 6.49.55.79 1.19 1.67 2.05 1.64.82-.03 1.13-.53 2.12-.53s1.27.53 2.13.51c.88-.01 1.44-.8 1.98-1.59.62-.91.88-1.79.89-1.84-.02-.01-1.71-.66-1.73-2.61-.01-1.63 1.33-2.41 1.39-2.45-.76-1.12-1.94-1.24-2.34-1.29z"/></svg>
+                Pay
+              </button>
+
               <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                 <ShieldCheck className="h-3.5 w-3.5" />
                 Secure checkout · SSL encrypted
