@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { SlidersHorizontal, Grid3X3, LayoutList, Star, Clock, ChefHat } from "lucide-react";
+import { SlidersHorizontal, Grid3X3, LayoutList, Star } from "lucide-react";
 import { products, categories } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
