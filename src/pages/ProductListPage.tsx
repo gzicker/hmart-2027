@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { SlidersHorizontal, Grid3X3, LayoutList, Star, Clock, ChefHat } from "lucide-react";
+import { SlidersHorizontal, Grid3X3, LayoutList, Star } from "lucide-react";
 import { products, categories } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
+
 
 export default function ProductListPage() {
   const [searchParams] = useSearchParams();
@@ -126,30 +126,7 @@ export default function ProductListPage() {
 
             {/* Tip card inserted */}
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-              {sortedProducts.filter(p => !p.isSponsored).slice(0, 4).map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-
-              {/* Quick Tip Card */}
-              <div className="col-span-2 overflow-hidden rounded-lg bg-card">
-                <Link to={`/product/gochujang-001`} className="flex h-full">
-                  <img src={recipeTteokbokki} alt="Quick tip" className="h-full w-32 object-cover" />
-                  <div className="flex flex-col justify-center p-4">
-                    <div className="flex items-center gap-1.5 text-primary">
-                      <ChefHat className="h-4 w-4" />
-                      <span className="text-[11px] font-semibold uppercase tracking-wider">Quick Tip</span>
-                    </div>
-                    <h4 className="mt-1 font-display text-sm font-medium text-foreground">
-                      Mix gochujang with honey for the perfect dipping sauce
-                    </h4>
-                    <p className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
-                      <Clock className="h-3 w-3" /> 2 min · 2 ingredients
-                    </p>
-                  </div>
-                </Link>
-              </div>
-
-              {sortedProducts.filter(p => !p.isSponsored).slice(4).map((product) => (
+              {sortedProducts.filter(p => !p.isSponsored).map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
