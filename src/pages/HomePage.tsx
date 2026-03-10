@@ -11,14 +11,14 @@ import HeroCarousel from "@/components/HeroCarousel";
 import categoryVeg from "@/assets/category-vegetables.jpg";
 import categoryMeat from "@/assets/category-meat.jpg";
 import categoryPantry from "@/assets/category-pantry.jpg";
-import categoryFrozen from "@/assets/category-frozen.jpg";
+import categoryKbeauty from "@/assets/category-kbeauty.jpg";
 import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
 
 const categoryImages = [
   { name: "Vegetables", nameKo: "채소", image: categoryVeg, link: "/products" },
   { name: "Meat & Seafood", nameKo: "육류 & 해산물", image: categoryMeat, link: "/products" },
   { name: "Pantry Staples", nameKo: "식료품", image: categoryPantry, link: "/products" },
-  { name: "Frozen", nameKo: "냉동식품", image: categoryFrozen, link: "/products" },
+  { name: "K-Beauty", nameKo: "뷰티", image: categoryKbeauty, link: "/products" },
 ];
 
 export default function HomePage() {
