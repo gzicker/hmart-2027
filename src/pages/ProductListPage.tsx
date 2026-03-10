@@ -6,7 +6,7 @@ import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
+
 
 export default function ProductListPage() {
   const [searchParams] = useSearchParams();
