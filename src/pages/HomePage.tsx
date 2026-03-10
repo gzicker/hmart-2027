@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import { Truck, Store, Clock, ArrowRight, Star, ChefHat, Play } from "lucide-react";
 import { products } from "@/data/products";
 import bannerNongshim from "@/assets/banner-nongshim.jpg";
@@ -38,8 +39,16 @@ const categoryImages = [
 
 export default function HomePage() {
   const { addItem } = useCart();
+  const location = useLocation();
   const sponsoredProducts = products.filter((p) => p.isSponsored);
   const chefPicks = products.filter((p) => p.rating >= 4.7).slice(0, 4);
+
+  useEffect(() => {
+    if (location.hash) {
+      const el = document.querySelector(location.hash);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [location.hash]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -153,7 +162,7 @@ export default function HomePage() {
       </section>
 
       {/* Creator Reels / TikTok Shelf */}
-      <section className="hmart-container py-12">
+      <section id="trending-tiktok" className="hmart-container py-12 scroll-mt-32">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Play className="h-5 w-5 text-primary" />
