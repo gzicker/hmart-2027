@@ -167,18 +167,19 @@ export default function Header() {
 
             <StoreSelector />
 
-          <div className="flex items-center gap-3">
-            <button className="rounded-full p-2 transition-colors hover:bg-secondary">
-              <User className="h-5 w-5 text-foreground" />
-            </button>
-            <Link to="/checkout" className="relative rounded-full p-2 transition-colors hover:bg-secondary">
-              <ShoppingCart className="h-5 w-5 text-foreground" />
-              {totalItems > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                  {totalItems}
-                </span>
-              )}
-            </Link>
+            <div className="flex items-center gap-3">
+              <button className="rounded-full p-2 transition-colors hover:bg-secondary">
+                <User className="h-5 w-5 text-foreground" />
+              </button>
+              <Link to="/checkout" className="relative rounded-full p-2 transition-colors hover:bg-secondary">
+                <ShoppingCart className="h-5 w-5 text-foreground" />
+                {totalItems > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
+            </div>
           </div>
         </div>
       </div>
