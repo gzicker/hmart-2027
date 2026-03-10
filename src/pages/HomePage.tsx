@@ -35,11 +35,12 @@ export default function HomePage() {
 
       {/* Fulfillment bar */}
       <section className="border-b border-border bg-card">
-        <div className="hmart-container grid grid-cols-1 gap-0 divide-y divide-border sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        <div className="hmart-container grid grid-cols-1 gap-0 divide-y divide-border sm:grid-cols-2 md:grid-cols-4 sm:divide-x sm:divide-y-0">
           {[
             { icon: Truck, title: "Same-Day Delivery", desc: "From your local H Mart store", color: "text-primary" },
             { icon: Store, title: "Curbside Pickup", desc: "Ready in as little as 2 hours", color: "text-green-600" },
             { icon: Clock, title: "Ship Nationwide", desc: "Pantry staples to your door", color: "text-blue-600" },
+            { icon: ArrowRight, title: "Wholesale Ordering", desc: "Shop through our B2B site", color: "text-orange-600" },
           ].map(({ icon: Icon, title, desc, color }) => (
             <div key={title} className="flex items-center gap-3 px-4 py-4">
               <Icon className={`h-6 w-6 flex-shrink-0 ${color}`} />
