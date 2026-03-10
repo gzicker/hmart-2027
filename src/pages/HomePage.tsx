@@ -39,8 +39,16 @@ const categoryImages = [
 
 export default function HomePage() {
   const { addItem } = useCart();
+  const location = useLocation();
   const sponsoredProducts = products.filter((p) => p.isSponsored);
   const chefPicks = products.filter((p) => p.rating >= 4.7).slice(0, 4);
+
+  useEffect(() => {
+    if (location.hash) {
+      const el = document.querySelector(location.hash);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [location.hash]);
 
   return (
     <div className="min-h-screen bg-background">
