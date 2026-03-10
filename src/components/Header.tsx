@@ -1,90 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, User, ChevronDown, ChevronLeft, ChevronRight, Sparkles, Tag, Heart } from "lucide-react";
+import { Search, ShoppingCart, User, ChevronDown } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import logoImg from "@/assets/hmart-logo.png";
 import StoreSelector from "@/components/StoreSelector";
-
-const PROMO_BANNERS = [
-  {
-    bg: "bg-primary",
-    content: (
-      <>
-        <span>JOIN <strong>H MART PLUS</strong> — FREE SHIPPING on orders $49+</span>
-        <span className="hidden sm:inline">·</span>
-        <span className="hidden sm:inline">Earn 2x Smart Rewards Points</span>
-        <span className="hidden md:inline">·</span>
-        <span className="hidden md:inline">Exclusive Weekly Deals</span>
-      </>
-    ),
-    cta: "Learn More",
-    link: "/products",
-  },
-  {
-    bg: "bg-[hsl(260,60%,45%)]",
-    content: (
-      <>
-        <Sparkles className="h-3.5 w-3.5" />
-        <span><strong>H MART PLUS</strong> Members save an extra <strong>15%</strong> on all fresh produce</span>
-        <span className="hidden sm:inline">·</span>
-        <span className="hidden sm:inline">Free same-day delivery</span>
-        <span className="hidden md:inline">·</span>
-        <span className="hidden md:inline">Priority checkout lanes</span>
-      </>
-    ),
-    cta: "Join Now",
-    link: "/products",
-  },
-  {
-    bg: "bg-[hsl(145,55%,35%)]",
-    content: (
-      <>
-        <Tag className="h-3.5 w-3.5" />
-        <span>📰 <strong>WEEKLY DEALS</strong> — Up to <strong>40% OFF</strong> on 200+ items</span>
-        <span className="hidden sm:inline">·</span>
-        <span className="hidden sm:inline">New flyer every Thursday</span>
-        <span className="hidden md:inline">·</span>
-        <span className="hidden md:inline">Valid thru Mar 16</span>
-      </>
-    ),
-    cta: "View Flyer",
-    link: "/products",
-  },
-  {
-    bg: "bg-[hsl(330,55%,45%)]",
-    content: (
-      <>
-        <Heart className="h-3.5 w-3.5" />
-        <span>✨ <strong>K-BEAUTY</strong> — Premium skincare & cosmetics now at H Mart</span>
-        <span className="hidden sm:inline">·</span>
-        <span className="hidden sm:inline">Top Korean brands</span>
-        <span className="hidden md:inline">·</span>
-        <span className="hidden md:inline">Buy 2 Get 1 Free</span>
-      </>
-    ),
-    cta: "Shop Beauty",
-    link: "/products",
-  },
-];
 
 export default function Header() {
   const { totalItems } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
-  const [bannerIndex, setBannerIndex] = useState(0);
   const navigate = useNavigate();
-
-  const nextBanner = useCallback(() => {
-    setBannerIndex((i) => (i + 1) % PROMO_BANNERS.length);
-  }, []);
-
-  const prevBanner = useCallback(() => {
-    setBannerIndex((i) => (i - 1 + PROMO_BANNERS.length) % PROMO_BANNERS.length);
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(nextBanner, 5000);
-    return () => clearInterval(timer);
-  }, [nextBanner]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,35 +17,19 @@ export default function Header() {
     }
   };
 
-  const banner = PROMO_BANNERS[bannerIndex];
-
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur-sm">
       {/* Promo bar */}
-      <div className={`${banner.bg} relative transition-colors duration-500`}>
+      <div className="bg-primary">
         <div className="hmart-container flex items-center justify-center gap-4 py-1.5 text-xs font-medium text-primary-foreground sm:gap-6">
-          <button onClick={prevBanner} className="absolute left-2 rounded-full p-0.5 transition-colors hover:bg-white/20 sm:left-4">
-            <ChevronLeft className="h-3.5 w-3.5 text-primary-foreground" />
-          </button>
-          <div className="flex items-center gap-3 sm:gap-6">
-            {banner.content}
-          </div>
-          <Link to={banner.link} className="ml-2 rounded-sm bg-primary-foreground/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider transition-colors hover:bg-primary-foreground/30">
-            {banner.cta}
+          <span>JOIN <strong>H MART PLUS</strong> — FREE SHIPPING on orders $49+</span>
+          <span className="hidden sm:inline">·</span>
+          <span className="hidden sm:inline">Earn 2x Smart Rewards Points</span>
+          <span className="hidden md:inline">·</span>
+          <span className="hidden md:inline">Exclusive Weekly Deals</span>
+          <Link to="/products" className="ml-2 rounded-sm bg-primary-foreground/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider transition-colors hover:bg-primary-foreground/30">
+            Learn More
           </Link>
-          <button onClick={nextBanner} className="absolute right-2 rounded-full p-0.5 transition-colors hover:bg-white/20 sm:right-4">
-            <ChevronRight className="h-3.5 w-3.5 text-primary-foreground" />
-          </button>
-        </div>
-        {/* Dots */}
-        <div className="absolute bottom-0.5 left-1/2 flex -translate-x-1/2 gap-1">
-          {PROMO_BANNERS.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setBannerIndex(i)}
-              className={`h-1 rounded-full transition-all ${i === bannerIndex ? "w-3 bg-primary-foreground" : "w-1 bg-primary-foreground/40"}`}
-            />
-          ))}
         </div>
       </div>
 
