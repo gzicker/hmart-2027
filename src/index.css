@@ -68,7 +68,8 @@
   }
 
   .sponsored-badge {
-    @apply inline-flex items-center gap-1 rounded-sm bg-accent/20 px-2 py-0.5 text-xs font-medium text-accent-foreground;
+    @apply inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-medium text-accent-foreground;
+    background-color: hsl(var(--accent) / 0.2);
   }
 
   .product-card {
