@@ -13,7 +13,7 @@ export const translations: Record<Language, Record<string, string>> = {
     // Site tabs
     "tab.hmart": "H Mart",
     "tab.gifts": "Gifts to Korea",
-    "tab.b2b": "B2B",
+    "tab.b2b": "Wholesale",
 
     // Nav
     "nav.categories": "Categories",
