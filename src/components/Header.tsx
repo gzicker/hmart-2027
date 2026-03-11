@@ -77,7 +77,7 @@ export default function Header() {
               }`}
             >
               {tab.icon && <tab.icon className="h-3.5 w-3.5" />}
-              <span>{tab.id === "b2b" ? `${t("tab.hmart")} B2B` : t("tab.hmart")}</span>
+              <span>{tab.id === "b2b" ? `${t("tab.hmart")} B2B` : tab.id === "gifts" ? t("tab.giftsLabel") : t("tab.hmart")}</span>
               {tab.sublabelKey && (
                 <span className={`hidden text-[10px] font-normal sm:inline ${
                   activeTab === tab.id ? "text-muted-foreground" : "text-primary-foreground/70"
