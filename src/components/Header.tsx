@@ -82,7 +82,7 @@ export default function Header() {
               className={`flex items-center gap-2 rounded-t-lg px-5 py-2 text-sm font-semibold transition-colors ${
                 activeTab === tab.id
                   ? "bg-card text-foreground shadow-sm"
-                  : "bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20"
+                  : "bg-white/10 text-white hover:bg-white/20"
               }`}
             >
               {tab.icon && <tab.icon className="h-3.5 w-3.5" />}
