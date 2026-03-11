@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Truck, Store, Package, Minus, Plus, Trash2, ShieldCheck, CreditCard, MapPin, ChevronRight, Crown } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getProductName } from "@/lib/product-utils";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -11,7 +12,7 @@ export default function CheckoutPage() {
     items, updateQuantity, removeItem, totalPrice,
     fulfillmentMethod, setFulfillmentMethod, selectedStore,
   } = useCart();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const [hmartPlus, setHmartPlus] = useState(false);
   const hmartPlusFee = hmartPlus ? 9.99 : 0;
@@ -129,13 +130,13 @@ export default function CheckoutPage() {
                 {items.map(({ product, quantity }) => (
                   <div key={product.id} className="flex gap-4 py-4 first:pt-0 last:pb-0">
                     <Link to={`/product/${product.id}`}>
-                      <img src={product.image} alt={product.name} className="h-20 w-20 rounded-lg object-cover" />
+                      <img src={product.image} alt={getProductName(product, language)} className="h-20 w-20 rounded-lg object-cover" />
                     </Link>
                     <div className="flex flex-1 flex-col justify-between">
                       <div>
                         <p className="text-[11px] text-muted-foreground">{product.brand}</p>
                         <Link to={`/product/${product.id}`} className="text-sm font-medium text-foreground hover:text-primary">
-                          {product.name}
+                          {getProductName(product, language)}
                         </Link>
                         <p className="text-[11px] text-muted-foreground">{product.weight}</p>
                       </div>

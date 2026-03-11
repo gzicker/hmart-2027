@@ -5,6 +5,7 @@ import { Star, Truck, Store, Package, Plus, Minus, ChevronRight, X, ShoppingCart
 import { products } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getProductName, getProductSubName, getProductDescription } from "@/lib/product-utils";
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -14,7 +15,7 @@ export default function ProductDetailPage() {
   const { id } = useParams();
   const product = products.find((p) => p.id === id) || products[0];
   const { addItem } = useCart();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [quantity, setQuantity] = useState(1);
   const [showPairDrawer, setShowPairDrawer] = useState(false);
   const [selectedFulfillment, setSelectedFulfillment] = useState<"delivery" | "pickup" | "shipping">(
@@ -27,6 +28,10 @@ export default function ProductDetailPage() {
 
   const relatedProducts = products.filter(p => p.id !== product.id).slice(0, 4);
 
+  const displayName = getProductName(product, language);
+  const subName = getProductSubName(product, language);
+  const description = getProductDescription(product, language);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -37,7 +42,7 @@ export default function ProductDetailPage() {
           <span className="mx-2">›</span>
           <Link to="/products" className="hover:text-primary">{t("detail.products")}</Link>
           <span className="mx-2">›</span>
-          <span className="text-foreground font-medium">{product.name}</span>
+          <span className="text-foreground font-medium">{displayName}</span>
         </nav>
 
         <div className="grid gap-8 lg:grid-cols-2">
@@ -46,7 +51,7 @@ export default function ProductDetailPage() {
             animate={{ opacity: 1 }}
             className="overflow-hidden rounded-xl bg-card"
           >
-            <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+            <img src={product.image} alt={displayName} className="h-full w-full object-cover" />
           </motion.div>
 
           <motion.div
@@ -61,8 +66,8 @@ export default function ProductDetailPage() {
 
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{product.brand}</p>
             <h1 className="mt-1 font-display text-3xl font-medium text-foreground">
-              {product.name}
-              {product.nameKo && <span className="ml-3 text-xl text-muted-foreground">{product.nameKo}</span>}
+              {displayName}
+              {subName && <span className="ml-3 text-xl text-muted-foreground">{subName}</span>}
             </h1>
 
             <div className="mt-2 flex items-center gap-2">
@@ -88,7 +93,7 @@ export default function ProductDetailPage() {
             </div>
             <p className="mt-1 text-xs text-muted-foreground">{product.weight}</p>
 
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{product.description}</p>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{description}</p>
 
             <div className="mt-6">
               <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("detail.howToGet")}</h3>
@@ -211,10 +216,10 @@ export default function ProductDetailPage() {
 
                 <div className="rounded-xl border border-border p-4">
                   <div className="flex gap-4">
-                    <img src={product.image} alt={product.name} className="h-20 w-20 rounded-lg object-cover" />
+                    <img src={product.image} alt={displayName} className="h-20 w-20 rounded-lg object-cover" />
                     <div>
                       <p className="text-xs text-muted-foreground">{product.brand}</p>
-                      <p className="text-sm font-medium text-foreground">{product.name}</p>
+                      <p className="text-sm font-medium text-foreground">{displayName}</p>
                       <p className="text-sm font-bold text-foreground">${product.price.toFixed(2)}</p>
                     </div>
                   </div>
@@ -224,10 +229,10 @@ export default function ProductDetailPage() {
                   </div>
 
                   <div className="flex gap-4">
-                    <img src={pairProduct.image} alt={pairProduct.name} className="h-20 w-20 rounded-lg object-cover" />
+                    <img src={pairProduct.image} alt={getProductName(pairProduct, language)} className="h-20 w-20 rounded-lg object-cover" />
                     <div>
                       <p className="text-xs text-muted-foreground">{pairProduct.brand}</p>
-                      <p className="text-sm font-medium text-foreground">{pairProduct.name}</p>
+                      <p className="text-sm font-medium text-foreground">{getProductName(pairProduct, language)}</p>
                       <p className="text-sm font-bold text-foreground">${pairProduct.price.toFixed(2)}</p>
                     </div>
                   </div>
@@ -241,7 +246,7 @@ export default function ProductDetailPage() {
                       <span className="text-[11px] font-semibold uppercase tracking-wider">{t("detail.suggestedRecipe")}</span>
                     </div>
                     <h4 className="mt-1 font-display text-lg font-medium text-foreground">{t("recipe.title")} 떡볶이</h4>
-                    <p className="mt-1 text-xs text-muted-foreground">Classic Korean street food. Sweet, spicy, chewy perfection.</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{t("recipe.desc").slice(0, 80)}...</p>
                     <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {t("recipe.time")}</span>
                       <span>{t("detail.serves")}</span>

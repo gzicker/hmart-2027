@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Product } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getProductName, getProductSubName } from "@/lib/product-utils";
 import { Plus, Star } from "lucide-react";
 
 interface ProductCardProps {
@@ -11,7 +12,10 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, featured }: ProductCardProps) {
   const { addItem } = useCart();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  const displayName = getProductName(product, language);
+  const subName = getProductSubName(product, language);
 
   return (
     <div className={`product-card ${featured ? "col-span-2 row-span-2" : ""}`}>
@@ -37,7 +41,7 @@ export default function ProductCard({ product, featured }: ProductCardProps) {
 
       <Link to={`/product/${product.id}`}>
         <div className="product-card-image">
-          <img src={product.image} alt={product.name} loading="lazy" />
+          <img src={product.image} alt={displayName} loading="lazy" />
         </div>
       </Link>
 
@@ -45,8 +49,8 @@ export default function ProductCard({ product, featured }: ProductCardProps) {
         <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{product.brand}</p>
         <Link to={`/product/${product.id}`}>
           <h3 className="mt-0.5 text-sm font-medium leading-tight text-foreground hover:text-primary">
-            {product.name}
-            {product.nameKo && <span className="ml-1.5 text-muted-foreground">{product.nameKo}</span>}
+            {displayName}
+            {subName && <span className="ml-1.5 text-muted-foreground">{subName}</span>}
           </h3>
         </Link>
         <p className="mt-0.5 text-[11px] text-muted-foreground">{product.weight}</p>
