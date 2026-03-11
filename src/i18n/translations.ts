@@ -3,15 +3,15 @@ export type Language = "en" | "ko" | "zh";
 export const translations: Record<Language, Record<string, string>> = {
   en: {
     // Promo bar
-    "promo.join": "JOIN",
-    "promo.hmartPlus": "H MART PLUS",
-    "promo.freeShipping": "— FREE SHIPPING on orders $49+",
+    "promo.join": "Join",
+    "promo.hmartPlus": "H Mart Plus",
+    "promo.freeShipping": "— Free shipping on orders $49+",
     "promo.rewards": "Earn 2x Smart Rewards Points",
     "promo.deals": "Exclusive Weekly Deals",
     "promo.learnMore": "Learn More",
 
     // Site tabs
-    "tab.hmart": "H MART",
+    "tab.hmart": "H Mart",
     "tab.gifts": "Gifts to Korea",
     "tab.b2b": "Wholesale",
 
@@ -233,14 +233,14 @@ export const translations: Record<Language, Record<string, string>> = {
   ko: {
     // Promo bar
     "promo.join": "가입하세요",
-    "promo.hmartPlus": "H MART PLUS",
+    "promo.hmartPlus": "H Mart Plus",
     "promo.freeShipping": "— $49 이상 무료배송",
     "promo.rewards": "스마트 리워드 포인트 2배 적립",
     "promo.deals": "독점 주간 특가",
     "promo.learnMore": "더 알아보기",
 
     // Site tabs
-    "tab.hmart": "H MART",
+    "tab.hmart": "H Mart",
     "tab.gifts": "고국통신",
     "tab.b2b": "도매",
 
@@ -462,14 +462,14 @@ export const translations: Record<Language, Record<string, string>> = {
   zh: {
     // Promo bar
     "promo.join": "加入",
-    "promo.hmartPlus": "H MART PLUS",
+    "promo.hmartPlus": "H Mart Plus",
     "promo.freeShipping": "— 满$49免运费",
     "promo.rewards": "赚取2倍积分",
     "promo.deals": "每周独家优惠",
     "promo.learnMore": "了解更多",
 
     // Site tabs
-    "tab.hmart": "H MART",
+    "tab.hmart": "H Mart",
     "tab.gifts": "韩国礼品",
     "tab.b2b": "批发",
 

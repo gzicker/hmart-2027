@@ -3,7 +3,7 @@ import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, Chevro
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState, useRef, useEffect } from "react";
-import logoImg from "@/assets/hmart-logo.png";
+import logoImg from "@/assets/hmart-logo.svg";
 import StoreSelector from "@/components/StoreSelector";
 import LanguageSelector from "@/components/LanguageSelector";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
