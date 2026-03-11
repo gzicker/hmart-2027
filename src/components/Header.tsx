@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight, Package, MapPin, CreditCard, LogOut } from "lucide-react";
+import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight, Package, MapPin, CreditCard, LogOut, ShoppingBasket } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState, useRef, useEffect } from "react";
@@ -9,7 +9,7 @@ import LanguageSelector from "@/components/LanguageSelector";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const SITE_TABS = [
-  { id: "hmart", labelKey: "tab.hmart", icon: null, sublabelKey: null },
+  { id: "hmart", labelKey: "tab.hmart", icon: ShoppingBasket, sublabelKey: null },
   { id: "gifts", labelKey: "tab.hmart", icon: Gift, sublabelKey: "tab.gifts" },
   { id: "b2b", labelKey: "tab.hmart", icon: Building2, sublabelKey: "tab.b2b" },
 ] as const;
