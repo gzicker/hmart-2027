@@ -39,10 +39,10 @@ export default function B2BHomePage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute -right-40 top-0 h-[500px] w-[500px] rounded-full bg-gray-400/30 blur-3xl" />
-          <div className="absolute -bottom-40 -left-20 h-80 w-80 rounded-full bg-gray-500/20 blur-3xl" />
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <img src={heroB2B} alt="" className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/75 to-gray-900/50" />
         </div>
         <div className="hmart-container relative py-20 lg:py-28">
           <motion.div
