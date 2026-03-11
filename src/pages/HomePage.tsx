@@ -7,9 +7,12 @@ import bannerNongshim from "@/assets/banner-nongshim.jpg";
 import bannerCj from "@/assets/banner-cj.jpg";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTab } from "@/contexts/TabContext";
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import GiftsHomePage from "./GiftsHomePage";
+import B2BHomePage from "./B2BHomePage";
 
 import HeroCarousel from "@/components/HeroCarousel";
 import categoryVeg from "@/assets/category-vegetables.jpg";
