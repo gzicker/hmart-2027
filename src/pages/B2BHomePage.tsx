@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Building2, Truck, RefreshCw, ArrowRight, Package, Coffee, Factory, Store, TrendingUp, Shield, CheckCircle2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import heroB2B from "@/assets/hero-b2b.jpg";
 
 const SEGMENTS = [
   { icon: Store, label: "Asian Grocery Stores", desc: "Bulk staples, fresh produce & branded products at wholesale prices. Weekly subscription delivery available.", color: "from-gray-600 to-gray-800" },
@@ -38,10 +39,10 @@ export default function B2BHomePage() {
       <Header />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute -right-40 top-0 h-[500px] w-[500px] rounded-full bg-gray-400/30 blur-3xl" />
-          <div className="absolute -bottom-40 -left-20 h-80 w-80 rounded-full bg-gray-500/20 blur-3xl" />
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <img src={heroB2B} alt="" className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/75 to-gray-900/50" />
         </div>
         <div className="hmart-container relative py-20 lg:py-28">
           <motion.div
