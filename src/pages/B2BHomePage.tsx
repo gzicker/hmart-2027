@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Building2, Truck, RefreshCw, ArrowRight, Package, Coffee, Factory, Store, TrendingUp, Shield, CheckCircle2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import heroB2B from "@/assets/hero-b2b.jpg";
 
 const SEGMENTS = [
   { icon: Store, label: "Asian Grocery Stores", desc: "Bulk staples, fresh produce & branded products at wholesale prices. Weekly subscription delivery available.", color: "from-gray-600 to-gray-800" },
