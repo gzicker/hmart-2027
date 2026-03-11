@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight, Package, MapPin, CreditCard, LogOut, ShoppingBasket } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTab } from "@/contexts/TabContext";
 import { useState, useRef, useEffect } from "react";
 import logoImg from "@/assets/hmart-logo.png";
 import StoreSelector from "@/components/StoreSelector";
