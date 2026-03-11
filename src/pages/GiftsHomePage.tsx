@@ -1,16 +1,16 @@
 import { motion } from "framer-motion";
-import { Gift, Heart, Plane, Package, Clock, Star, ArrowRight, Beef, Apple, Fish, Cake, Pill } from "lucide-react";
+import { Gift, Heart, Plane, Package, Clock, Star, ArrowRight, Beef, Apple, Fish, Cake, Pill, ShoppingCart, Droplets } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-const ROYAL = {
-  bg: "bg-[hsl(230,60%,50%)]",
-  bgLight: "bg-[hsl(230,60%,96%)]",
-  bgMid: "bg-[hsl(230,60%,50%)]/10",
-  text: "text-[hsl(230,60%,50%)]",
-  gradient: "from-[hsl(230,60%,50%)] to-[hsl(230,80%,40%)]",
-  gradientLight: "from-[hsl(230,60%,96%)] via-[hsl(230,50%,94%)] to-[hsl(240,60%,95%)]",
-};
+import giftsHero from "@/assets/gifts-hero.jpg";
+import giftHanwoo1 from "@/assets/gift-hanwoo-1.jpg";
+import giftHanwoo2 from "@/assets/gift-hanwoo-2.jpg";
+import giftHanwoo3 from "@/assets/gift-hanwoo-3.jpg";
+import giftGinseng from "@/assets/gift-ginseng.jpg";
+import giftFruit from "@/assets/gift-fruit.jpg";
+import giftSeafood from "@/assets/gift-seafood.jpg";
+import giftHangwa from "@/assets/gift-hangwa.jpg";
 
 const GIFT_CATEGORIES = [
   { icon: Beef, label: "프리미엄 한우", desc: "1++ 등급 한우 세트", color: "bg-red-50 text-red-600" },
@@ -21,11 +21,19 @@ const GIFT_CATEGORIES = [
   { icon: Package, label: "간편한 한끼", desc: "큐레이션 선물 패키지", color: "bg-pink-50 text-pink-600" },
 ];
 
-const FEATURED_SETS = [
-  { name: "프리미엄 한우 세트", desc: "1++ 등급 등심 & 꽃등심, 총 1.2kg. 프리미엄 포장 포함.", price: "$89.99", badge: "베스트셀러", rating: 4.9, reviews: 2340 },
-  { name: "한국 인삼 디럭스", desc: "6년근 홍삼 농축액, 꿀스틱 & 캡슐. 최고의 건강 선물.", price: "$129.99", badge: "프리미엄", rating: 4.8, reviews: 1890 },
-  { name: "제철 과일 박스", desc: "엄선된 프리미엄 과일: 배, 포도, 감 등.", price: "$64.99", badge: "신상품", rating: 4.7, reviews: 560 },
-  { name: "로얄 헤리티지 세트", desc: "한우, 전복, 인삼 & 전통 한과. 최고급 선물.", price: "$199.99", badge: "럭셔리", rating: 5.0, reviews: 890 },
+const GIFT_PRODUCTS = [
+  { image: giftHanwoo1, brand: "암소서울", name: "암소서울 1++암소선물세트 (등심400g+안심400g+채끝400g)", price: 209.99, originalPrice: 299.99, discount: 30, rating: 4.9, reviews: 2340, isCold: true },
+  { image: giftHanwoo2, brand: "동화고옥", name: "동화고옥 향연LA갈비세트 2호 (꽃갈비 2800g)", price: 149.99, originalPrice: 215.00, discount: 30, rating: 4.8, reviews: 1890, isCold: true },
+  { image: giftGinseng, brand: "정관장", name: "정관장 홍삼정 에브리타임 밸런스 선물세트 (10ml x 30포)", price: 129.99, originalPrice: 169.99, discount: 24, rating: 4.9, reviews: 3120, isCold: false },
+  { image: giftHanwoo1, brand: "Seouloin", name: "서울로인 1호세트 (등심 300g+안심300g+불고기용 300g)", price: 130.99, originalPrice: 243.99, discount: 46, rating: 4.7, reviews: 1560, isCold: true },
+  { image: giftFruit, brand: "명품과일", name: "제주 황금향 & 천혜향 프리미엄 과일세트 (3kg)", price: 64.99, originalPrice: 89.99, discount: 28, rating: 4.8, reviews: 890, isCold: true },
+  { image: giftSeafood, brand: "해맑은", name: "완도 활전복 & 건어물 프리미엄 선물세트", price: 99.99, originalPrice: 149.99, discount: 33, rating: 4.7, reviews: 670, isCold: true },
+  { image: giftHanwoo3, brand: "한우애명작", name: "프리미엄 숙성한우 구이특선 한상스페셜 1호", price: 156.99, originalPrice: 239.99, discount: 35, rating: 4.9, reviews: 1230, isCold: true },
+  { image: giftHangwa, brand: "궁중한과", name: "궁중한과 전통 수제 한과세트 특선 (800g)", price: 49.99, originalPrice: 69.99, discount: 29, rating: 4.6, reviews: 450, isCold: false },
+  { image: giftHanwoo2, brand: "동화고옥", name: "동화고옥 향연LA갈비세트 1호 (꽃갈비 1400g)", price: 99.99, originalPrice: 149.99, discount: 33, rating: 4.8, reviews: 980, isCold: true },
+  { image: giftGinseng, brand: "고려인삼", name: "고려 6년근 홍삼 농축액 선물세트 (240g x 2병)", price: 189.99, originalPrice: 259.99, discount: 27, rating: 4.9, reviews: 2100, isCold: false },
+  { image: giftHanwoo3, brand: "한우애명작", name: "프리미엄 구이&정육 명절한상 스페셜 3호 불고기 육전...", price: 115.99, originalPrice: 179.99, discount: 36, rating: 4.8, reviews: 760, isCold: true },
+  { image: giftFruit, brand: "명품과일", name: "나주배 & 샤인머스캣 프리미엄 혼합 과일세트 (5kg)", price: 79.99, originalPrice: 109.99, discount: 27, rating: 4.7, reviews: 540, isCold: true },
 ];
 
 const STEPS = [
@@ -40,33 +48,33 @@ export default function GiftsHomePage() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero */}
-      <section className={`relative overflow-hidden bg-gradient-to-br ${ROYAL.gradientLight}`}>
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute -right-20 -top-20 h-96 w-96 rounded-full bg-[hsl(230,60%,50%)]/20 blur-3xl" />
-          <div className="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-[hsl(230,80%,70%)]/30 blur-3xl" />
+      {/* Hero with image */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <img src={giftsHero} alt="" className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(230,60%,25%)]/90 via-[hsl(230,60%,30%)]/70 to-transparent" />
         </div>
         <div className="hmart-container relative py-20 lg:py-28">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="max-w-2xl"
+            className="max-w-xl"
           >
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-[hsl(230,60%,50%)]/10 px-4 py-1.5 text-sm font-semibold text-[hsl(230,60%,50%)]">
+            <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-sm font-semibold text-white backdrop-blur-sm">
               <Heart className="h-4 w-4" /> 고국통신
             </span>
-            <h1 className="mb-4 font-display text-4xl font-bold leading-tight text-foreground lg:text-5xl">
+            <h1 className="mb-4 font-display text-4xl font-bold leading-tight text-white lg:text-5xl">
               한국에 사랑을 보내세요
             </h1>
-            <p className="mb-8 text-lg text-muted-foreground leading-relaxed">
-              프리미엄 한국 선물 세트를 한국에 계신 소중한 분께 직접 배송해 드립니다. 신선한 한우부터 건강 보조제까지 — 바다 건너 마음을 전하세요.
+            <p className="mb-8 text-lg text-white/80 leading-relaxed">
+              프리미엄 한국 선물 세트를 한국에 계신 소중한 분께 직접 배송해 드립니다. 신선한 한우부터 건강 보조제까지.
             </p>
             <div className="flex flex-wrap gap-4">
-              <button className="rounded-xl bg-[hsl(230,60%,50%)] px-8 py-3.5 font-semibold text-white shadow-lg shadow-[hsl(230,60%,50%)]/25 transition-transform hover:scale-105">
+              <button className="rounded-xl bg-white px-8 py-3.5 font-semibold text-[hsl(230,60%,40%)] shadow-lg transition-transform hover:scale-105">
                 선물 세트 쇼핑
               </button>
-              <button className="rounded-xl border-2 border-[hsl(230,60%,50%)]/20 bg-card px-8 py-3.5 font-semibold text-[hsl(230,60%,50%)] transition-colors hover:bg-[hsl(230,60%,50%)]/5">
+              <button className="rounded-xl border-2 border-white/30 bg-white/10 px-8 py-3.5 font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20">
                 이용 방법
               </button>
             </div>
@@ -103,44 +111,71 @@ export default function GiftsHomePage() {
         </div>
       </section>
 
-      {/* Featured Gift Sets */}
-      <section className="bg-secondary/50 py-16">
+      {/* Product Grid - like the real site */}
+      <section className="bg-secondary/30 py-16">
         <div className="hmart-container">
           <div className="mb-10 text-center">
-            <h2 className="mb-2 font-display text-2xl font-bold text-foreground">인기 선물 세트</h2>
-            <p className="text-muted-foreground">모든 기념일을 위한 베스트셀러 선물 세트</p>
+            <h2 className="mb-2 font-display text-2xl font-bold text-foreground">베스트 셀러</h2>
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              {["한우", "건강", "정육", "과일", "수산", "한과"].map((tab, i) => (
+                <button
+                  key={tab}
+                  className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+                    i === 0
+                      ? "bg-[hsl(230,60%,50%)] text-white"
+                      : "bg-card text-muted-foreground border border-border hover:bg-[hsl(230,60%,50%)]/10 hover:text-[hsl(230,60%,50%)]"
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {FEATURED_SETS.map((set, i) => (
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+            {GIFT_PRODUCTS.map((product, i) => (
               <motion.div
-                key={set.name}
+                key={i}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-lg"
+                transition={{ delay: i * 0.04 }}
+                className="group overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all hover:shadow-lg"
               >
-                <div className="relative h-48 bg-gradient-to-br from-[hsl(230,60%,50%)]/10 to-[hsl(230,60%,90%)] flex items-center justify-center">
-                  <Gift className="h-16 w-16 text-[hsl(230,60%,50%)]/30" />
-                  <span className="absolute left-3 top-3 rounded-full bg-[hsl(230,60%,50%)] px-3 py-1 text-[10px] font-bold uppercase text-white">
-                    {set.badge}
+                {/* Image */}
+                <div className="relative aspect-square overflow-hidden bg-gray-50">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  {/* Discount badge */}
+                  <span className="absolute left-2 top-2 rounded-md bg-[hsl(230,60%,50%)] px-2 py-0.5 text-xs font-bold text-white">
+                    -{product.discount}%
                   </span>
+                  {/* Cold badge */}
+                  {product.isCold && (
+                    <span className="absolute left-2 top-8 flex h-6 w-6 items-center justify-center rounded-full bg-[hsl(230,60%,50%)]">
+                      <Droplets className="h-3 w-3 text-white" />
+                    </span>
+                  )}
+                  {/* Cart icon */}
+                  <button className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white/80 text-muted-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-[hsl(230,60%,50%)] hover:text-white">
+                    <ShoppingCart className="h-4 w-4" />
+                  </button>
                 </div>
-                <div className="p-5">
-                  <h3 className="mb-1 font-display text-base font-bold text-foreground">{set.name}</h3>
-                  <p className="mb-3 text-xs text-muted-foreground leading-relaxed">{set.desc}</p>
-                  <div className="mb-3 flex items-center gap-2">
-                    <div className="flex items-center gap-1">
-                      <Star className="h-3.5 w-3.5 fill-accent text-accent" />
-                      <span className="text-xs font-semibold">{set.rating}</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground">({set.reviews.toLocaleString()})</span>
+
+                {/* Info */}
+                <div className="p-3">
+                  <span className="text-xs font-semibold text-[hsl(230,60%,50%)]">{product.brand}</span>
+                  <p className="mt-1 line-clamp-2 text-xs font-medium leading-snug text-foreground">
+                    {product.name}
+                  </p>
+                  <div className="mt-2 flex items-baseline gap-1.5">
+                    <span className="text-base font-extrabold text-foreground">${product.price.toFixed(2)}</span>
+                    <span className="text-xs text-muted-foreground line-through">${product.originalPrice.toFixed(2)}</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-[hsl(230,60%,50%)]">{set.price}</span>
-                    <button className="rounded-lg bg-[hsl(230,60%,50%)]/10 px-4 py-2 text-xs font-semibold text-[hsl(230,60%,50%)] transition-colors hover:bg-[hsl(230,60%,50%)] hover:text-white">
-                      장바구니 담기
-                    </button>
-                  </div>
+                  <button className="mt-2 flex items-center gap-1 rounded-full border border-[hsl(230,60%,50%)] px-3 py-1.5 text-xs font-semibold text-[hsl(230,60%,50%)] transition-colors hover:bg-[hsl(230,60%,50%)] hover:text-white">
+                    <ShoppingCart className="h-3 w-3" />
+                  </button>
                 </div>
               </motion.div>
             ))}
