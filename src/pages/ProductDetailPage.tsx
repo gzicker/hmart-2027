@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Star, Truck, Store, Package, Plus, Minus, ChevronRight, X, ShoppingCart, Clock, ChefHat } from "lucide-react";
 import { products } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -13,13 +14,13 @@ export default function ProductDetailPage() {
   const { id } = useParams();
   const product = products.find((p) => p.id === id) || products[0];
   const { addItem } = useCart();
+  const { t } = useLanguage();
   const [quantity, setQuantity] = useState(1);
   const [showPairDrawer, setShowPairDrawer] = useState(false);
   const [selectedFulfillment, setSelectedFulfillment] = useState<"delivery" | "pickup" | "shipping">(
     product.fulfillment[0] as "delivery" | "pickup" | "shipping"
   );
 
-  // Find a "perfect pair" product
   const pairProduct = product.id === "gochujang-001"
     ? products.find(p => p.id === "tteok-001")
     : products.find(p => p.id !== product.id && p.id !== "gochujang-001");
@@ -31,17 +32,15 @@ export default function ProductDetailPage() {
       <Header />
 
       <div className="hmart-container py-6">
-        {/* Breadcrumb */}
         <nav className="mb-6 text-xs text-muted-foreground">
-          <Link to="/" className="hover:text-primary">Home</Link>
+          <Link to="/" className="hover:text-primary">{t("detail.home")}</Link>
           <span className="mx-2">›</span>
-          <Link to="/products" className="hover:text-primary">Products</Link>
+          <Link to="/products" className="hover:text-primary">{t("detail.products")}</Link>
           <span className="mx-2">›</span>
           <span className="text-foreground font-medium">{product.name}</span>
         </nav>
 
         <div className="grid gap-8 lg:grid-cols-2">
-          {/* Image */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -50,15 +49,14 @@ export default function ProductDetailPage() {
             <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
           </motion.div>
 
-          {/* Details */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            {product.isSponsored && <span className="sponsored-badge mb-2 inline-block">Sponsored</span>}
+            {product.isSponsored && <span className="sponsored-badge mb-2 inline-block">{t("brands.sponsored")}</span>}
             {product.isNew && (
-              <span className="mb-2 inline-block rounded-sm bg-primary px-2 py-0.5 text-xs font-bold text-primary-foreground">New!</span>
+              <span className="mb-2 inline-block rounded-sm bg-primary px-2 py-0.5 text-xs font-bold text-primary-foreground">{t("product.new")}</span>
             )}
 
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{product.brand}</p>
@@ -74,7 +72,7 @@ export default function ProductDetailPage() {
                 ))}
               </div>
               <span className="text-sm font-medium text-foreground">{product.rating}</span>
-              <span className="text-sm text-muted-foreground">({product.reviewCount.toLocaleString()} reviews)</span>
+              <span className="text-sm text-muted-foreground">({product.reviewCount.toLocaleString()} {t("product.reviews")})</span>
             </div>
 
             <div className="mt-4 flex items-baseline gap-2">
@@ -83,7 +81,7 @@ export default function ProductDetailPage() {
                 <>
                   <span className="text-lg text-muted-foreground line-through">${product.originalPrice.toFixed(2)}</span>
                   <span className="rounded-sm bg-accent/20 px-2 py-0.5 text-sm font-semibold text-accent-foreground">
-                    Save ${(product.originalPrice - product.price).toFixed(2)}
+                    {t("product.save")} ${(product.originalPrice - product.price).toFixed(2)}
                   </span>
                 </>
               )}
@@ -92,9 +90,8 @@ export default function ProductDetailPage() {
 
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{product.description}</p>
 
-            {/* Fulfillment Options */}
             <div className="mt-6">
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">How would you like to get it?</h3>
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("detail.howToGet")}</h3>
               <div className="flex flex-wrap gap-2">
                 {product.fulfillment.includes("delivery") && (
                   <button
@@ -103,8 +100,8 @@ export default function ProductDetailPage() {
                   >
                     <Truck className="h-4 w-4" />
                     <div className="text-left">
-                      <p>Delivery</p>
-                      <p className="text-[10px] font-normal text-muted-foreground">Today, 2-4pm</p>
+                      <p>{t("product.delivery")}</p>
+                      <p className="text-[10px] font-normal text-muted-foreground">{t("detail.deliveryToday")}</p>
                     </div>
                   </button>
                 )}
@@ -115,8 +112,8 @@ export default function ProductDetailPage() {
                   >
                     <Store className="h-4 w-4" />
                     <div className="text-left">
-                      <p>Pickup</p>
-                      <p className="text-[10px] font-normal text-muted-foreground">Ready in 2h</p>
+                      <p>{t("product.pickup")}</p>
+                      <p className="text-[10px] font-normal text-muted-foreground">{t("detail.readyIn2h")}</p>
                     </div>
                   </button>
                 )}
@@ -127,20 +124,19 @@ export default function ProductDetailPage() {
                   >
                     <Package className="h-4 w-4" />
                     <div className="text-left">
-                      <p>Ship</p>
-                      <p className="text-[10px] font-normal text-muted-foreground">3-5 days</p>
+                      <p>{t("product.ship")}</p>
+                      <p className="text-[10px] font-normal text-muted-foreground">{t("detail.ship3to5")}</p>
                     </div>
                   </button>
                 )}
               </div>
               {product.storeName && selectedFulfillment !== "shipping" && (
                 <p className="mt-2 text-xs text-muted-foreground">
-                  From <span className="font-medium text-foreground">{product.storeName}</span>
+                  {t("detail.from")} <span className="font-medium text-foreground">{product.storeName}</span>
                 </p>
               )}
             </div>
 
-            {/* Add to Cart */}
             <div className="mt-6 flex items-center gap-3">
               <div className="flex items-center rounded-lg border border-border">
                 <button
@@ -163,14 +159,13 @@ export default function ProductDetailPage() {
                 className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-body text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] active:scale-95"
               >
                 <ShoppingCart className="h-4 w-4" />
-                Add to Cart — ${(product.price * quantity).toFixed(2)}
+                {t("product.addToCart")} — ${(product.price * quantity).toFixed(2)}
               </button>
 
-              {/* Perfect Pair trigger */}
               <button
                 onClick={() => setShowPairDrawer(true)}
                 className="flex h-12 w-12 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-primary hover:bg-primary/5 hover:text-primary"
-                title="Find the Perfect Pair"
+                title={t("detail.perfectPair")}
               >
                 <Plus className="h-5 w-5" />
               </button>
@@ -178,9 +173,8 @@ export default function ProductDetailPage() {
           </motion.div>
         </div>
 
-        {/* Related Products */}
         <section className="mt-16">
-          <h2 className="mb-6 font-display text-2xl font-medium text-foreground">You might also like</h2>
+          <h2 className="mb-6 font-display text-2xl font-medium text-foreground">{t("detail.youMightLike")}</h2>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {relatedProducts.map((p) => (
               <ProductCard key={p.id} product={p} />
@@ -209,7 +203,7 @@ export default function ProductDetailPage() {
             >
               <div className="p-6">
                 <div className="mb-6 flex items-center justify-between">
-                  <h3 className="font-display text-xl font-medium text-foreground">The Perfect Pair</h3>
+                  <h3 className="font-display text-xl font-medium text-foreground">{t("detail.perfectPair")}</h3>
                   <button onClick={() => setShowPairDrawer(false)} className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary">
                     <X className="h-5 w-5" />
                   </button>
@@ -239,26 +233,25 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
-                {/* Recipe suggestion */}
                 <div className="mt-4 overflow-hidden rounded-xl">
                   <img src={recipeTteokbokki} alt="Tteokbokki" className="aspect-video w-full object-cover" />
                   <div className="bg-secondary/50 p-4">
                     <div className="flex items-center gap-1.5 text-primary">
                       <ChefHat className="h-4 w-4" />
-                      <span className="text-[11px] font-semibold uppercase tracking-wider">Suggested Recipe</span>
+                      <span className="text-[11px] font-semibold uppercase tracking-wider">{t("detail.suggestedRecipe")}</span>
                     </div>
-                    <h4 className="mt-1 font-display text-lg font-medium text-foreground">Spicy Tteokbokki 떡볶이</h4>
+                    <h4 className="mt-1 font-display text-lg font-medium text-foreground">{t("recipe.title")} 떡볶이</h4>
                     <p className="mt-1 text-xs text-muted-foreground">Classic Korean street food. Sweet, spicy, chewy perfection.</p>
                     <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> 20 min</span>
-                      <span>Serves 2</span>
+                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {t("recipe.time")}</span>
+                      <span>{t("detail.serves")}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="mt-6 rounded-lg bg-secondary/50 p-3">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Bundle total</span>
+                    <span className="text-muted-foreground">{t("detail.bundleTotal")}</span>
                     <span className="text-lg font-bold text-foreground">
                       ${(product.price + pairProduct.price).toFixed(2)}
                     </span>
@@ -274,7 +267,7 @@ export default function ProductDetailPage() {
                   className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] active:scale-95"
                 >
                   <ShoppingCart className="h-4 w-4" />
-                  Add Both to Cart
+                  {t("detail.addBoth")}
                 </button>
               </div>
             </motion.div>

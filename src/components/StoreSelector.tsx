@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { MapPin, ChevronDown, Navigation, Clock, Phone, X } from "lucide-react";
+import { MapPin, ChevronDown, Navigation, Clock, Phone } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Dialog,
   DialogContent,
@@ -18,10 +19,9 @@ const STORES = [
 
 export default function StoreSelector() {
   const { selectedStore, setSelectedStore, fulfillmentMethod, setFulfillmentMethod } = useCart();
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [zipcode, setZipcode] = useState("");
-
-  const currentStore = STORES.find((s) => s.name === selectedStore) || STORES[0];
 
   return (
     <>
@@ -32,7 +32,7 @@ export default function StoreSelector() {
         <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
         <div className="text-left hidden sm:block">
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground leading-none mb-0.5">
-            {fulfillmentMethod === "delivery" ? "Deliver to" : fulfillmentMethod === "pickup" ? "Pickup at" : "Ship from"}
+            {fulfillmentMethod === "delivery" ? t("store.deliverTo") : fulfillmentMethod === "pickup" ? t("store.pickupAt") : t("store.shipFrom")}
           </div>
           <div className="font-medium text-foreground leading-tight truncate max-w-[140px]">{selectedStore}</div>
         </div>
@@ -42,10 +42,9 @@ export default function StoreSelector() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="font-display text-xl">Choose your store</DialogTitle>
+            <DialogTitle className="font-display text-xl">{t("store.chooseStore")}</DialogTitle>
           </DialogHeader>
 
-          {/* Fulfillment tabs */}
           <div className="flex gap-1 rounded-lg bg-secondary p-1">
             {(["delivery", "pickup", "shipping"] as const).map((method) => (
               <button
@@ -57,15 +56,14 @@ export default function StoreSelector() {
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {method}
+                {method === "delivery" ? t("checkout.delivery") : method === "pickup" ? t("checkout.pickup") : t("checkout.ship")}
               </button>
             ))}
           </div>
 
-          {/* Zipcode input */}
           {fulfillmentMethod === "delivery" && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Enter your ZIP code</label>
+              <label className="text-sm font-medium text-foreground">{t("store.enterZip")}</label>
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <Navigation className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -78,16 +76,15 @@ export default function StoreSelector() {
                   />
                 </div>
                 <button className="rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
-                  Find stores
+                  {t("store.findStores")}
                 </button>
               </div>
             </div>
           )}
 
-          {/* Store list */}
           <div className="space-y-2">
             <p className="text-sm font-medium text-muted-foreground">
-              {fulfillmentMethod === "pickup" ? "Select a store for pickup" : "Stores near you"}
+              {fulfillmentMethod === "pickup" ? t("store.selectPickup") : t("store.nearYou")}
             </p>
             {STORES.map((store) => (
               <button
@@ -117,7 +114,7 @@ export default function StoreSelector() {
                 </div>
                 {selectedStore === store.name && (
                   <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-primary">
-                    <MapPin className="h-3 w-3" /> Your selected store
+                    <MapPin className="h-3 w-3" /> {t("store.yourStore")}
                   </div>
                 )}
               </button>

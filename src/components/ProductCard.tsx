@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Product } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Plus, Star } from "lucide-react";
 
 interface ProductCardProps {
@@ -10,25 +11,26 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, featured }: ProductCardProps) {
   const { addItem } = useCart();
+  const { t } = useLanguage();
 
   return (
     <div className={`product-card ${featured ? "col-span-2 row-span-2" : ""}`}>
       {product.isSponsored && (
         <div className="absolute left-2 top-2 z-10">
-          <span className="sponsored-badge">Sponsored</span>
+          <span className="sponsored-badge">{t("brands.sponsored")}</span>
         </div>
       )}
       {product.isNew && (
         <div className="absolute left-2 top-2 z-10">
           <span className="inline-flex items-center rounded-sm bg-primary px-2 py-0.5 text-xs font-bold text-primary-foreground">
-            New!
+            {t("product.new")}
           </span>
         </div>
       )}
       {product.originalPrice && (
         <div className="absolute right-2 top-2 z-10">
           <span className="inline-flex items-center rounded-sm bg-accent px-2 py-0.5 text-xs font-bold text-accent-foreground">
-            Save ${(product.originalPrice - product.price).toFixed(2)}
+            {t("product.save")} ${(product.originalPrice - product.price).toFixed(2)}
           </span>
         </div>
       )}
@@ -57,13 +59,13 @@ export default function ProductCard({ product, featured }: ProductCardProps) {
 
         <div className="mt-1.5 flex items-center gap-1.5">
           {product.fulfillment.includes("delivery") && (
-            <span className="text-[10px] font-medium text-primary">Delivery</span>
+            <span className="text-[10px] font-medium text-primary">{t("product.delivery")}</span>
           )}
           {product.fulfillment.includes("pickup") && (
-            <span className="text-[10px] font-medium text-green-600">Pickup</span>
+            <span className="text-[10px] font-medium text-green-600">{t("product.pickup")}</span>
           )}
           {product.fulfillment.includes("shipping") && (
-            <span className="text-[10px] font-medium text-blue-600">Ship</span>
+            <span className="text-[10px] font-medium text-blue-600">{t("product.ship")}</span>
           )}
         </div>
 

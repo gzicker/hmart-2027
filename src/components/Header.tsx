@@ -1,39 +1,29 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight, Package, MapPin, CreditCard, LogOut, X } from "lucide-react";
+import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight, Package, MapPin, CreditCard, LogOut } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useState, useRef, useEffect } from "react";
 import logoImg from "@/assets/hmart-logo.png";
 import StoreSelector from "@/components/StoreSelector";
+import LanguageSelector from "@/components/LanguageSelector";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-const SITE_TABS: { id: string; label: string; sublabel?: string; icon: typeof Gift | null; active?: boolean }[] = [
-  { id: "hmart", label: "H MART", icon: null, active: true },
-  { id: "gifts", label: "고국통신", sublabel: "Gifts to Korea", icon: Gift },
-  { id: "b2b", label: "H MART B2B", sublabel: "Wholesale", icon: Building2 },
-];
+const SITE_TABS = [
+  { id: "hmart", labelKey: "tab.hmart", icon: null, sublabelKey: null },
+  { id: "gifts", labelKey: "tab.hmart", icon: Gift, sublabelKey: "tab.gifts" },
+  { id: "b2b", labelKey: "tab.hmart", icon: Building2, sublabelKey: "tab.b2b" },
+] as const;
 
-const CATEGORIES = [
-  "Rice & Grain",
-  "Ramen & Noodle",
-  "Snacks & Candy & Nuts",
-  "Instant & Quick Food",
-  "Seaweed & Dried Produce",
-  "Oil & Seasoning & Canned Food",
-  "Beverage & Coffee & Tea & Honey",
-  "Paste & Marinade & Sauce",
-  "Flour & Baking",
-  "Meat",
-  "Seafood",
-  "Produce",
-  "Kimchi & Side Dish & Deli",
-  "Dairy & Egg",
-  "Health",
-  "Household & Home",
-  "K-Beauty",
+const CATEGORY_KEYS = [
+  "catList.riceGrain", "catList.ramenNoodle", "catList.snacks", "catList.instant",
+  "catList.seaweed", "catList.oil", "catList.beverage", "catList.paste",
+  "catList.flour", "catList.meat", "catList.seafood", "catList.produce",
+  "catList.kimchi", "catList.dairy", "catList.health", "catList.household", "catList.kbeauty",
 ];
 
 export default function Header() {
   const { totalItems } = useCart();
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("hmart");
   const [categoriesOpen, setCategoriesOpen] = useState(false);
@@ -62,13 +52,13 @@ export default function Header() {
       {/* Promo bar */}
       <div className="bg-primary">
         <div className="hmart-container flex items-center justify-center gap-4 py-1.5 text-xs font-medium text-primary-foreground sm:gap-6">
-          <span>JOIN <strong>H MART PLUS</strong> — FREE SHIPPING on orders $49+</span>
+          <span>{t("promo.join")} <strong>{t("promo.hmartPlus")}</strong> {t("promo.freeShipping")}</span>
           <span className="hidden sm:inline">·</span>
-          <span className="hidden sm:inline">Earn 2x Smart Rewards Points</span>
+          <span className="hidden sm:inline">{t("promo.rewards")}</span>
           <span className="hidden md:inline">·</span>
-          <span className="hidden md:inline">Exclusive Weekly Deals</span>
+          <span className="hidden md:inline">{t("promo.deals")}</span>
           <Link to="/products" className="ml-2 rounded-sm bg-primary-foreground/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider transition-colors hover:bg-primary-foreground/30">
-            Learn More
+            {t("promo.learnMore")}
           </Link>
         </div>
       </div>
@@ -87,12 +77,12 @@ export default function Header() {
               }`}
             >
               {tab.icon && <tab.icon className="h-3.5 w-3.5" />}
-              <span>{tab.label}</span>
-              {tab.sublabel && (
+              <span>{tab.id === "hmart" ? t("tab.hmart") : t("tab.hmart")}</span>
+              {tab.sublabelKey && (
                 <span className={`hidden text-[10px] font-normal sm:inline ${
                   activeTab === tab.id ? "text-muted-foreground" : "text-primary-foreground/70"
                 }`}>
-                  {tab.sublabel}
+                  {t(tab.sublabelKey)}
                 </span>
               )}
             </button>
@@ -116,20 +106,20 @@ export default function Header() {
                   categoriesOpen ? "text-primary" : "text-foreground"
                 }`}
               >
-                Categories <ChevronDown className={`h-3.5 w-3.5 transition-transform ${categoriesOpen ? "rotate-180" : ""}`} />
+                {t("nav.categories")} <ChevronDown className={`h-3.5 w-3.5 transition-transform ${categoriesOpen ? "rotate-180" : ""}`} />
               </button>
 
               {categoriesOpen && (
                 <div className="absolute left-0 top-full mt-3 w-72 rounded-xl border border-border bg-card shadow-xl animate-fade-in z-50">
                   <div className="py-2">
-                    {CATEGORIES.map((cat) => (
+                    {CATEGORY_KEYS.map((key) => (
                       <Link
-                        key={cat}
+                        key={key}
                         to="/products"
                         onClick={() => setCategoriesOpen(false)}
                         className="flex items-center justify-between px-4 py-2.5 text-sm text-primary transition-colors hover:bg-secondary"
                       >
-                        {cat}
+                        {t(key)}
                         <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
                       </Link>
                     ))}
@@ -139,7 +129,7 @@ export default function Header() {
             </div>
 
             <Link to="/products" className="text-sm font-semibold text-primary transition-colors hover:text-primary/80">
-              Weekly Deals
+              {t("nav.weeklyDeals")}
             </Link>
 
             <Link
@@ -147,7 +137,7 @@ export default function Header() {
               className="flex items-center gap-1.5 rounded-full bg-foreground px-3.5 py-1.5 text-xs font-bold text-background transition-transform hover:scale-105 active:scale-95"
             >
               <Flame className="h-3.5 w-3.5" />
-              Trending on TikTok
+              {t("nav.trending")}
             </Link>
           </nav>
 
@@ -158,7 +148,7 @@ export default function Header() {
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="text"
-                  placeholder="Search for kimchi, ramen..."
+                  placeholder={t("nav.search")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full rounded-lg border border-border bg-background py-2.5 pl-10 pr-4 text-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
@@ -189,30 +179,33 @@ export default function Header() {
                   </div>
                   <div className="px-4 py-2">
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                      <Flame className="h-3 w-3" /> H Mart Plus Member
+                      <Flame className="h-3 w-3" /> {t("user.plusMember")}
                     </span>
                   </div>
                   <div className="border-t border-border">
                     <button className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
-                      <Package className="h-4 w-4 text-muted-foreground" /> Orders
+                      <Package className="h-4 w-4 text-muted-foreground" /> {t("user.orders")}
                       <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
                     </button>
                     <button className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
-                      <Gift className="h-4 w-4 text-muted-foreground" /> Exclusive Offers
+                      <Gift className="h-4 w-4 text-muted-foreground" /> {t("user.exclusiveOffers")}
                       <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
                     </button>
                     <button className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
-                      <CreditCard className="h-4 w-4 text-muted-foreground" /> Subscription
+                      <CreditCard className="h-4 w-4 text-muted-foreground" /> {t("user.subscription")}
                       <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
                     </button>
                   </div>
                   <div className="border-t border-border p-3">
                     <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
-                      <LogOut className="h-4 w-4" /> Sign Out
+                      <LogOut className="h-4 w-4" /> {t("user.signOut")}
                     </button>
                   </div>
                 </PopoverContent>
               </Popover>
+
+              <LanguageSelector />
+
               <Link to="/checkout" className="relative rounded-full p-2 transition-colors hover:bg-secondary">
                 <ShoppingCart className="h-5 w-5 text-foreground" />
                 {totalItems > 0 && (
