@@ -40,6 +40,13 @@ export default function HomePage() {
   const { activeTab } = useTab();
   const location = useLocation();
 
+  useEffect(() => {
+    if (location.hash) {
+      const el = document.querySelector(location.hash);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [location.hash]);
+
   if (activeTab === "gifts") return <GiftsHomePage />;
   if (activeTab === "b2b") return <B2BHomePage />;
 
@@ -52,12 +59,6 @@ export default function HomePage() {
     { name: t("cat.pantry"), nameKo: "식료품", image: categoryPantry, link: "/products" },
     { name: t("cat.kbeauty"), nameKo: "뷰티", image: categoryKbeauty, link: "/products" },
   ];
-
-  useEffect(() => {
-    if (location.hash) {
-      const el = document.querySelector(location.hash);
-      if (el) el.scrollIntoView({ behavior: "smooth" });
-    }
   }, [location.hash]);
 
   return (
