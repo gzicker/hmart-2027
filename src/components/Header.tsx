@@ -25,8 +25,8 @@ const CATEGORY_KEYS = [
 export default function Header() {
   const { totalItems } = useCart();
   const { t } = useLanguage();
+  const { activeTab, setActiveTab } = useTab();
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("hmart");
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const catRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
