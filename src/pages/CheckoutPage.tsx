@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Truck, Store, Package, Minus, Plus, Trash2, ShieldCheck, CreditCard, MapPin, ChevronRight, Crown } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -10,6 +11,7 @@ export default function CheckoutPage() {
     items, updateQuantity, removeItem, totalPrice,
     fulfillmentMethod, setFulfillmentMethod, selectedStore,
   } = useCart();
+  const { t } = useLanguage();
 
   const [hmartPlus, setHmartPlus] = useState(false);
   const hmartPlusFee = hmartPlus ? 9.99 : 0;
@@ -22,10 +24,10 @@ export default function CheckoutPage() {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="hmart-container flex flex-col items-center justify-center py-24 text-center">
-          <h1 className="font-display text-3xl font-medium text-foreground">Your cart is empty</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Discover authentic Asian ingredients and start building your meal.</p>
+          <h1 className="font-display text-3xl font-medium text-foreground">{t("checkout.emptyCart")}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">{t("checkout.emptyDesc")}</p>
           <Link to="/products" className="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-105">
-            Continue Shopping
+            {t("checkout.continueShopping")}
           </Link>
         </div>
         <Footer />
@@ -39,43 +41,42 @@ export default function CheckoutPage() {
 
       <div className="hmart-container py-6">
         <nav className="mb-6 text-xs text-muted-foreground">
-          <Link to="/" className="hover:text-primary">Home</Link>
+          <Link to="/" className="hover:text-primary">{t("detail.home")}</Link>
           <span className="mx-2">›</span>
-          <span className="font-medium text-foreground">Checkout</span>
+          <span className="font-medium text-foreground">{t("checkout.title")}</span>
         </nav>
 
-        <h1 className="mb-8 font-display text-3xl font-medium text-foreground">Checkout</h1>
+        <h1 className="mb-8 font-display text-3xl font-medium text-foreground">{t("checkout.title")}</h1>
 
         <div className="grid gap-8 lg:grid-cols-3">
-          {/* Cart Items & Fulfillment */}
           <div className="lg:col-span-2 space-y-6">
             {/* Fulfillment Selection */}
             <div className="rounded-xl border border-border bg-card p-6">
-              <h2 className="mb-4 font-display text-lg font-medium text-foreground">Fulfillment Method</h2>
+              <h2 className="mb-4 font-display text-lg font-medium text-foreground">{t("checkout.fulfillmentMethod")}</h2>
               <div className="grid grid-cols-3 gap-3">
                 <button
                   onClick={() => setFulfillmentMethod("delivery")}
                   className={`flex flex-col items-center gap-2 rounded-lg border p-4 text-center transition-colors ${fulfillmentMethod === "delivery" ? "border-primary bg-primary/5" : "border-border hover:bg-secondary"}`}
                 >
                   <Truck className={`h-6 w-6 ${fulfillmentMethod === "delivery" ? "text-primary" : "text-muted-foreground"}`} />
-                  <span className="text-sm font-medium text-foreground">Delivery</span>
-                  <span className="text-[10px] text-muted-foreground">Today 2-4pm · $5.99</span>
+                  <span className="text-sm font-medium text-foreground">{t("checkout.delivery")}</span>
+                  <span className="text-[10px] text-muted-foreground">{t("checkout.deliveryTime")}</span>
                 </button>
                 <button
                   onClick={() => setFulfillmentMethod("pickup")}
                   className={`flex flex-col items-center gap-2 rounded-lg border p-4 text-center transition-colors ${fulfillmentMethod === "pickup" ? "border-green-600 bg-green-50" : "border-border hover:bg-secondary"}`}
                 >
                   <Store className={`h-6 w-6 ${fulfillmentMethod === "pickup" ? "text-green-600" : "text-muted-foreground"}`} />
-                  <span className="text-sm font-medium text-foreground">Pickup</span>
-                  <span className="text-[10px] text-muted-foreground">Ready in 2h · Free</span>
+                  <span className="text-sm font-medium text-foreground">{t("checkout.pickup")}</span>
+                  <span className="text-[10px] text-muted-foreground">{t("checkout.pickupTime")}</span>
                 </button>
                 <button
                   onClick={() => setFulfillmentMethod("shipping")}
                   className={`flex flex-col items-center gap-2 rounded-lg border p-4 text-center transition-colors ${fulfillmentMethod === "shipping" ? "border-blue-600 bg-blue-50" : "border-border hover:bg-secondary"}`}
                 >
                   <Package className={`h-6 w-6 ${fulfillmentMethod === "shipping" ? "text-blue-600" : "text-muted-foreground"}`} />
-                  <span className="text-sm font-medium text-foreground">Ship</span>
-                  <span className="text-[10px] text-muted-foreground">3-5 days · $9.99</span>
+                  <span className="text-sm font-medium text-foreground">{t("checkout.ship")}</span>
+                  <span className="text-[10px] text-muted-foreground">{t("checkout.shipTime")}</span>
                 </button>
               </div>
 
@@ -83,18 +84,18 @@ export default function CheckoutPage() {
                 <div className="mt-4 flex items-center gap-2 rounded-lg bg-secondary/50 p-3 text-sm">
                   <MapPin className="h-4 w-4 text-primary" />
                   <span className="text-muted-foreground">
-                    {fulfillmentMethod === "delivery" ? "Delivering from" : "Pickup at"}{" "}
+                    {fulfillmentMethod === "delivery" ? t("checkout.deliveringFrom") : t("checkout.pickupAt")}{" "}
                     <span className="font-medium text-foreground">{selectedStore}</span>
                   </span>
-                  <button className="ml-auto text-xs font-medium text-primary">Change</button>
+                  <button className="ml-auto text-xs font-medium text-primary">{t("checkout.change")}</button>
                 </div>
               )}
 
               {fulfillmentMethod === "shipping" && (
                 <div className="mt-4 rounded-lg bg-secondary/50 p-3">
-                  <p className="text-sm font-medium text-foreground">Ship to</p>
+                  <p className="text-sm font-medium text-foreground">{t("checkout.shipTo")}</p>
                   <p className="text-xs text-muted-foreground">124 Main St, New York, NY 10001</p>
-                  <button className="mt-1 text-xs font-medium text-primary">Change Address</button>
+                  <button className="mt-1 text-xs font-medium text-primary">{t("checkout.changeAddress")}</button>
                 </div>
               )}
             </div>
@@ -109,8 +110,8 @@ export default function CheckoutPage() {
                   <Crown className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="text-sm font-bold text-foreground">Join H Mart Plus</p>
-                  <p className="text-[11px] text-muted-foreground">Free delivery, 2× rewards, exclusive deals</p>
+                  <p className="text-sm font-bold text-foreground">{t("checkout.joinPlus")}</p>
+                  <p className="text-[11px] text-muted-foreground">{t("checkout.plusBenefits")}</p>
                 </div>
                 <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">$9.99/mo</span>
                 <div className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors ${hmartPlus ? "border-primary bg-primary" : "border-primary/40"}`}>
@@ -122,7 +123,7 @@ export default function CheckoutPage() {
             {/* Cart Items */}
             <div className="rounded-xl border border-border bg-card p-6">
               <h2 className="mb-4 font-display text-lg font-medium text-foreground">
-                Your Items ({items.reduce((s, i) => s + i.quantity, 0)})
+                {t("checkout.yourItems")} ({items.reduce((s, i) => s + i.quantity, 0)})
               </h2>
               <div className="divide-y divide-border">
                 {items.map(({ product, quantity }) => (
@@ -166,14 +167,14 @@ export default function CheckoutPage() {
 
             {/* Payment */}
             <div className="rounded-xl border border-border bg-card p-6">
-              <h2 className="mb-4 font-display text-lg font-medium text-foreground">Payment Method</h2>
+              <h2 className="mb-4 font-display text-lg font-medium text-foreground">{t("checkout.paymentMethod")}</h2>
               <div className="flex items-center gap-3 rounded-lg border border-border p-3">
                 <CreditCard className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <p className="text-sm font-medium text-foreground">•••• •••• •••• 4242</p>
                   <p className="text-[11px] text-muted-foreground">Visa · Expires 12/28</p>
                 </div>
-                <button className="ml-auto text-xs font-medium text-primary">Change</button>
+                <button className="ml-auto text-xs font-medium text-primary">{t("checkout.change")}</button>
               </div>
             </div>
           </div>
@@ -181,70 +182,69 @@ export default function CheckoutPage() {
           {/* Order Summary */}
           <div>
             <div className="sticky top-28 rounded-xl border border-border bg-card p-6">
-              <h2 className="mb-4 font-display text-lg font-medium text-foreground">Order Summary</h2>
+              <h2 className="mb-4 font-display text-lg font-medium text-foreground">{t("checkout.orderSummary")}</h2>
 
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="text-muted-foreground">{t("checkout.subtotal")}</span>
                   <span className="font-medium text-foreground">${totalPrice.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">
-                    {fulfillmentMethod === "delivery" ? "Delivery Fee" : fulfillmentMethod === "shipping" ? "Shipping" : "Pickup"}
+                    {fulfillmentMethod === "delivery" ? t("checkout.deliveryFee") : fulfillmentMethod === "shipping" ? t("checkout.shipping") : t("checkout.pickup")}
                   </span>
                   <span className={`font-medium ${deliveryFee === 0 ? "text-green-600" : "text-foreground"}`}>
-                    {deliveryFee === 0 ? "Free" : `$${deliveryFee.toFixed(2)}`}
+                    {deliveryFee === 0 ? t("checkout.free") : `$${deliveryFee.toFixed(2)}`}
                   </span>
                 </div>
                 {hmartPlus && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">H Mart Plus</span>
+                    <span className="text-muted-foreground">{t("checkout.hmartPlus")}</span>
                     <span className="font-medium text-foreground">$9.99</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Tax</span>
+                  <span className="text-muted-foreground">{t("checkout.tax")}</span>
                   <span className="font-medium text-foreground">${tax.toFixed(2)}</span>
                 </div>
 
                 {totalPrice >= 49 && fulfillmentMethod === "delivery" && (
                   <div className="rounded-md bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700">
-                    🎉 You qualify for free delivery!
+                    {t("checkout.freeDelivery")}
                   </div>
                 )}
 
                 <div className="border-t border-border pt-2">
                   <div className="flex justify-between">
-                    <span className="font-semibold text-foreground">Total</span>
+                    <span className="font-semibold text-foreground">{t("checkout.total")}</span>
                     <span className="text-xl font-bold text-foreground">${grandTotal.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
 
               <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] active:scale-95">
-                Place Order <ChevronRight className="h-4 w-4" />
+                {t("checkout.placeOrder")} <ChevronRight className="h-4 w-4" />
               </button>
 
               <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-foreground py-3.5 text-sm font-semibold text-background transition-transform hover:scale-[1.02] active:scale-95">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.72 7.54c-.46.53-1.21.94-1.94.88-.09-.76.28-1.56.72-2.06.46-.53 1.26-.92 1.91-.95.08.79-.23 1.57-.69 2.13zm.69 1.08c-1.07-.06-1.99.61-2.5.61-.51 0-1.29-.58-2.13-.56-1.1.02-2.11.64-2.67 1.62-1.14 1.97-.29 4.89.81 6.49.55.79 1.19 1.67 2.05 1.64.82-.03 1.13-.53 2.12-.53s1.27.53 2.13.51c.88-.01 1.44-.8 1.98-1.59.62-.91.88-1.79.89-1.84-.02-.01-1.71-.66-1.73-2.61-.01-1.63 1.33-2.41 1.39-2.45-.76-1.12-1.94-1.24-2.34-1.29z"/></svg>
-                Pay
+                {t("checkout.pay")}
               </button>
 
               <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                 <ShieldCheck className="h-3.5 w-3.5" />
-                Secure checkout · SSL encrypted
+                {t("checkout.secureCheckout")}
               </div>
 
-              {/* Smart Rewards */}
               <div className="mt-4 rounded-lg bg-accent/10 p-3">
-                <p className="text-xs font-semibold text-foreground">Smart Rewards</p>
+                <p className="text-xs font-semibold text-foreground">{t("checkout.smartRewards")}</p>
                 <p className="text-[11px] text-muted-foreground">
-                  Earn <span className="font-bold text-accent-foreground">{Math.floor(grandTotal)}</span> points with this purchase
+                  {t("checkout.earn")} <span className="font-bold text-accent-foreground">{Math.floor(grandTotal)}</span> {t("checkout.earnPoints")}
                 </p>
               </div>
 
               <Link to="/products" className="mt-4 block text-center text-xs font-medium text-primary hover:underline">
-                ← Continue Shopping
+                {t("checkout.continueShopping")}
               </Link>
             </div>
           </div>
