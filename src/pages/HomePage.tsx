@@ -37,7 +37,12 @@ const CREATORS = [
 export default function HomePage() {
   const { addItem } = useCart();
   const { t } = useLanguage();
+  const { activeTab } = useTab();
   const location = useLocation();
+
+  if (activeTab === "gifts") return <GiftsHomePage />;
+  if (activeTab === "b2b") return <B2BHomePage />;
+
   const sponsoredProducts = products.filter((p) => p.isSponsored);
   const chefPicks = products.filter((p) => p.rating >= 4.7).slice(0, 4);
 
