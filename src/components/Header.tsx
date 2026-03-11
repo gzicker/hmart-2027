@@ -51,21 +51,29 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-sm">
       {/* Promo bar */}
-      <div className="bg-primary">
-        <div className="hmart-container flex items-center justify-center gap-4 py-1.5 text-xs font-medium text-primary-foreground sm:gap-6">
+      <div className={
+        activeTab === "gifts" ? "bg-[hsl(230,60%,50%)]"
+        : activeTab === "b2b" ? "bg-gray-800"
+        : "bg-primary"
+      }>
+        <div className="hmart-container flex items-center justify-center gap-4 py-1.5 text-xs font-medium text-white sm:gap-6">
           <span>{t("promo.join")} <strong>{t("promo.hmartPlus")}</strong> {t("promo.freeShipping")}</span>
           <span className="hidden sm:inline">·</span>
           <span className="hidden sm:inline">{t("promo.rewards")}</span>
           <span className="hidden md:inline">·</span>
           <span className="hidden md:inline">{t("promo.deals")}</span>
-          <Link to="/products" className="ml-2 rounded-sm bg-primary-foreground/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider transition-colors hover:bg-primary-foreground/30">
+          <Link to="/products" className="ml-2 rounded-sm bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider transition-colors hover:bg-white/30">
             {t("promo.learnMore")}
           </Link>
         </div>
       </div>
 
       {/* Site tabs */}
-      <div className="bg-primary/90">
+      <div className={
+        activeTab === "gifts" ? "bg-[hsl(230,60%,50%)]/90"
+        : activeTab === "b2b" ? "bg-gray-700"
+        : "bg-primary/90"
+      }>
         <div className="hmart-container flex items-end gap-1 pt-1">
           {SITE_TABS.map((tab) => (
             <button
@@ -74,14 +82,14 @@ export default function Header() {
               className={`flex items-center gap-2 rounded-t-lg px-5 py-2 text-sm font-semibold transition-colors ${
                 activeTab === tab.id
                   ? "bg-card text-foreground shadow-sm"
-                  : "bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20"
+                  : "bg-white/10 text-white hover:bg-white/20"
               }`}
             >
               {tab.icon && <tab.icon className="h-3.5 w-3.5" />}
               <span>{tab.id === "b2b" ? `${t("tab.hmart")} B2B` : tab.id === "gifts" ? t("tab.giftsLabel") : t("tab.hmart")}</span>
               {tab.sublabelKey && (
                 <span className={`hidden text-[10px] font-normal sm:inline ${
-                  activeTab === tab.id ? "text-muted-foreground" : "text-primary-foreground/70"
+                  activeTab === tab.id ? "text-muted-foreground" : "text-white/70"
                 }`}>
                   {t(tab.sublabelKey)}
                 </span>
