@@ -7,9 +7,12 @@ import bannerNongshim from "@/assets/banner-nongshim.jpg";
 import bannerCj from "@/assets/banner-cj.jpg";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTab } from "@/contexts/TabContext";
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import GiftsHomePage from "./GiftsHomePage";
+import B2BHomePage from "./B2BHomePage";
 
 import HeroCarousel from "@/components/HeroCarousel";
 import categoryVeg from "@/assets/category-vegetables.jpg";
@@ -34,7 +37,19 @@ const CREATORS = [
 export default function HomePage() {
   const { addItem } = useCart();
   const { t } = useLanguage();
+  const { activeTab } = useTab();
   const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const el = document.querySelector(location.hash);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [location.hash]);
+
+  if (activeTab === "gifts") return <GiftsHomePage />;
+  if (activeTab === "b2b") return <B2BHomePage />;
+
   const sponsoredProducts = products.filter((p) => p.isSponsored);
   const chefPicks = products.filter((p) => p.rating >= 4.7).slice(0, 4);
 
@@ -44,13 +59,6 @@ export default function HomePage() {
     { name: t("cat.pantry"), nameKo: "식료품", image: categoryPantry, link: "/products" },
     { name: t("cat.kbeauty"), nameKo: "뷰티", image: categoryKbeauty, link: "/products" },
   ];
-
-  useEffect(() => {
-    if (location.hash) {
-      const el = document.querySelector(location.hash);
-      if (el) el.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [location.hash]);
 
   return (
     <div className="min-h-screen bg-background">

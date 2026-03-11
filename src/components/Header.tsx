@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight, Package, MapPin, CreditCard, LogOut, ShoppingBasket } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTab } from "@/contexts/TabContext";
 import { useState, useRef, useEffect } from "react";
 import logoImg from "@/assets/hmart-logo.png";
 import StoreSelector from "@/components/StoreSelector";
@@ -24,8 +25,8 @@ const CATEGORY_KEYS = [
 export default function Header() {
   const { totalItems } = useCart();
   const { t } = useLanguage();
+  const { activeTab, setActiveTab } = useTab();
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("hmart");
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const catRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
