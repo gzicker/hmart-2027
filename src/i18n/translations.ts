@@ -11,7 +11,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "promo.learnMore": "Learn More",
 
     // Site tabs
-    "tab.hmart": "H MART",
+    "tab.hmart": "H Mart",
     "tab.gifts": "Gifts to Korea",
     "tab.b2b": "Wholesale",
 
