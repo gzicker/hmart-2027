@@ -59,7 +59,6 @@ export default function HomePage() {
     { name: t("cat.pantry"), nameKo: "식료품", image: categoryPantry, link: "/products" },
     { name: t("cat.kbeauty"), nameKo: "뷰티", image: categoryKbeauty, link: "/products" },
   ];
-  }, [location.hash]);
 
   return (
     <div className="min-h-screen bg-background">
