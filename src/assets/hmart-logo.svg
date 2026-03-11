@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 111" width="500" height="111">
+  <!-- Red square with H -->
+  <rect x="0" y="0" width="108" height="108" rx="4" fill="#E31837"/>
+  <text x="54" y="84" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="90" fill="white">H</text>
+  <!-- MART text -->
+  <text x="125" y="90" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="100" fill="#E31837" letter-spacing="4">MART</text>
+  <!-- ® symbol -->
+  <text x="478" y="30" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#E31837">®</text>
+</svg>
