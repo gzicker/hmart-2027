@@ -240,7 +240,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "promo.learnMore": "더 알아보기",
 
     // Site tabs
-    "tab.hmart": "H MART",
+    "tab.hmart": "H Mart",
     "tab.gifts": "고국통신",
     "tab.b2b": "도매",
 
