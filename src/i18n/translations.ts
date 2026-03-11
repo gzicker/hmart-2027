@@ -469,7 +469,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "promo.learnMore": "了解更多",
 
     // Site tabs
-    "tab.hmart": "H MART",
+    "tab.hmart": "H Mart",
     "tab.gifts": "韩国礼品",
     "tab.b2b": "批发",
 
