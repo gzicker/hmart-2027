@@ -233,7 +233,7 @@ export const translations: Record<Language, Record<string, string>> = {
   ko: {
     // Promo bar
     "promo.join": "가입하세요",
-    "promo.hmartPlus": "H MART PLUS",
+    "promo.hmartPlus": "H Mart Plus",
     "promo.freeShipping": "— $49 이상 무료배송",
     "promo.rewards": "스마트 리워드 포인트 2배 적립",
     "promo.deals": "독점 주간 특가",
