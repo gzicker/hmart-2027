@@ -4,7 +4,7 @@ export const translations: Record<Language, Record<string, string>> = {
   en: {
     // Promo bar
     "promo.join": "JOIN",
-    "promo.hmartPlus": "H MART PLUS",
+    "promo.hmartPlus": "H Mart Plus",
     "promo.freeShipping": "— FREE SHIPPING on orders $49+",
     "promo.rewards": "Earn 2x Smart Rewards Points",
     "promo.deals": "Exclusive Weekly Deals",
