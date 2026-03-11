@@ -462,7 +462,7 @@ export const translations: Record<Language, Record<string, string>> = {
   zh: {
     // Promo bar
     "promo.join": "加入",
-    "promo.hmartPlus": "H MART PLUS",
+    "promo.hmartPlus": "H Mart Plus",
     "promo.freeShipping": "— 满$49免运费",
     "promo.rewards": "赚取2倍积分",
     "promo.deals": "每周独家优惠",
