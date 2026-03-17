@@ -16,7 +16,7 @@ import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
-  const { addItem, selectedSellerId, selectedStoreData } = useCart();
+  const { addItem, selectedSellerId, selectedStore } = useCart();
   const { t, language } = useLanguage();
   const [quantity, setQuantity] = useState(1);
   const [showPairDrawer, setShowPairDrawer] = useState(false);
