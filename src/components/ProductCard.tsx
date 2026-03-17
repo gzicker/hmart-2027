@@ -35,6 +35,8 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
   const displayListPrice = sellerPrice?.available && sellerPrice.listPrice > 0 ? sellerPrice.listPrice : product.originalPrice;
   const isUnavailable = sellerPrice !== null && !sellerPrice.available;
 
+  if (hideIfUnavailable && isUnavailable) return null;
+
   return (
     <div className={`product-card ${featured ? "col-span-2 row-span-2" : ""} ${isUnavailable ? "opacity-60" : ""}`}>
       {product.isSponsored && (
