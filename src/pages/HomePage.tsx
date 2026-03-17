@@ -32,7 +32,7 @@ const TIKTOK_VIDEOS = [
 ];
 
 export default function HomePage() {
-  const { addItem } = useCart();
+  const { addItem, selectedSellerId } = useCart();
   const { t } = useLanguage();
   const { activeTab } = useTab();
   const location = useLocation();
