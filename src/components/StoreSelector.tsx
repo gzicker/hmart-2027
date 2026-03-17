@@ -22,14 +22,24 @@ export default function StoreSelector() {
   const [isSearching, setIsSearching] = useState(false);
   const [sellers, setSellers] = useState<RegionSeller[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [locationLabel, setLocationLabel] = useState("");
 
   const searchByZip = async () => {
     const zip = zipcode.replace(/\D/g, "");
     if (zip.length < 5) return;
     setIsSearching(true);
     setHasSearched(true);
+    setLocationLabel("");
     try {
-      const results = await getSellersForZipcode(zip);
+      // Fetch city/state from ZIP in parallel with seller lookup
+      const [results, geoRes] = await Promise.all([
+        getSellersForZipcode(zip),
+        fetch(`https://api.zippopotam.us/us/${zip}`).then(r => r.ok ? r.json() : null).catch(() => null),
+      ]);
+      if (geoRes?.places?.[0]) {
+        const place = geoRes.places[0];
+        setLocationLabel(`${place['place name']}, ${place['state abbreviation']}`);
+      }
       setSellers(results);
       if (results.length === 1) {
         setSelectedSellerId(results[0].id);
@@ -150,7 +160,11 @@ export default function StoreSelector() {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="space-y-1">
-                        <div className="font-medium text-foreground">{seller.name}</div>
+                        <div className="font-medium text-foreground">
+                          {fulfillmentMethod === "delivery"
+                            ? (locationLabel || `ZIP ${zipcode}`)
+                            : seller.name}
+                        </div>
                         {fulfillmentMethod === "pickup" && STORE_ADDRESSES[seller.id] && (
                           <div className="text-xs text-muted-foreground">{STORE_ADDRESSES[seller.id]}</div>
                         )}
