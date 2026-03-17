@@ -28,12 +28,12 @@ import creator3 from "@/assets/creator-3.jpg";
 import creator4 from "@/assets/creator-4.jpg";
 import creator5 from "@/assets/creator-5.jpg";
 
-const CREATORS = [
-  { image: creator1, name: "@jieun.eats", handle: "Jieun", caption: "Best ramen hack from H Mart 🍜", views: "1.2M", product: "Shin Ramyun" },
-  { image: creator2, name: "@david.mukbang", handle: "David", caption: "Korean fried chicken taste test!", views: "890K", product: "Korean Fried Chicken" },
-  { image: creator3, name: "@glow.with.mina", handle: "Mina", caption: "K-Beauty haul under $30 ✨", views: "2.1M", product: "K-Beauty Essentials" },
-  { image: creator4, name: "@chef.park", handle: "Chef Park", caption: "Kimchi jjigae in 15 min 🔥", views: "650K", product: "Kimchi Jjigae Kit" },
-  { image: creator5, name: "@snackqueen.amy", handle: "Amy", caption: "H Mart snack haul you NEED", views: "1.8M", product: "Korean Snacks" },
+const TIKTOK_VIDEOS = [
+  { id: "7364167688190446890", username: "katchaomeow", caption: "Must-have items at H Mart 🛒 #hmart #hmartmusthaves", views: "21.9K" },
+  { id: "7576335970484686111", username: "hmart_pnw", caption: "Redmond H Mart just went crazy 🎉 Super fresh Tuna!", views: "1.1K" },
+  { id: "7577554949295443231", username: "ally_wong", caption: "Essential grocery haul from H Mart for new home 🏠", views: "5.2K" },
+  { id: "7512658858544925998", username: "seattlefoodieadventure", caption: "Best Korean food finds at H Mart! 🍜", views: "12K" },
+  { id: "7364167688190446890", username: "katchaomeow", caption: "Korean grocery store tour #hmart 🇰🇷", views: "21.9K" },
 ];
 
 export default function HomePage() {
