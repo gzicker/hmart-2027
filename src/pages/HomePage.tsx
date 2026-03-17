@@ -60,7 +60,18 @@ export default function HomePage() {
   if (activeTab === "b2b") return <B2BHomePage />;
 
   const sponsoredProducts = vtexProducts.slice(0, 3);
-  const chefPicks = vtexProducts.slice(0, 4);
+
+  // Always show 4 available items for the selected seller
+  const chefPicks = useMemo(() => {
+    return vtexProducts
+      .filter((p) => {
+        const sellers = (p as any)._vtex?.sellers;
+        if (!sellers || sellers.length === 0) return true; // no seller data = show
+        const match = sellers.find((s: any) => s.sellerId === selectedSellerId);
+        return match ? match.available : sellers.some((s: any) => s.available);
+      })
+      .slice(0, 4);
+  }, [vtexProducts, selectedSellerId]);
 
   const categoryImages = [
     { name: t("cat.vegetables"), nameKo: "채소", image: categoryVeg, link: "/products" },
