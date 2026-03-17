@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Product } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getProductName, getProductSubName } from "@/lib/product-utils";
+import { getProductName } from "@/lib/product-utils";
 import { useProductSellerSimulation } from "@/hooks/useSellerSimulation";
 import { Plus, Star, AlertTriangle } from "lucide-react";
 
@@ -17,7 +17,6 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
   const { t, language } = useLanguage();
 
   const displayName = getProductName(product, language);
-  const subName = getProductSubName(product, language);
   const simulation = useProductSellerSimulation(product, selectedSellerId);
 
   const isUnavailable = simulation ? !simulation.available : false;
@@ -49,30 +48,21 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
       )}
 
       <Link to={`/product/${product.id}`}>
-        <div className="product-card-image">
-          <img src={product.image} alt={displayName} loading="lazy" />
+        <div className="product-card-image aspect-square overflow-hidden">
+          <img src={product.image} alt={displayName} loading="lazy" className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105" />
         </div>
       </Link>
 
       <div className="flex flex-1 flex-col p-3">
         <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{product.brand}</p>
         <Link to={`/product/${product.id}`}>
-          <h3
-            className="mt-0.5 text-sm font-medium leading-tight text-foreground overflow-hidden max-h-[2.5rem] group-hover:max-h-[3.75rem] transition-all duration-300 hover:text-primary"
-            title={`${displayName}${subName ? ` ${subName}` : ""}`}
-          >
+          <h3 className="mt-0.5 text-sm font-medium leading-tight text-foreground hover:text-primary line-clamp-2">
             {displayName}
           </h3>
-          {subName && (
-            <p
-              className="mt-0.5 text-xs leading-tight text-muted-foreground overflow-hidden max-h-[2.25rem] group-hover:max-h-40 transition-all duration-300"
-              title={subName}
-            >
-              {subName}
-            </p>
-          )}
         </Link>
-        <p className="mt-0.5 text-[11px] text-muted-foreground">{product.weight}</p>
+        <p className="mt-0.5 text-[11px] text-muted-foreground line-clamp-1 group-hover:line-clamp-3 transition-all">
+          {product.weight}
+        </p>
 
         <div className="mt-1.5 flex items-center gap-1">
           <Star className="h-3 w-3 fill-accent text-accent" />
