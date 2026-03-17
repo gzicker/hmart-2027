@@ -223,18 +223,6 @@ export default function ProductDetailPage() {
                     </div>
                   </button>
                 )}
-                {product.fulfillment.includes("shipping") && (
-                  <button
-                    onClick={() => setSelectedFulfillment("shipping")}
-                    className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${selectedFulfillment === "shipping" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-border text-foreground hover:bg-secondary"}`}
-                  >
-                    <Package className="h-4 w-4" />
-                    <div className="text-left">
-                      <p>{t("product.ship")}</p>
-                      <p className="text-[10px] font-normal text-muted-foreground">{t("detail.ship3to5")}</p>
-                    </div>
-                  </button>
-                )}
               </div>
               {product.storeName && selectedFulfillment !== "shipping" && (
                 <p className="mt-2 text-xs text-muted-foreground">
