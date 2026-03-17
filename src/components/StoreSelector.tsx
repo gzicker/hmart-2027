@@ -1,70 +1,53 @@
 import { useState } from "react";
-import { MapPin, ChevronDown, Check, Search, Loader2, Clock, Truck } from "lucide-react";
+import { MapPin, ChevronDown, Check, Search, Loader2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { FRANCHISE_STORES, getDeliverySLAsForZipcode, formatShippingEstimate, type DeliverySLA } from "@/api/stores";
+import { getSellersForZipcode, type RegionSeller } from "@/api/stores";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 
 export default function StoreSelector() {
   const {
-    selectedStore, selectedStoreData, setSelectedStoreById,
+    selectedStore, setSelectedStore,
+    selectedSellerId, setSelectedSellerId,
     fulfillmentMethod, setFulfillmentMethod,
-    selectedSLA, setSelectedSLA,
   } = useCart();
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [zipcode, setZipcode] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const [availableSLAs, setAvailableSLAs] = useState<DeliverySLA[]>([]);
-  const [searchDone, setSearchDone] = useState(false);
-  const [searchError, setSearchError] = useState<string | null>(null);
+  const [sellers, setSellers] = useState<RegionSeller[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
 
-  const handleZipcodeSearch = async () => {
-    const cleaned = zipcode.replace(/\D/g, "");
-    if (cleaned.length < 5) return;
-
+  const searchByZip = async () => {
+    const zip = zipcode.replace(/\D/g, "");
+    if (zip.length < 5) return;
     setIsSearching(true);
-    setSearchError(null);
-    setAvailableSLAs([]);
-    setSearchDone(false);
-
+    setHasSearched(true);
     try {
-      if (fulfillmentMethod === "delivery") {
-        const slas = await getDeliverySLAsForZipcode(cleaned);
-        setAvailableSLAs(slas);
-        setSearchDone(true);
-        if (slas.length === 0) {
-          setSearchError("No delivery options available for this zipcode.");
-        }
+      const results = await getSellersForZipcode(zip);
+      setSellers(results);
+      if (results.length === 1) {
+        setSelectedSellerId(results[0].id);
+        setSelectedStore(results[0].name);
       }
-    } catch {
-      setSearchError("Could not look up zipcode. Please try again.");
+    } catch (err) {
+      console.error("Region lookup failed:", err);
+      setSellers([]);
     } finally {
       setIsSearching(false);
     }
   };
 
-  const handleSelectSLA = (sla: DeliverySLA) => {
-    setSelectedSLA(sla);
-    // Auto-select the franchise store in background
-    setSelectedStoreById(sla.storeId);
+  const selectSeller = (seller: RegionSeller) => {
+    setSelectedSellerId(seller.id);
+    setSelectedStore(seller.name);
     setOpen(false);
   };
-
-  const handleSelectStore = (storeId: string) => {
-    setSelectedStoreById(storeId);
-    setOpen(false);
-  };
-
-  const displayLabel = fulfillmentMethod === "delivery"
-    ? (selectedSLA?.name || selectedStoreData?.name || selectedStore || "Select delivery")
-    : (selectedStoreData?.name || selectedStore || "Select store");
 
   return (
     <>
@@ -78,7 +61,7 @@ export default function StoreSelector() {
             {fulfillmentMethod === "delivery" ? t("store.deliverTo") : t("store.pickupAt")}
           </div>
           <div className="font-medium text-foreground leading-tight truncate max-w-[140px]">
-            {displayLabel}
+            {selectedStore || "Enter ZIP code"}
           </div>
         </div>
         <ChevronDown className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
@@ -88,160 +71,110 @@ export default function StoreSelector() {
         <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-display text-xl">
-              {fulfillmentMethod === "delivery" ? t("store.chooseStore") : t("store.chooseStore")}
+              {t("store.chooseStore")}
             </DialogTitle>
           </DialogHeader>
+
+          <p className="text-sm text-muted-foreground">
+            Enter your ZIP code to find your store. Prices and availability depend on your location.
+          </p>
+
+          {/* ZIP Search */}
+          <div className="flex gap-2">
+            <input
+              placeholder="Enter ZIP code"
+              value={zipcode}
+              onChange={(e) => setZipcode(e.target.value.replace(/\D/g, "").slice(0, 5))}
+              onKeyDown={(e) => e.key === "Enter" && searchByZip()}
+              className="flex-1 rounded-lg border border-border bg-background py-2.5 px-4 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+            <button
+              onClick={searchByZip}
+              disabled={isSearching || zipcode.replace(/\D/g, "").length < 5}
+              className="flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+            >
+              {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+              Find
+            </button>
+          </div>
 
           {/* Fulfillment toggle */}
           <div className="flex gap-1 rounded-lg bg-secondary p-1">
             {(["delivery", "pickup"] as const).map((method) => (
               <button
                 key={method}
-                onClick={() => {
-                  setFulfillmentMethod(method);
-                  setAvailableSLAs([]);
-                  setSearchDone(false);
-                  setSearchError(null);
-                }}
-                className={`flex-1 rounded-md px-3 py-2 text-sm font-medium capitalize transition-colors ${
+                onClick={() => setFulfillmentMethod(method)}
+                className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                   fulfillmentMethod === method
                     ? "bg-card text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {method === "delivery" ? t("checkout.delivery") : t("checkout.pickup")}
+                {method === "delivery" ? "Delivery" : "Pickup"}
               </button>
             ))}
           </div>
 
-          {/* DELIVERY MODE — zipcode + SLAs */}
-          {fulfillmentMethod === "delivery" && (
-            <>
-              <p className="text-sm text-muted-foreground">
-                Enter your zipcode to see available delivery options.
-              </p>
-
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Enter zipcode"
-                  value={zipcode}
-                  onChange={(e) => setZipcode(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleZipcodeSearch()}
-                  className="flex-1"
-                  maxLength={10}
-                />
-                <button
-                  onClick={handleZipcodeSearch}
-                  disabled={isSearching || zipcode.replace(/\D/g, "").length < 5}
-                  className="flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
-                >
-                  {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                  Find
-                </button>
-              </div>
-
-              {searchError && (
-                <p className="text-sm text-destructive">{searchError}</p>
-              )}
-
-              {searchDone && availableSLAs.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Available for {zipcode}
-                  </p>
-                  {availableSLAs.map((sla) => {
-                    const isSelected = selectedSLA?.id === sla.id && selectedSLA?.sellerId === sla.sellerId;
-                    return (
-                      <button
-                        key={`${sla.id}-${sla.sellerId}`}
-                        onClick={() => handleSelectSLA(sla)}
-                        className={`w-full rounded-lg border p-4 text-left transition-all ${
-                          isSelected
-                            ? "border-primary bg-primary/5 ring-1 ring-primary"
-                            : "border-border hover:border-primary/50"
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="space-y-1.5">
-                            <div className="flex items-center gap-2">
-                              <Truck className="h-4 w-4 text-muted-foreground" />
-                              <span className="font-medium text-foreground">{sla.name}</span>
-                            </div>
-                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                              {sla.shippingEstimate && (
-                                <span className="flex items-center gap-1">
-                                  <Clock className="h-3.5 w-3.5" />
-                                  {formatShippingEstimate(sla.shippingEstimate)}
-                                </span>
-                              )}
-                              <span className="font-medium">
-                                {sla.price === 0 ? (
-                                  <span className="text-green-600">Free</span>
-                                ) : (
-                                  `$${sla.price.toFixed(2)}`
-                                )}
-                              </span>
-                            </div>
-                          </div>
-                          {isSelected && (
-                            <div className="flex-shrink-0 rounded-full bg-primary p-1">
-                              <Check className="h-3.5 w-3.5 text-primary-foreground" />
-                            </div>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </>
+          {/* Results */}
+          {isSearching && (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
           )}
 
-          {/* PICKUP MODE — store list */}
-          {fulfillmentMethod === "pickup" && (
-            <>
-              <p className="text-sm text-muted-foreground">
-                Select a store for pickup.
-              </p>
+          {hasSearched && !isSearching && sellers.length === 0 && (
+            <div className="rounded-lg border border-border bg-secondary/30 p-6 text-center">
+              <p className="text-sm font-medium text-foreground">No store serves ZIP code {zipcode}</p>
+              <p className="mt-1 text-xs text-muted-foreground">Try a different ZIP code</p>
+            </div>
+          )}
 
-              <div className="space-y-2">
-                {FRANCHISE_STORES.map((store) => {
-                  const isSelected = selectedStoreData?.id === store.id;
-                  return (
-                    <button
-                      key={store.id}
-                      onClick={() => handleSelectStore(store.id)}
-                      className={`w-full rounded-lg border p-4 text-left transition-all ${
-                        isSelected
-                          ? "border-primary bg-primary/5 ring-1 ring-primary"
-                          : "border-border hover:border-primary/50"
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="space-y-1">
-                          <div className="font-medium text-foreground">{store.name}</div>
-                          <div className="text-sm text-muted-foreground">{store.address}</div>
-                        </div>
-                        {isSelected && (
-                          <div className="flex-shrink-0 rounded-full bg-primary p-1">
-                            <Check className="h-3.5 w-3.5 text-primary-foreground" />
-                          </div>
-                        )}
+          {hasSearched && !isSearching && sellers.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                {sellers.length === 1 ? "Your store" : `${sellers.length} stores serve ZIP ${zipcode}`}
+              </p>
+              {sellers.map((seller) => {
+                const isSelected = selectedSellerId === seller.id;
+                return (
+                  <button
+                    key={seller.id}
+                    onClick={() => selectSeller(seller)}
+                    className={`w-full rounded-lg border p-4 text-left transition-all ${
+                      isSelected
+                        ? "border-primary bg-primary/5 ring-1 ring-primary"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <div className="font-medium text-foreground">{seller.name}</div>
                       </div>
                       {isSelected && (
-                        <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-primary">
-                          <MapPin className="h-3 w-3" /> {t("store.yourStore")}
+                        <div className="flex-shrink-0 rounded-full bg-primary p-1">
+                          <Check className="h-3.5 w-3.5 text-primary-foreground" />
                         </div>
                       )}
-                    </button>
-                  );
-                })}
-              </div>
-            </>
+                    </div>
+                    {isSelected && (
+                      <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-primary">
+                        <MapPin className="h-3 w-3" /> {t("store.yourStore")}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {!hasSearched && (
+            <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+              Enter your ZIP code above to find your store
+            </div>
           )}
 
           <p className="text-xs text-muted-foreground text-center">
-            Prices, promotions, and product availability may vary by location.
+            Prices, promotions, inventory, and delivery options are determined by the store that serves your area.
           </p>
         </DialogContent>
       </Dialog>
