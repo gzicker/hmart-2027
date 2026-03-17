@@ -120,7 +120,7 @@ export async function searchProducts(params: {
 
 export async function searchBySlug(slug: string): Promise<ISProduct | null> {
   const data = await vtexFetch<ISSearchResponse>(`${IS_BASE}/product_search/${slug}/p`, {
-    params: { locale: VTEX_CONFIG.locale },
+    params: { locale: VTEX_CONFIG.locale, sc: VTEX_CONFIG.salesChannel },
   });
   return data.products?.[0] ?? null;
 }
