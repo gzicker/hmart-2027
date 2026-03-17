@@ -49,11 +49,23 @@ export default function HomePage() {
     }
   }, [location.hash]);
 
+  const [vtexProducts, setVtexProducts] = useState<Product[]>([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+
+  useEffect(() => {
+    searchProducts({ query: '', count: 20, sort: 'orders_desc' })
+      .then((res) => {
+        setVtexProducts(vtexProductsToProducts(res.products));
+      })
+      .catch(console.error)
+      .finally(() => setIsLoadingProducts(false));
+  }, []);
+
   if (activeTab === "gifts") return <GiftsHomePage />;
   if (activeTab === "b2b") return <B2BHomePage />;
 
-  const sponsoredProducts = products.filter((p) => p.isSponsored);
-  const chefPicks = products.filter((p) => p.rating >= 4.7).slice(0, 4);
+  const sponsoredProducts = vtexProducts.slice(0, 3);
+  const chefPicks = vtexProducts.slice(0, 4);
 
   const categoryImages = [
     { name: t("cat.vegetables"), nameKo: "채소", image: categoryVeg, link: "/products" },
