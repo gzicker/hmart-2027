@@ -71,6 +71,8 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
               {subName}
             </p>
           )}
+        </Link>
+        <p className="mt-0.5 text-[11px] text-muted-foreground">{product.weight}</p>
 
         <div className="mt-1.5 flex items-center gap-1">
           <Star className="h-3 w-3 fill-accent text-accent" />
