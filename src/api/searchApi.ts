@@ -96,6 +96,8 @@ export interface ISFacetValue {
   value: string;
   quantity: number;
   selected: boolean;
+  range?: { from: number; to: number };
+  children?: ISFacetValue[];
 }
 
 export interface ISFacetsResponse {
