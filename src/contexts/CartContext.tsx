@@ -38,6 +38,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const [selectedStoreData, setSelectedStoreData] = useState<FranchiseStore>(DEFAULT_STORE);
   const [selectedSellerId, setSelectedSellerId] = useState(DEFAULT_STORE.sellerId);
+  const [selectedSLA, setSelectedSLA] = useState<DeliverySLA | null>(null);
 
   const setSelectedStoreById = useCallback((storeId: string) => {
     const store = FRANCHISE_STORES.find(s => s.id === storeId);
