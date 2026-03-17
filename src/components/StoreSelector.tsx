@@ -44,17 +44,16 @@ export default function StoreSelector() {
     }
   }, [promptStoreSelector, setPromptStoreSelector]);
 
-  const searchByZip = async () => {
-    const zip = zipcode.replace(/\D/g, "");
-    if (zip.length < 5) return;
+  const runSearch = async (zip: string, isAutoInit = false) => {
+    const cleanZip = zip.replace(/\D/g, "");
+    if (cleanZip.length < 5) return;
     setIsSearching(true);
     setHasSearched(true);
     setLocationLabel("");
     try {
-      // Fetch city/state from ZIP in parallel with seller lookup
       const [results, geoRes] = await Promise.all([
-        getSellersForZipcode(zip),
-        fetch(`https://api.zippopotam.us/us/${zip}`).then(r => r.ok ? r.json() : null).catch(() => null),
+        getSellersForZipcode(cleanZip),
+        fetch(`https://api.zippopotam.us/us/${cleanZip}`).then(r => r.ok ? r.json() : null).catch(() => null),
       ]);
       let geoLabel = "";
       if (geoRes?.places?.[0]) {
@@ -63,10 +62,10 @@ export default function StoreSelector() {
         setLocationLabel(geoLabel);
       }
       setSellers(results);
-      if (results.length === 1) {
+      if (results.length >= 1) {
         setSelectedSellerId(results[0].id);
         const label = fulfillmentMethod === "delivery"
-          ? (geoLabel || `ZIP ${zip}`)
+          ? (geoLabel || `ZIP ${cleanZip}`)
           : (STORE_DISPLAY_NAMES[results[0].id] || results[0].name);
         setSelectedStore(label);
       }
@@ -77,6 +76,8 @@ export default function StoreSelector() {
       setIsSearching(false);
     }
   };
+
+  const searchByZip = () => runSearch(zipcode);
 
   const selectSeller = (seller: RegionSeller) => {
     setSelectedSellerId(seller.id);
