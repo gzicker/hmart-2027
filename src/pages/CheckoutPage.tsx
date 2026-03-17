@@ -81,7 +81,6 @@ export default function CheckoutPage() {
                 </span>
                 <button className="ml-auto text-xs font-medium text-primary">{t("checkout.change")}</button>
               </div>
-              )}
             </div>
 
             {/* H Mart Plus Sign Up */}
