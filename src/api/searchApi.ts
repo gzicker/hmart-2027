@@ -102,7 +102,7 @@ export interface ISFacetsResponse {
   facets: ISFacet[];
 }
 
-export type SortOption = 'score_desc' | 'price_asc' | 'price_desc' | 'orders_desc' | 'name_asc' | 'name_desc' | 'release_desc' | 'discount_desc';
+export type SortOption = '' | 'price_asc' | 'price_desc' | 'orders_desc' | 'name_asc' | 'name_desc' | 'release_desc' | 'discount_desc';
 
 export async function searchProducts(params: {
   query?: string;
@@ -111,10 +111,10 @@ export async function searchProducts(params: {
   count?: number;
   sort?: SortOption;
 } = {}): Promise<ISSearchResponse> {
-  const { query = '', facets = '', page = 1, count = 20, sort = 'score_desc' } = params;
+  const { query = '', facets = '', page = 1, count = 20, sort = '' } = params;
   const path = facets ? `${IS_BASE}/product_search/${facets}` : `${IS_BASE}/product_search`;
   return vtexFetch<ISSearchResponse>(path, {
-    params: { query: query || undefined, page, count, sort, locale: VTEX_CONFIG.locale },
+    params: { query: query || undefined, page, count, sort: sort || undefined, locale: VTEX_CONFIG.locale },
   });
 }
 
