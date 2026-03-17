@@ -19,6 +19,7 @@ export default function ProductDetailPage() {
   const { t, language } = useLanguage();
   const [quantity, setQuantity] = useState(1);
   const [showPairDrawer, setShowPairDrawer] = useState(false);
+  const [selectedFulfillment, setSelectedFulfillment] = useState<"delivery" | "pickup" | "shipping">("delivery");
 
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
@@ -32,8 +33,10 @@ export default function ProductDetailPage() {
       .then((res) => {
         const allProducts = vtexProductsToProducts(res.products);
         const found = allProducts.find(p => p.id === id);
-        setProduct(found || allProducts[0] || null);
-        setRelatedProducts(allProducts.filter(p => p.id !== id).slice(0, 4));
+        const p = found || allProducts[0] || null;
+        setProduct(p);
+        if (p) setSelectedFulfillment(p.fulfillment[0] as "delivery" | "pickup" | "shipping");
+        setRelatedProducts(allProducts.filter(pr => pr.id !== (p?.id ?? id)).slice(0, 4));
       })
       .catch(console.error)
       .finally(() => setIsLoading(false));
@@ -63,10 +66,6 @@ export default function ProductDetailPage() {
       </div>
     );
   }
-
-  const [selectedFulfillment, setSelectedFulfillment] = useState<"delivery" | "pickup" | "shipping">(
-    product.fulfillment[0] as "delivery" | "pickup" | "shipping"
-  );
 
   const pairProduct = relatedProducts[0] || null;
 
