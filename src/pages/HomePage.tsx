@@ -49,7 +49,7 @@ export default function HomePage() {
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
 
   useEffect(() => {
-    searchProducts({ query: '', count: 20 })
+    searchProducts({ query: '', count: 60 })
       .then((res) => {
         setVtexProducts(vtexProductsToProducts(res.products));
       })
