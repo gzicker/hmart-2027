@@ -136,6 +136,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         fulfillmentMethod, setFulfillmentMethod,
         isVtexSynced,
         selectedSellerId, setSelectedSellerId,
+        hasConfirmedLocation, setHasConfirmedLocation,
+        promptStoreSelector, setPromptStoreSelector,
       }}
     >
       {children}
