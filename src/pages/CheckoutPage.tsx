@@ -175,7 +175,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">
-                    {fulfillmentMethod === "delivery" ? t("checkout.deliveryFee") : fulfillmentMethod === "shipping" ? t("checkout.shipping") : t("checkout.pickup")}
+                    {fulfillmentMethod === "delivery" ? t("checkout.deliveryFee") : t("checkout.pickup")}
                   </span>
                   <span className={`font-medium ${deliveryFee === 0 ? "text-green-600" : "text-foreground"}`}>
                     {deliveryFee === 0 ? t("checkout.free") : `$${deliveryFee.toFixed(2)}`}

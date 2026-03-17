@@ -29,7 +29,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [selectedStore, setSelectedStore] = useState(DEFAULT_STORE.name);
-  const [fulfillmentMethod, setFulfillmentMethod] = useState<"delivery" | "pickup" | "shipping">("delivery");
+  const [fulfillmentMethod, setFulfillmentMethod] = useState<"delivery" | "pickup">("delivery");
   const [orderFormId, setOrderFormId] = useState<string | null>(null);
   const [isVtexSynced, setIsVtexSynced] = useState(false);
   const initialized = useRef(false);
