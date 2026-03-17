@@ -132,7 +132,9 @@ export default function StoreSelector() {
           {hasSearched && !isSearching && sellers.length > 0 && (
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {sellers.length === 1 ? "Your store" : `${sellers.length} stores serve ZIP ${zipcode}`}
+                {fulfillmentMethod === "delivery"
+                  ? "Your zipcode"
+                  : (sellers.length === 1 ? "Your store" : `${sellers.length} stores serve ZIP ${zipcode}`)}
               </p>
               {sellers.map((seller) => {
                 const isSelected = selectedSellerId === seller.id;
@@ -161,7 +163,8 @@ export default function StoreSelector() {
                     </div>
                     {isSelected && (
                       <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-primary">
-                        <MapPin className="h-3 w-3" /> {t("store.yourStore")}
+                        <MapPin className="h-3 w-3" />
+                        {fulfillmentMethod === "delivery" ? `Your selected zipcode` : t("store.yourStore")}
                       </div>
                     )}
                   </button>
