@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, Truck, Store, Package, Plus, Minus, ChevronRight, X, ShoppingCart, Clock, ChefHat, Loader2, AlertTriangle } from "lucide-react";
+import { Star, Truck, Store, Plus, Minus, ChevronRight, X, ShoppingCart, Clock, ChefHat, Loader2, AlertTriangle } from "lucide-react";
 import { Product } from "@/data/products";
 import { getProductById, searchProducts } from "@/api/searchApi";
 import { vtexProductToProduct, vtexProductsToProducts } from "@/api/vtexAdapter";
@@ -20,7 +20,7 @@ export default function ProductDetailPage() {
   const { t, language } = useLanguage();
   const [quantity, setQuantity] = useState(1);
   const [showPairDrawer, setShowPairDrawer] = useState(false);
-  const [selectedFulfillment, setSelectedFulfillment] = useState<"delivery" | "pickup" | "shipping">("delivery");
+  const [selectedFulfillment, setSelectedFulfillment] = useState<"delivery" | "pickup">("delivery");
 
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
@@ -37,7 +37,8 @@ export default function ProductDetailPage() {
         if (vtexProduct) {
           const p = vtexProductToProduct(vtexProduct);
           setProduct(p);
-          setSelectedFulfillment(p.fulfillment[0] as "delivery" | "pickup" | "shipping");
+          const first = p.fulfillment.find(f => f === "delivery" || f === "pickup") as "delivery" | "pickup" | undefined;
+          setSelectedFulfillment(first || "delivery");
         } else {
           setProduct(null);
         }
@@ -222,20 +223,8 @@ export default function ProductDetailPage() {
                     </div>
                   </button>
                 )}
-                {product.fulfillment.includes("shipping") && (
-                  <button
-                    onClick={() => setSelectedFulfillment("shipping")}
-                    className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${selectedFulfillment === "shipping" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-border text-foreground hover:bg-secondary"}`}
-                  >
-                    <Package className="h-4 w-4" />
-                    <div className="text-left">
-                      <p>{t("product.ship")}</p>
-                      <p className="text-[10px] font-normal text-muted-foreground">{t("detail.ship3to5")}</p>
-                    </div>
-                  </button>
-                )}
               </div>
-              {product.storeName && selectedFulfillment !== "shipping" && (
+              {product.storeName && (
                 <p className="mt-2 text-xs text-muted-foreground">
                   {t("detail.from")} <span className="font-medium text-foreground">{selectedStore || "your store"}</span>
                 </p>

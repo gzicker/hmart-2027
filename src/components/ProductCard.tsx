@@ -88,9 +88,6 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
           {product.fulfillment.includes("pickup") && (
             <span className="text-[10px] font-medium text-green-600">{t("product.pickup")}</span>
           )}
-          {product.fulfillment.includes("shipping") && (
-            <span className="text-[10px] font-medium text-blue-600">{t("product.ship")}</span>
-          )}
         </div>
 
         {isUnavailable ? (

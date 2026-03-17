@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Truck, Store, Clock, ArrowRight, Star, ChefHat, Play } from "lucide-react";
+import { Truck, Store, ArrowRight, Star, ChefHat, Play, Clock } from "lucide-react";
 import { Product } from "@/data/products";
 import { searchProducts } from "@/api/searchApi";
 import { vtexProductsToProducts } from "@/api/vtexAdapter";
@@ -82,7 +82,6 @@ export default function HomePage() {
           {[
             { icon: Truck, titleKey: "fulfillment.sameDay", descKey: "fulfillment.sameDayDesc", color: "text-primary" },
             { icon: Store, titleKey: "fulfillment.curbside", descKey: "fulfillment.curbsideDesc", color: "text-green-600" },
-            { icon: Clock, titleKey: "fulfillment.ship", descKey: "fulfillment.shipDesc", color: "text-blue-600" },
             { icon: ArrowRight, titleKey: "fulfillment.wholesale", descKey: "fulfillment.wholesaleDesc", color: "text-orange-600" },
           ].map(({ icon: Icon, titleKey, descKey, color }) => (
             <div key={titleKey} className="flex items-center gap-3 px-4 py-4">
