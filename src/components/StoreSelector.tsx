@@ -79,7 +79,6 @@ export default function StoreSelector() {
                     <div className="space-y-1">
                       <div className="font-medium text-foreground">{store.name}</div>
                       <div className="text-sm text-muted-foreground">{store.address}</div>
-                      <div className="text-xs text-muted-foreground/70">Seller: {store.sellerId}</div>
                     </div>
                     {isSelected && (
                       <div className="flex-shrink-0 rounded-full bg-primary p-1">
