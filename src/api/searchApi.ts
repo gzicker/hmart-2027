@@ -114,20 +114,20 @@ export async function searchProducts(params: {
   const { query = '', facets = '', page = 1, count = 20, sort = '' } = params;
   const path = facets ? `${IS_BASE}/product_search/${facets}` : `${IS_BASE}/product_search`;
   return vtexFetch<ISSearchResponse>(path, {
-    params: { query: query || undefined, page, count, sort: sort || undefined, locale: VTEX_CONFIG.locale },
+    params: { query: query || undefined, page, count, sort: sort || undefined, locale: VTEX_CONFIG.locale, sc: VTEX_CONFIG.salesChannel },
   });
 }
 
 export async function searchBySlug(slug: string): Promise<ISProduct | null> {
   const data = await vtexFetch<ISSearchResponse>(`${IS_BASE}/product_search/${slug}/p`, {
-    params: { locale: VTEX_CONFIG.locale },
+    params: { locale: VTEX_CONFIG.locale, sc: VTEX_CONFIG.salesChannel },
   });
   return data.products?.[0] ?? null;
 }
 
 export async function autocomplete(query: string): Promise<ISAutocompleteResponse> {
   return vtexFetch<ISAutocompleteResponse>(`${IS_BASE}/autocomplete`, {
-    params: { query, locale: VTEX_CONFIG.locale },
+    params: { query, locale: VTEX_CONFIG.locale, sc: VTEX_CONFIG.salesChannel },
   });
 }
 
