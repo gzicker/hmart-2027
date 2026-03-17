@@ -195,9 +195,45 @@ export default function Header() {
                   type="text"
                   placeholder={t("nav.search")}
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => handleSearchInput(e.target.value)}
+                  onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                   className="w-full rounded-lg border border-border bg-background py-2.5 pl-10 pr-4 text-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 />
+                {showSuggestions && (suggestions.terms.length > 0 || suggestions.products.length > 0) && (
+                  <div className="absolute left-0 top-full mt-1 w-full rounded-lg border border-border bg-card shadow-xl z-50 py-2">
+                    {suggestions.terms.length > 0 && (
+                      <div className="px-2 pb-1">
+                        {suggestions.terms.slice(0, 5).map((term) => (
+                          <button
+                            key={term}
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => { setSearchQuery(term); navigate(`/products?q=${encodeURIComponent(term)}`); setShowSuggestions(false); }}
+                            className="block w-full rounded-md px-3 py-2 text-left text-sm text-foreground hover:bg-secondary"
+                          >
+                            {term}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {suggestions.products.length > 0 && (
+                      <div className="border-t border-border px-2 pt-1">
+                        {suggestions.products.slice(0, 4).map((p) => (
+                          <Link
+                            key={p.slug}
+                            to={`/product/${p.slug}`}
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => setShowSuggestions(false)}
+                            className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-secondary"
+                          >
+                            {p.thumb && <img src={p.thumb} alt="" className="h-8 w-8 rounded object-cover" />}
+                            <span className="text-sm text-foreground">{p.name}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </form>
 
