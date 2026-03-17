@@ -60,7 +60,10 @@ export default function StoreSelector() {
 
   const selectSeller = (seller: RegionSeller) => {
     setSelectedSellerId(seller.id);
-    setSelectedStore(seller.name);
+    const label = fulfillmentMethod === "delivery"
+      ? (locationLabel || `ZIP ${zipcode}`)
+      : (STORE_DISPLAY_NAMES[seller.id] || seller.name);
+    setSelectedStore(label);
     setOpen(false);
   };
 
