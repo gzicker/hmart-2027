@@ -54,7 +54,7 @@ export default function CheckoutPage() {
             {/* Fulfillment Selection */}
             <div className="rounded-xl border border-border bg-card p-6">
               <h2 className="mb-4 font-display text-lg font-medium text-foreground">{t("checkout.fulfillmentMethod")}</h2>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => setFulfillmentMethod("delivery")}
                   className={`flex flex-col items-center gap-2 rounded-lg border p-4 text-center transition-colors ${fulfillmentMethod === "delivery" ? "border-primary bg-primary/5" : "border-border hover:bg-secondary"}`}
@@ -71,33 +71,16 @@ export default function CheckoutPage() {
                   <span className="text-sm font-medium text-foreground">{t("checkout.pickup")}</span>
                   <span className="text-[10px] text-muted-foreground">{t("checkout.pickupTime")}</span>
                 </button>
-                <button
-                  onClick={() => setFulfillmentMethod("shipping")}
-                  className={`flex flex-col items-center gap-2 rounded-lg border p-4 text-center transition-colors ${fulfillmentMethod === "shipping" ? "border-blue-600 bg-blue-50" : "border-border hover:bg-secondary"}`}
-                >
-                  <Package className={`h-6 w-6 ${fulfillmentMethod === "shipping" ? "text-blue-600" : "text-muted-foreground"}`} />
-                  <span className="text-sm font-medium text-foreground">{t("checkout.ship")}</span>
-                  <span className="text-[10px] text-muted-foreground">{t("checkout.shipTime")}</span>
-                </button>
               </div>
 
-              {fulfillmentMethod !== "shipping" && (
-                <div className="mt-4 flex items-center gap-2 rounded-lg bg-secondary/50 p-3 text-sm">
-                  <MapPin className="h-4 w-4 text-primary" />
-                  <span className="text-muted-foreground">
-                    {fulfillmentMethod === "delivery" ? t("checkout.deliveringFrom") : t("checkout.pickupAt")}{" "}
-                    <span className="font-medium text-foreground">{selectedStore}</span>
-                  </span>
-                  <button className="ml-auto text-xs font-medium text-primary">{t("checkout.change")}</button>
-                </div>
-              )}
-
-              {fulfillmentMethod === "shipping" && (
-                <div className="mt-4 rounded-lg bg-secondary/50 p-3">
-                  <p className="text-sm font-medium text-foreground">{t("checkout.shipTo")}</p>
-                  <p className="text-xs text-muted-foreground">124 Main St, New York, NY 10001</p>
-                  <button className="mt-1 text-xs font-medium text-primary">{t("checkout.changeAddress")}</button>
-                </div>
+              <div className="mt-4 flex items-center gap-2 rounded-lg bg-secondary/50 p-3 text-sm">
+                <MapPin className="h-4 w-4 text-primary" />
+                <span className="text-muted-foreground">
+                  {fulfillmentMethod === "delivery" ? t("checkout.deliveringFrom") : t("checkout.pickupAt")}{" "}
+                  <span className="font-medium text-foreground">{selectedStore}</span>
+                </span>
+                <button className="ml-auto text-xs font-medium text-primary">{t("checkout.change")}</button>
+              </div>
               )}
             </div>
 
