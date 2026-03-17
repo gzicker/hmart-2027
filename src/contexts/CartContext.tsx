@@ -16,8 +16,8 @@ interface CartContextType {
   totalPrice: number;
   selectedStore: string;
   setSelectedStore: (store: string) => void;
-  fulfillmentMethod: "delivery" | "pickup" | "shipping";
-  setFulfillmentMethod: (method: "delivery" | "pickup" | "shipping") => void;
+  fulfillmentMethod: "delivery" | "pickup";
+  setFulfillmentMethod: (method: "delivery" | "pickup") => void;
   isVtexSynced: boolean;
   selectedSellerId: string;
   selectedStoreData: FranchiseStore;
