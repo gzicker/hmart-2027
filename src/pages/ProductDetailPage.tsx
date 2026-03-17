@@ -1,10 +1,11 @@
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, Truck, Store, Package, Plus, Minus, ChevronRight, X, ShoppingCart, Clock, ChefHat, Loader2 } from "lucide-react";
+import { Star, Truck, Store, Package, Plus, Minus, ChevronRight, X, ShoppingCart, Clock, ChefHat, Loader2, AlertTriangle } from "lucide-react";
 import { Product } from "@/data/products";
 import { getProductById, searchProducts } from "@/api/searchApi";
 import { vtexProductToProduct, vtexProductsToProducts } from "@/api/vtexAdapter";
+import { simulateForSeller } from "@/api/checkoutApi";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getProductName, getProductSubName, getProductDescription } from "@/lib/product-utils";
@@ -15,7 +16,7 @@ import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
-  const { addItem } = useCart();
+  const { addItem, selectedSellerId, selectedStoreData } = useCart();
   const { t, language } = useLanguage();
   const [quantity, setQuantity] = useState(1);
   const [showPairDrawer, setShowPairDrawer] = useState(false);
@@ -24,6 +25,9 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [sellerPrice, setSellerPrice] = useState<{ price: number; available: boolean; listPrice: number } | null>(null);
+  const [simulating, setSimulating] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -45,6 +49,22 @@ export default function ProductDetailPage() {
       .finally(() => setIsLoading(false));
   }, [id]);
 
+  // Simulate price/availability for selected franchise seller
+  useEffect(() => {
+    if (!product) return;
+    const skuId = (product as any)._vtex?.skuId;
+    if (!skuId) return;
+
+    setSimulating(true);
+    simulateForSeller(skuId, selectedSellerId)
+      .then(setSellerPrice)
+      .catch((err) => {
+        console.error('Simulation error:', err);
+        setSellerPrice(null);
+      })
+      .finally(() => setSimulating(false));
+  }, [product, selectedSellerId]);
+
   useEffect(() => {
     searchProducts({ query: '', count: 4 })
       .then((res) => {
@@ -53,6 +73,11 @@ export default function ProductDetailPage() {
       })
       .catch(console.error);
   }, [product?.id]);
+
+  // Determine display price: use simulation result when available, fallback to IS price
+  const displayPrice = sellerPrice?.available && sellerPrice.price > 0 ? sellerPrice.price : product?.price ?? 0;
+  const displayListPrice = sellerPrice?.available && sellerPrice.listPrice > 0 ? sellerPrice.listPrice : product?.originalPrice;
+  const isUnavailable = sellerPrice !== null && !sellerPrice.available;
 
   if (isLoading) {
     return (
@@ -133,18 +158,40 @@ export default function ProductDetailPage() {
               <span className="text-sm text-muted-foreground">({product.reviewCount.toLocaleString()} {t("product.reviews")})</span>
             </div>
 
-            <div className="mt-4 flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-foreground">${product.price.toFixed(2)}</span>
-              {product.originalPrice && (
-                <>
-                  <span className="text-lg text-muted-foreground line-through">${product.originalPrice.toFixed(2)}</span>
-                  <span className="rounded-sm bg-accent/20 px-2 py-0.5 text-sm font-semibold text-accent-foreground">
-                    {t("product.save")} ${(product.originalPrice - product.price).toFixed(2)}
-                  </span>
-                </>
+            {/* Price section with simulation data */}
+            <div className="mt-4">
+              {simulating ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Checking price at {selectedStoreData.name}…</span>
+                </div>
+              ) : isUnavailable ? (
+                <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3">
+                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                  <div>
+                    <p className="text-sm font-medium text-destructive">Unavailable at {selectedStoreData.name}</p>
+                    <p className="text-xs text-muted-foreground">Try selecting a different store location.</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-bold text-foreground">${displayPrice.toFixed(2)}</span>
+                  {displayListPrice && displayListPrice > displayPrice && (
+                    <>
+                      <span className="text-lg text-muted-foreground line-through">${displayListPrice.toFixed(2)}</span>
+                      <span className="rounded-sm bg-accent/20 px-2 py-0.5 text-sm font-semibold text-accent-foreground">
+                        {t("product.save")} ${(displayListPrice - displayPrice).toFixed(2)}
+                      </span>
+                    </>
+                  )}
+                </div>
+              )}
+              {!isUnavailable && !simulating && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Price at <span className="font-medium text-foreground">{selectedStoreData.name}</span> · {product.weight}
+                </p>
               )}
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">{product.weight}</p>
 
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{description}</p>
 
@@ -190,7 +237,7 @@ export default function ProductDetailPage() {
               </div>
               {product.storeName && selectedFulfillment !== "shipping" && (
                 <p className="mt-2 text-xs text-muted-foreground">
-                  {t("detail.from")} <span className="font-medium text-foreground">{product.storeName}</span>
+                  {t("detail.from")} <span className="font-medium text-foreground">{selectedStoreData.name}</span>
                 </p>
               )}
             </div>
@@ -200,6 +247,7 @@ export default function ProductDetailPage() {
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   className="px-3 py-2.5 text-foreground transition-colors hover:bg-secondary"
+                  disabled={isUnavailable}
                 >
                   <Minus className="h-4 w-4" />
                 </button>
@@ -207,6 +255,7 @@ export default function ProductDetailPage() {
                 <button
                   onClick={() => setQuantity(quantity + 1)}
                   className="px-3 py-2.5 text-foreground transition-colors hover:bg-secondary"
+                  disabled={isUnavailable}
                 >
                   <Plus className="h-4 w-4" />
                 </button>
@@ -214,10 +263,17 @@ export default function ProductDetailPage() {
 
               <button
                 onClick={() => addItem(product, quantity)}
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-body text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] active:scale-95"
+                disabled={isUnavailable}
+                className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-6 py-3 font-body text-sm font-semibold transition-transform ${
+                  isUnavailable
+                    ? "bg-muted text-muted-foreground cursor-not-allowed"
+                    : "bg-primary text-primary-foreground hover:scale-[1.02] active:scale-95"
+                }`}
               >
                 <ShoppingCart className="h-4 w-4" />
-                {t("product.addToCart")} — ${(product.price * quantity).toFixed(2)}
+                {isUnavailable
+                  ? `Unavailable at ${selectedStoreData.name}`
+                  : `${t("product.addToCart")} — $${(displayPrice * quantity).toFixed(2)}`}
               </button>
 
               <button
@@ -273,7 +329,7 @@ export default function ProductDetailPage() {
                     <div>
                       <p className="text-xs text-muted-foreground">{product.brand}</p>
                       <p className="text-sm font-medium text-foreground">{displayName}</p>
-                      <p className="text-sm font-bold text-foreground">${product.price.toFixed(2)}</p>
+                      <p className="text-sm font-bold text-foreground">${displayPrice.toFixed(2)}</p>
                     </div>
                   </div>
 
@@ -311,7 +367,7 @@ export default function ProductDetailPage() {
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">{t("detail.bundleTotal")}</span>
                     <span className="text-lg font-bold text-foreground">
-                      ${(product.price + pairProduct.price).toFixed(2)}
+                      ${(displayPrice + pairProduct.price).toFixed(2)}
                     </span>
                   </div>
                 </div>

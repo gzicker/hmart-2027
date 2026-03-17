@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect, use
 import { Product } from "@/data/products";
 import { CartItem } from "@/data/cart";
 import { getOrCreateOrderForm, addToCart as vtexAddToCart, updateCartItems as vtexUpdateItems, redirectToCheckout as vtexRedirectToCheckout, type OrderForm } from "@/api/checkoutApi";
+import { FRANCHISE_STORES, DEFAULT_STORE, type FranchiseStore } from "@/api/stores";
 
 interface CartContextType {
   items: CartItem[];
@@ -17,17 +18,32 @@ interface CartContextType {
   fulfillmentMethod: "delivery" | "pickup" | "shipping";
   setFulfillmentMethod: (method: "delivery" | "pickup" | "shipping") => void;
   isVtexSynced: boolean;
+  selectedSellerId: string;
+  selectedStoreData: FranchiseStore;
+  setSelectedStoreById: (storeId: string) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
-  const [selectedStore, setSelectedStore] = useState("H Mart Manhattan");
+  const [selectedStore, setSelectedStore] = useState(DEFAULT_STORE.name);
   const [fulfillmentMethod, setFulfillmentMethod] = useState<"delivery" | "pickup" | "shipping">("delivery");
   const [orderFormId, setOrderFormId] = useState<string | null>(null);
   const [isVtexSynced, setIsVtexSynced] = useState(false);
   const initialized = useRef(false);
+
+  const [selectedStoreData, setSelectedStoreData] = useState<FranchiseStore>(DEFAULT_STORE);
+  const [selectedSellerId, setSelectedSellerId] = useState(DEFAULT_STORE.sellerId);
+
+  const setSelectedStoreById = useCallback((storeId: string) => {
+    const store = FRANCHISE_STORES.find(s => s.id === storeId);
+    if (store) {
+      setSelectedStoreData(store);
+      setSelectedSellerId(store.sellerId);
+      setSelectedStore(store.name);
+    }
+  }, []);
 
   // Initialize orderForm on mount
   useEffect(() => {
@@ -44,7 +60,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addItem = useCallback((product: Product, quantity = 1) => {
-    // Update local state immediately
     setItems((prev) => {
       const existing = prev.find((i) => i.product.id === product.id);
       if (existing) {
@@ -55,22 +70,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return [...prev, { product, quantity }];
     });
 
-    // Sync with VTEX in background
     if (orderFormId) {
       const vtexData = (product as any)._vtex;
       const skuId = vtexData?.skuId || product.id;
-      const sellerId = vtexData?.sellerId || '1';
+      const sellerId = selectedSellerId;
       vtexAddToCart(orderFormId, [{ id: skuId, quantity, seller: sellerId }])
         .then((of) => setOrderFormId(of.orderFormId))
         .catch((err) => console.warn('[Cart] VTEX add failed:', err));
     }
-  }, [orderFormId]);
+  }, [orderFormId, selectedSellerId]);
 
   const removeItem = useCallback((productId: string) => {
-    // Remove from local state
     setItems((prev) => prev.filter((i) => i.product.id !== productId));
 
-    // Remove from VTEX - find the item index in the ACTUAL orderForm
     if (orderFormId) {
       getOrCreateOrderForm().then((of) => {
         const vtexData = items.find(i => i.product.id === productId);
@@ -90,12 +102,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeItem(productId);
       return;
     }
-    // Update local state immediately
     setItems((prev) =>
       prev.map((i) => (i.product.id === productId ? { ...i, quantity } : i))
     );
 
-    // Update in VTEX - find correct index from actual orderForm
     if (orderFormId) {
       getOrCreateOrderForm().then((of) => {
         const vtexData = items.find(i => i.product.id === productId);
@@ -116,7 +126,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (orderFormId) {
       vtexRedirectToCheckout(orderFormId);
     } else {
-      // Fallback: go to local checkout page
       window.location.href = '/checkout';
     }
   }, [orderFormId]);
@@ -132,6 +141,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         selectedStore, setSelectedStore,
         fulfillmentMethod, setFulfillmentMethod,
         isVtexSynced,
+        selectedSellerId, selectedStoreData, setSelectedStoreById,
       }}
     >
       {children}
