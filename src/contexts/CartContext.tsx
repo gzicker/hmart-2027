@@ -20,6 +20,10 @@ interface CartContextType {
   isVtexSynced: boolean;
   selectedSellerId: string;
   setSelectedSellerId: (id: string) => void;
+  hasConfirmedLocation: boolean;
+  setHasConfirmedLocation: (v: boolean) => void;
+  promptStoreSelector: boolean;
+  setPromptStoreSelector: (v: boolean) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
