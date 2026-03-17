@@ -255,8 +255,8 @@ export default function HomePage() {
               <div className="mt-6 flex gap-3">
                 <button
                   onClick={() => {
-                    const gochujang = products.find(p => p.id === "gochujang-001");
-                    const tteok = products.find(p => p.id === "tteok-001");
+                    const gochujang = vtexProducts[0];
+                    const tteok = vtexProducts[1];
                     if (gochujang) addItem(gochujang);
                     if (tteok) addItem(tteok);
                   }}
