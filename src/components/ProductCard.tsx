@@ -17,7 +17,6 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
   const { t, language } = useLanguage();
 
   const displayName = getProductName(product, language);
-  const subName = getProductSubName(product, language);
   const simulation = useProductSellerSimulation(product, selectedSellerId);
 
   const isUnavailable = simulation ? !simulation.available : false;
