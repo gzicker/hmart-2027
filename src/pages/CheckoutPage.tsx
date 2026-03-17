@@ -223,7 +223,7 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] active:scale-95">
+              <button onClick={goToCheckout} className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] active:scale-95">
                 {t("checkout.placeOrder")} <ChevronRight className="h-4 w-4" />
               </button>
 
