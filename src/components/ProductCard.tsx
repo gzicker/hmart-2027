@@ -27,7 +27,7 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
   if (hideIfUnavailable && isUnavailable) return null;
 
   return (
-    <div className={`product-card ${featured ? "col-span-2 row-span-2" : ""} ${isUnavailable ? "opacity-60" : ""}`}>
+    <div className={`product-card group ${featured ? "col-span-2 row-span-2" : ""} ${isUnavailable ? "opacity-60" : ""}`}>
       {product.isSponsored && (
         <div className="absolute left-2 top-2 z-10">
           <span className="sponsored-badge">{t("brands.sponsored")}</span>
@@ -54,10 +54,13 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
         </div>
       </Link>
 
-      <div className="p-3">
+      <div className="flex flex-1 flex-col p-3">
         <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{product.brand}</p>
         <Link to={`/product/${product.id}`}>
-          <h3 className="mt-0.5 text-sm font-medium leading-tight text-foreground hover:text-primary">
+          <h3
+            className="mt-0.5 text-sm font-medium leading-tight text-foreground line-clamp-2 group-hover:line-clamp-3 hover:text-primary"
+            title={`${displayName}${subName ? ` ${subName}` : ""}`}
+          >
             {displayName}
             {subName && <span className="ml-1.5 text-muted-foreground">{subName}</span>}
           </h3>
@@ -80,12 +83,12 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
         </div>
 
         {isUnavailable ? (
-          <div className="mt-2 flex items-center gap-1.5">
+          <div className="mt-auto flex items-center gap-1.5 pt-2">
             <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
             <span className="text-xs font-medium text-destructive">Unavailable</span>
           </div>
         ) : (
-          <div className="mt-2 flex items-center justify-between">
+          <div className="mt-auto flex items-center justify-between pt-2">
             <div className="flex items-baseline gap-1.5">
               <span className="text-lg font-bold text-foreground">${displayPrice.toFixed(2)}</span>
               {displayListPrice && displayListPrice > displayPrice && (
