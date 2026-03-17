@@ -147,7 +147,17 @@ export default function Header() {
               {categoriesOpen && (
                 <div className="absolute left-0 top-full mt-3 w-72 rounded-xl border border-border bg-card shadow-xl animate-fade-in z-50">
                   <div className="py-2">
-                    {CATEGORY_KEYS.map((key) => (
+                    {vtexCategories.length > 0 ? vtexCategories.map((cat) => (
+                      <Link
+                        key={cat.id}
+                        to="/products"
+                        onClick={() => setCategoriesOpen(false)}
+                        className="flex items-center justify-between px-4 py-2.5 text-sm text-primary transition-colors hover:bg-secondary"
+                      >
+                        {cat.name}
+                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                      </Link>
+                    )) : CATEGORY_KEYS.map((key) => (
                       <Link
                         key={key}
                         to="/products"
