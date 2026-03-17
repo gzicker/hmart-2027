@@ -64,6 +64,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return [...prev, { product, quantity }];
     });
 
+    // Prompt location confirmation on first add
+    if (!hasConfirmedLocation) {
+      setPromptStoreSelector(true);
+    }
+
     if (orderFormId) {
       const vtexData = (product as any)._vtex;
       const skuId = vtexData?.skuId || product.id;
@@ -72,7 +77,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         .then((of) => setOrderFormId(of.orderFormId))
         .catch((err) => console.warn('[Cart] VTEX add failed:', err));
     }
-  }, [orderFormId, selectedSellerId]);
+  }, [orderFormId, selectedSellerId, hasConfirmedLocation]);
 
   const removeItem = useCallback((productId: string) => {
     setItems((prev) => prev.filter((i) => i.product.id !== productId));
