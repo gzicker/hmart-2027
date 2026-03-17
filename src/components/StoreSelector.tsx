@@ -160,7 +160,11 @@ export default function StoreSelector() {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="space-y-1">
-                        <div className="font-medium text-foreground">{seller.name}</div>
+                        <div className="font-medium text-foreground">
+                          {fulfillmentMethod === "delivery"
+                            ? (locationLabel || `ZIP ${zipcode}`)
+                            : seller.name}
+                        </div>
                         {fulfillmentMethod === "pickup" && STORE_ADDRESSES[seller.id] && (
                           <div className="text-xs text-muted-foreground">{STORE_ADDRESSES[seller.id]}</div>
                         )}
