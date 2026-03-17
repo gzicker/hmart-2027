@@ -20,6 +20,10 @@ interface CartContextType {
   isVtexSynced: boolean;
   selectedSellerId: string;
   setSelectedSellerId: (id: string) => void;
+  hasConfirmedLocation: boolean;
+  setHasConfirmedLocation: (v: boolean) => void;
+  promptStoreSelector: boolean;
+  setPromptStoreSelector: (v: boolean) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -33,7 +37,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const initialized = useRef(false);
 
   const [selectedSellerId, setSelectedSellerId] = useState("1");
-
+  const [hasConfirmedLocation, setHasConfirmedLocation] = useState(false);
+  const [promptStoreSelector, setPromptStoreSelector] = useState(false);
   // Initialize orderForm on mount
   useEffect(() => {
     if (initialized.current) return;
@@ -59,6 +64,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return [...prev, { product, quantity }];
     });
 
+    // Prompt location confirmation on first add
+    if (!hasConfirmedLocation) {
+      setPromptStoreSelector(true);
+    }
+
     if (orderFormId) {
       const vtexData = (product as any)._vtex;
       const skuId = vtexData?.skuId || product.id;
@@ -67,7 +77,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         .then((of) => setOrderFormId(of.orderFormId))
         .catch((err) => console.warn('[Cart] VTEX add failed:', err));
     }
-  }, [orderFormId, selectedSellerId]);
+  }, [orderFormId, selectedSellerId, hasConfirmedLocation]);
 
   const removeItem = useCallback((productId: string) => {
     setItems((prev) => prev.filter((i) => i.product.id !== productId));
@@ -131,6 +141,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         fulfillmentMethod, setFulfillmentMethod,
         isVtexSynced,
         selectedSellerId, setSelectedSellerId,
+        hasConfirmedLocation, setHasConfirmedLocation,
+        promptStoreSelector, setPromptStoreSelector,
       }}
     >
       {children}

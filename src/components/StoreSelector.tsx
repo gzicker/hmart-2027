@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MapPin, ChevronDown, Check, Search, Loader2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -10,31 +10,50 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+const DEFAULT_ZIP = "10001";
+
 export default function StoreSelector() {
   const {
     selectedStore, setSelectedStore,
     selectedSellerId, setSelectedSellerId,
     fulfillmentMethod, setFulfillmentMethod,
+    hasConfirmedLocation, setHasConfirmedLocation,
+    promptStoreSelector, setPromptStoreSelector,
   } = useCart();
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
-  const [zipcode, setZipcode] = useState("");
+  const [zipcode, setZipcode] = useState(DEFAULT_ZIP);
   const [isSearching, setIsSearching] = useState(false);
   const [sellers, setSellers] = useState<RegionSeller[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [locationLabel, setLocationLabel] = useState("");
+  const initializedRef = useRef(false);
 
-  const searchByZip = async () => {
-    const zip = zipcode.replace(/\D/g, "");
-    if (zip.length < 5) return;
+  // Auto-init with default ZIP on mount
+  useEffect(() => {
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+    runSearch(DEFAULT_ZIP, true);
+  }, []);
+
+  // Open modal when cart prompts for confirmation
+  useEffect(() => {
+    if (promptStoreSelector) {
+      setOpen(true);
+      setPromptStoreSelector(false);
+    }
+  }, [promptStoreSelector, setPromptStoreSelector]);
+
+  const runSearch = async (zip: string, isAutoInit = false) => {
+    const cleanZip = zip.replace(/\D/g, "");
+    if (cleanZip.length < 5) return;
     setIsSearching(true);
     setHasSearched(true);
     setLocationLabel("");
     try {
-      // Fetch city/state from ZIP in parallel with seller lookup
       const [results, geoRes] = await Promise.all([
-        getSellersForZipcode(zip),
-        fetch(`https://api.zippopotam.us/us/${zip}`).then(r => r.ok ? r.json() : null).catch(() => null),
+        getSellersForZipcode(cleanZip),
+        fetch(`https://api.zippopotam.us/us/${cleanZip}`).then(r => r.ok ? r.json() : null).catch(() => null),
       ]);
       let geoLabel = "";
       if (geoRes?.places?.[0]) {
@@ -43,10 +62,10 @@ export default function StoreSelector() {
         setLocationLabel(geoLabel);
       }
       setSellers(results);
-      if (results.length === 1) {
+      if (results.length >= 1) {
         setSelectedSellerId(results[0].id);
         const label = fulfillmentMethod === "delivery"
-          ? (geoLabel || `ZIP ${zip}`)
+          ? (geoLabel || `ZIP ${cleanZip}`)
           : (STORE_DISPLAY_NAMES[results[0].id] || results[0].name);
         setSelectedStore(label);
       }
@@ -58,12 +77,15 @@ export default function StoreSelector() {
     }
   };
 
+  const searchByZip = () => runSearch(zipcode);
+
   const selectSeller = (seller: RegionSeller) => {
     setSelectedSellerId(seller.id);
     const label = fulfillmentMethod === "delivery"
       ? (locationLabel || `ZIP ${zipcode}`)
       : (STORE_DISPLAY_NAMES[seller.id] || seller.name);
     setSelectedStore(label);
+    setHasConfirmedLocation(true);
     setOpen(false);
   };
 
