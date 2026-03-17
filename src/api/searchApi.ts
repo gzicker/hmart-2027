@@ -120,11 +120,33 @@ export async function searchProducts(params: {
   });
 }
 
-export async function searchBySlug(slug: string): Promise<ISProduct | null> {
-  const data = await vtexFetch<ISSearchResponse>(`${IS_BASE}/product_search/${slug}/p`, {
-    params: { locale: VTEX_CONFIG.locale, sc: VTEX_CONFIG.salesChannel },
+export async function getProductById(productId: string): Promise<ISProduct | null> {
+  const data = await vtexFetch<ISSearchResponse>(`${IS_BASE}/product_search`, {
+    params: { 
+      query: productId, 
+      locale: VTEX_CONFIG.locale, 
+      sc: VTEX_CONFIG.salesChannel 
+    },
   });
-  return data.products?.[0] ?? null;
+  const exact = data.products?.find(p => p.productId === productId);
+  if (exact) return exact;
+  
+  try {
+    const catalogData = await vtexFetch<any[]>(
+      `/api/catalog_system/pub/products/search?fq=productId:${productId}&sc=${VTEX_CONFIG.salesChannel}`
+    );
+    if (catalogData && catalogData.length > 0) {
+      return catalogData[0] as ISProduct;
+    }
+  } catch (e) {
+    console.warn('Catalog fallback failed:', e);
+  }
+  
+  return null;
+}
+
+export async function searchBySlug(slug: string): Promise<ISProduct | null> {
+  return getProductById(slug);
 }
 
 export async function autocomplete(query: string): Promise<ISAutocompleteResponse> {

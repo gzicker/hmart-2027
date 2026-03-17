@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Truck, Store, Package, Plus, Minus, ChevronRight, X, ShoppingCart, Clock, ChefHat, Loader2 } from "lucide-react";
 import { Product } from "@/data/products";
-import { searchBySlug, searchProducts } from "@/api/searchApi";
+import { getProductById, searchProducts } from "@/api/searchApi";
 import { vtexProductToProduct, vtexProductsToProducts } from "@/api/vtexAdapter";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -14,7 +14,7 @@ import Footer from "@/components/Footer";
 import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
 
 export default function ProductDetailPage() {
-  const { slug } = useParams();
+  const { id } = useParams();
   const { addItem } = useCart();
   const { t, language } = useLanguage();
   const [quantity, setQuantity] = useState(1);
@@ -26,9 +26,9 @@ export default function ProductDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!slug) return;
+    if (!id) return;
     setIsLoading(true);
-    searchBySlug(slug)
+    getProductById(id)
       .then((vtexProduct) => {
         if (vtexProduct) {
           const p = vtexProductToProduct(vtexProduct);
@@ -43,7 +43,7 @@ export default function ProductDetailPage() {
         setProduct(null);
       })
       .finally(() => setIsLoading(false));
-  }, [slug]);
+  }, [id]);
 
   useEffect(() => {
     searchProducts({ query: '', count: 4 })
