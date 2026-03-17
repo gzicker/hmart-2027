@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Truck, Store, Package, Plus, Minus, ChevronRight, X, ShoppingCart, Clock, ChefHat, Loader2 } from "lucide-react";
 import { Product } from "@/data/products";
-import { searchProducts } from "@/api/searchApi";
-import { vtexProductsToProducts } from "@/api/vtexAdapter";
+import { searchBySlug, searchProducts } from "@/api/searchApi";
+import { vtexProductToProduct, vtexProductsToProducts } from "@/api/vtexAdapter";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getProductName, getProductSubName, getProductDescription } from "@/lib/product-utils";
@@ -14,7 +14,7 @@ import Footer from "@/components/Footer";
 import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
 
 export default function ProductDetailPage() {
-  const { id } = useParams();
+  const { slug } = useParams();
   const { addItem } = useCart();
   const { t, language } = useLanguage();
   const [quantity, setQuantity] = useState(1);
@@ -26,21 +26,33 @@ export default function ProductDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) return;
+    if (!slug) return;
     setIsLoading(true);
-
-    searchProducts({ query: '', count: 50 })
-      .then((res) => {
-        const allProducts = vtexProductsToProducts(res.products);
-        const found = allProducts.find(p => p.id === id);
-        const p = found || allProducts[0] || null;
-        setProduct(p);
-        if (p) setSelectedFulfillment(p.fulfillment[0] as "delivery" | "pickup" | "shipping");
-        setRelatedProducts(allProducts.filter(pr => pr.id !== (p?.id ?? id)).slice(0, 4));
+    searchBySlug(slug)
+      .then((vtexProduct) => {
+        if (vtexProduct) {
+          const p = vtexProductToProduct(vtexProduct);
+          setProduct(p);
+          setSelectedFulfillment(p.fulfillment[0] as "delivery" | "pickup" | "shipping");
+        } else {
+          setProduct(null);
+        }
       })
-      .catch(console.error)
+      .catch((err) => {
+        console.error('PDP fetch error:', err);
+        setProduct(null);
+      })
       .finally(() => setIsLoading(false));
-  }, [id]);
+  }, [slug]);
+
+  useEffect(() => {
+    searchProducts({ query: '', count: 4 })
+      .then((res) => {
+        const related = vtexProductsToProducts(res.products).filter(p => p.id !== product?.id);
+        setRelatedProducts(related.slice(0, 4));
+      })
+      .catch(console.error);
+  }, [product?.id]);
 
   if (isLoading) {
     return (
