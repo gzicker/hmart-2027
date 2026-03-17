@@ -1,3 +1,5 @@
+import { vtexFetch, VTEX_CONFIG } from './vtexConfig';
+
 export interface FranchiseStore {
   id: string;
   sellerId: string;
@@ -5,6 +7,17 @@ export interface FranchiseStore {
   city: string;
   state: string;
   address: string;
+}
+
+export interface DeliverySLA {
+  id: string;
+  name: string;
+  shippingEstimate: string;
+  price: number;
+  /** Internal — never show to user */
+  sellerId: string;
+  /** Internal — never show to user */
+  storeId: string;
 }
 
 export const FRANCHISE_STORES: FranchiseStore[] = [
@@ -18,41 +31,133 @@ export const FRANCHISE_STORES: FranchiseStore[] = [
 export const DEFAULT_STORE = FRANCHISE_STORES[0];
 
 /**
- * Find the nearest franchise store for a given zipcode using VTEX simulation.
- * Sends a simulation request with each seller and returns the first available one.
+ * Parse VTEX shippingEstimate string (e.g. "3bd" = 3 business days, "45m" = 45 min)
+ * into a human-readable label.
  */
-export async function findStoreByZipcode(zipcode: string): Promise<FranchiseStore | null> {
-  const { vtexFetch, VTEX_CONFIG } = await import('./vtexConfig');
+export function formatShippingEstimate(estimate: string): string {
+  if (!estimate) return '';
+  const match = estimate.match(/^(\d+)([a-z]+)$/i);
+  if (!match) return estimate;
+  const [, num, unit] = match;
+  const n = parseInt(num, 10);
+  switch (unit) {
+    case 'bd': return n === 0 ? 'Same day' : n === 1 ? '1 business day' : `${n} business days`;
+    case 'd': return n === 0 ? 'Same day' : n === 1 ? '1 day' : `${n} days`;
+    case 'h': return n === 1 ? '1 hour' : `${n} hours`;
+    case 'm': return n <= 60 ? `${n} min` : `${Math.round(n / 60)} hours`;
+    default: return estimate;
+  }
+}
 
-  // Try simulation with each franchise seller to see which one serves this zipcode
-  for (const store of FRANCHISE_STORES) {
-    try {
-      const data = await vtexFetch<any>(
-        '/api/checkout/pub/orderForms/simulation',
-        {
-          method: 'POST',
-          body: {
-            items: [],
-            postalCode: zipcode,
-            country: 'USA',
-            salesChannel: VTEX_CONFIG.salesChannel,
-          },
-          params: { sc: VTEX_CONFIG.salesChannel },
-          timeout: 5000,
-        }
-      );
+/**
+ * Probe a single franchise seller for available delivery SLAs at a given zipcode.
+ * Uses a lightweight simulation with a probe SKU.
+ */
+async function probeSeller(
+  store: FranchiseStore,
+  postalCode: string,
+  probeSkuId: string,
+): Promise<DeliverySLA[]> {
+  try {
+    const data = await vtexFetch<any>(
+      '/api/checkout/pub/orderForms/simulation',
+      {
+        method: 'POST',
+        body: {
+          items: [{ id: probeSkuId, quantity: 1, seller: store.sellerId }],
+          postalCode,
+          country: 'USA',
+        },
+        params: { sc: VTEX_CONFIG.salesChannel },
+        timeout: 8000,
+      },
+    );
 
-      // Check if logistics info indicates this seller can serve the zipcode
-      const logisticsInfo = data?.logisticsInfo;
-      if (logisticsInfo && logisticsInfo.length > 0) {
-        return store;
+    const logisticsInfo = data?.logisticsInfo?.[0];
+    if (!logisticsInfo?.slas?.length) return [];
+
+    return logisticsInfo.slas
+      .filter((sla: any) => sla.availableDeliveryWindows !== undefined || sla.deliveryChannel === 'delivery')
+      .map((sla: any) => ({
+        id: sla.id,
+        name: sla.name || sla.id,
+        shippingEstimate: sla.shippingEstimate || '',
+        price: sla.price ? sla.price / 100 : 0,
+        sellerId: store.sellerId,
+        storeId: store.id,
+      }));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Query all franchise stores for available delivery SLAs at a zipcode.
+ * Returns deduplicated SLAs (first match per SLA name wins).
+ */
+export async function getDeliverySLAsForZipcode(
+  postalCode: string,
+  probeSkuId?: string,
+): Promise<DeliverySLA[]> {
+  // Use a known probe SKU or fallback — we try "1" which is common in VTEX
+  const skuId = probeSkuId || '1';
+
+  const results = await Promise.allSettled(
+    FRANCHISE_STORES.map((store) => probeSeller(store, postalCode, skuId)),
+  );
+
+  const allSLAs: DeliverySLA[] = [];
+  const seen = new Set<string>();
+
+  for (const result of results) {
+    if (result.status !== 'fulfilled') continue;
+    for (const sla of result.value) {
+      // Deduplicate by SLA id — keep the cheapest option
+      if (!seen.has(sla.id)) {
+        seen.add(sla.id);
+        allSLAs.push(sla);
       }
-    } catch {
-      // This seller can't serve the zipcode, try next
-      continue;
     }
   }
 
-  return null;
+  return allSLAs;
 }
 
+/**
+ * Find stores that offer pickup for a given zipcode.
+ */
+export async function findPickupStoresForZipcode(postalCode: string, probeSkuId?: string): Promise<FranchiseStore[]> {
+  const skuId = probeSkuId || '1';
+  const available: FranchiseStore[] = [];
+
+  const results = await Promise.allSettled(
+    FRANCHISE_STORES.map(async (store) => {
+      try {
+        const data = await vtexFetch<any>(
+          '/api/checkout/pub/orderForms/simulation',
+          {
+            method: 'POST',
+            body: {
+              items: [{ id: skuId, quantity: 1, seller: store.sellerId }],
+              postalCode,
+              country: 'USA',
+            },
+            params: { sc: VTEX_CONFIG.salesChannel },
+            timeout: 8000,
+          },
+        );
+        const logistics = data?.logisticsInfo?.[0];
+        const hasPickup = logistics?.slas?.some((sla: any) => sla.deliveryChannel === 'pickup-in-point');
+        return hasPickup ? store : null;
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  for (const r of results) {
+    if (r.status === 'fulfilled' && r.value) available.push(r.value);
+  }
+
+  return available;
+}

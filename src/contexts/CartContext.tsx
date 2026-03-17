@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect, use
 import { Product } from "@/data/products";
 import { CartItem } from "@/data/cart";
 import { getOrCreateOrderForm, addToCart as vtexAddToCart, updateCartItems as vtexUpdateItems, redirectToCheckout as vtexRedirectToCheckout, type OrderForm } from "@/api/checkoutApi";
-import { FRANCHISE_STORES, DEFAULT_STORE, type FranchiseStore } from "@/api/stores";
+import { FRANCHISE_STORES, DEFAULT_STORE, type FranchiseStore, type DeliverySLA } from "@/api/stores";
 
 interface CartContextType {
   items: CartItem[];
@@ -22,6 +22,8 @@ interface CartContextType {
   selectedSellerId: string;
   selectedStoreData: FranchiseStore;
   setSelectedStoreById: (storeId: string) => void;
+  selectedSLA: DeliverySLA | null;
+  setSelectedSLA: (sla: DeliverySLA | null) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -36,6 +38,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const [selectedStoreData, setSelectedStoreData] = useState<FranchiseStore>(DEFAULT_STORE);
   const [selectedSellerId, setSelectedSellerId] = useState(DEFAULT_STORE.sellerId);
+  const [selectedSLA, setSelectedSLA] = useState<DeliverySLA | null>(null);
 
   const setSelectedStoreById = useCallback((storeId: string) => {
     const store = FRANCHISE_STORES.find(s => s.id === storeId);
@@ -143,6 +146,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         fulfillmentMethod, setFulfillmentMethod,
         isVtexSynced,
         selectedSellerId, selectedStoreData, setSelectedStoreById,
+        selectedSLA, setSelectedSLA,
       }}
     >
       {children}
