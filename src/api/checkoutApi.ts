@@ -77,3 +77,32 @@ export function redirectToCheckout(orderFormId?: string): void {
   if (!id) return;
   window.location.href = `${VTEX_CONFIG.checkoutUrl}/?orderFormId=${id}#/cart`;
 }
+
+export async function simulateForSeller(
+  skuId: string,
+  sellerId: string,
+  quantity = 1
+): Promise<{ price: number; available: boolean; listPrice: number }> {
+  const data = await vtexFetch<any>(
+    '/api/checkout/pub/orderForms/simulation',
+    {
+      method: 'POST',
+      body: {
+        items: [{ id: skuId, quantity, seller: sellerId }],
+        country: 'USA',
+      },
+      params: { sc: VTEX_CONFIG.salesChannel },
+    }
+  );
+
+  const item = data.items?.[0];
+  if (!item || item.availability !== 'available') {
+    return { price: 0, available: false, listPrice: 0 };
+  }
+
+  return {
+    price: item.sellingPrice ? item.sellingPrice / 100 : item.price || 0,
+    listPrice: item.listPrice ? item.listPrice / 100 : 0,
+    available: true,
+  };
+}
