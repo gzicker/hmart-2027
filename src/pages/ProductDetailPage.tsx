@@ -20,7 +20,7 @@ export default function ProductDetailPage() {
   const { t, language } = useLanguage();
   const [quantity, setQuantity] = useState(1);
   const [showPairDrawer, setShowPairDrawer] = useState(false);
-  const [selectedFulfillment, setSelectedFulfillment] = useState<"delivery" | "pickup" | "shipping">("delivery");
+  const [selectedFulfillment, setSelectedFulfillment] = useState<"delivery" | "pickup">("delivery");
 
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
