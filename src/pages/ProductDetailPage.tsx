@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Truck, Store, Package, Plus, Minus, ChevronRight, X, ShoppingCart, Clock, ChefHat, Loader2 } from "lucide-react";
 import { Product } from "@/data/products";
-import { searchBySlug, searchProducts } from "@/api/searchApi";
+import { getProductById, searchProducts } from "@/api/searchApi";
 import { vtexProductToProduct, vtexProductsToProducts } from "@/api/vtexAdapter";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
