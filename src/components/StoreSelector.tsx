@@ -85,6 +85,7 @@ export default function StoreSelector() {
       ? (locationLabel || `ZIP ${zipcode}`)
       : (STORE_DISPLAY_NAMES[seller.id] || seller.name);
     setSelectedStore(label);
+    setHasConfirmedLocation(true);
     setOpen(false);
   };
 
