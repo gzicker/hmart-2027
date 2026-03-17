@@ -88,6 +88,7 @@ export default function HomePage() {
           {[
             { icon: Truck, titleKey: "fulfillment.sameDay", descKey: "fulfillment.sameDayDesc", color: "text-primary" },
             { icon: Store, titleKey: "fulfillment.curbside", descKey: "fulfillment.curbsideDesc", color: "text-green-600" },
+            { icon: Package, titleKey: "fulfillment.ship", descKey: "fulfillment.shipDesc", color: "text-blue-600" },
             { icon: ArrowRight, titleKey: "fulfillment.wholesale", descKey: "fulfillment.wholesaleDesc", color: "text-orange-600" },
           ].map(({ icon: Icon, titleKey, descKey, color }) => (
             <div key={titleKey} className="flex items-center gap-3 px-4 py-4">
