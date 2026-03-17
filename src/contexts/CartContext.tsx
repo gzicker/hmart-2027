@@ -37,7 +37,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const initialized = useRef(false);
 
   const [selectedSellerId, setSelectedSellerId] = useState("1");
-
+  const [hasConfirmedLocation, setHasConfirmedLocation] = useState(false);
+  const [promptStoreSelector, setPromptStoreSelector] = useState(false);
   // Initialize orderForm on mount
   useEffect(() => {
     if (initialized.current) return;
