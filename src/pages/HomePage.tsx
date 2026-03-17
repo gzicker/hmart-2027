@@ -192,41 +192,33 @@ export default function HomePage() {
             <Play className="h-5 w-5 text-primary" />
             <h2 className="font-display text-2xl font-medium text-foreground">{t("tiktok.title")}</h2>
           </div>
-          <span className="text-xs font-medium text-muted-foreground">{t("tiktok.swipe")}</span>
+          <a
+            href="https://www.tiktok.com/tag/hmart"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-medium text-primary hover:underline"
+          >
+            {t("tiktok.swipe")} →
+          </a>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-          {CREATORS.map((creator, i) => (
+          {TIKTOK_VIDEOS.map((video, i) => (
             <motion.div
-              key={creator.name}
+              key={`${video.id}-${i}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08, duration: 0.4 }}
-              className="group relative flex-shrink-0 cursor-pointer"
-              style={{ width: 200 }}
+              className="flex-shrink-0"
+              style={{ width: 325 }}
             >
-              <div className="relative overflow-hidden rounded-xl aspect-[9/16]">
-                <img
-                  src={creator.image}
-                  alt={creator.caption}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm">
-                    <Play className="h-5 w-5 fill-foreground text-foreground" />
-                  </div>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-transparent to-transparent" />
-                <span className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-foreground/60 px-2 py-0.5 text-[10px] font-bold text-background backdrop-blur-sm">
-                  <Play className="h-2.5 w-2.5 fill-background" /> {creator.views}
-                </span>
-                <div className="absolute bottom-0 left-0 right-0 p-3">
-                  <p className="text-xs font-bold text-background">{creator.name}</p>
-                  <p className="mt-0.5 line-clamp-2 text-[11px] leading-tight text-background/80">{creator.caption}</p>
-                  <span className="mt-2 inline-block rounded-md bg-primary/90 px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
-                    {t("tiktok.shop")} {creator.product}
-                  </span>
-                </div>
-              </div>
+              <iframe
+                src={`https://www.tiktok.com/embed/v2/${video.id}`}
+                style={{ width: 325, height: 578, border: 'none', borderRadius: 12, overflow: 'hidden' }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                loading="lazy"
+                title={video.caption}
+              />
             </motion.div>
           ))}
         </div>
