@@ -47,7 +47,7 @@ export default function ProductCard({ product, featured }: ProductCardProps) {
 
       <div className="p-3">
         <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{product.brand}</p>
-        <Link to={`/product/${(product as any)._vtex?.linkText || product.id}`}>
+        <Link to={`/product/${product.id}`}>
           <h3 className="mt-0.5 text-sm font-medium leading-tight text-foreground hover:text-primary">
             {displayName}
             {subName && <span className="ml-1.5 text-muted-foreground">{subName}</span>}
