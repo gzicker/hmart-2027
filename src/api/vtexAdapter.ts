@@ -2,41 +2,43 @@ import { Product } from '@/data/products';
 import { ISProduct, getDefaultSku, getBestOffer, getMainImage } from './searchApi';
 
 export function vtexProductToProduct(vtexProduct: ISProduct): Product {
-  const sku = getDefaultSku(vtexProduct);
-  const offer = sku ? getBestOffer(sku) : null;
-  const price = offer?.commertialOffer?.Price ?? 0;
-  const listPrice = offer?.commertialOffer?.ListPrice ?? 0;
-  const hasDiscount = listPrice > price;
-  const imageUrl = sku ? getMainImage(sku) : '';
-  const isAvailable = offer?.commertialOffer?.IsAvailable ?? false;
+  // Get first SKU
+  const sku = vtexProduct.items?.[0];
+  // Get first seller from that SKU
+  const seller = sku?.sellers?.[0];
+  // Get commercial offer
+  const offer = seller?.commertialOffer;
 
-  // Extract weight from specifications if available
-  const weightSpec = vtexProduct.skuSpecifications?.find(
-    s => s.field.name.toLowerCase().includes('weight') || s.field.name.toLowerCase().includes('peso')
-  );
-  const weight = weightSpec?.values?.[0]?.name || sku?.name || '';
+  // Extract prices - VTEX returns prices as decimals (e.g. 4.99), not cents
+  const price = offer?.Price ?? 0;
+  const listPrice = offer?.ListPrice ?? 0;
+  const hasDiscount = listPrice > 0 && listPrice > price;
+  const isAvailable = (offer?.AvailableQuantity ?? 0) > 0;
+
+  // Extract image URL
+  const imageUrl = sku?.images?.[0]?.imageUrl ?? '';
 
   return {
     id: vtexProduct.productId,
     name: vtexProduct.productName,
-    brand: vtexProduct.brand || '',
+    brand: vtexProduct.brand || 'H Mart',
     price: price,
     originalPrice: hasDiscount ? listPrice : undefined,
     image: imageUrl,
-    category: vtexProduct.categories?.[0]?.replace(/^\//,'').replace(/\/$/,'') || '',
-    weight: weight,
+    category: vtexProduct.categories?.[0]?.replace(/^\//, '').replace(/\/$/, '').split('/').pop() || '',
+    weight: sku?.nameComplete || sku?.name || '',
     inStock: isAvailable,
     isSponsored: false,
     isNew: false,
     rating: 4.5,
     reviewCount: 0,
-    fulfillment: ['delivery', 'pickup', 'shipping'],
-    description: vtexProduct.description || '',
+    fulfillment: ['delivery', 'pickup', 'shipping'] as ("delivery" | "pickup" | "shipping")[],
+    description: vtexProduct.description || vtexProduct.productName,
     storeName: 'H Mart',
     _vtex: {
       productId: vtexProduct.productId,
       skuId: sku?.itemId || '',
-      sellerId: offer?.sellerId || '1',
+      sellerId: seller?.sellerId || '1',
       linkText: vtexProduct.linkText,
     },
   };
