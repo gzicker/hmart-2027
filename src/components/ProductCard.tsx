@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Product } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getProductName, getProductSubName } from "@/lib/product-utils";
-import { Plus, Star } from "lucide-react";
+import { simulateForSeller } from "@/api/checkoutApi";
+import { Plus, Star, AlertTriangle } from "lucide-react";
 
 interface ProductCardProps {
   product: Product;
@@ -11,14 +13,29 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, featured }: ProductCardProps) {
-  const { addItem } = useCart();
+  const { addItem, selectedSellerId, selectedStore } = useCart();
   const { t, language } = useLanguage();
 
   const displayName = getProductName(product, language);
   const subName = getProductSubName(product, language);
 
+  const [sellerPrice, setSellerPrice] = useState<{ price: number; available: boolean; listPrice: number } | null>(null);
+
+  useEffect(() => {
+    const skuId = (product as any)._vtex?.skuId;
+    if (!skuId) return;
+
+    simulateForSeller(skuId, selectedSellerId)
+      .then(setSellerPrice)
+      .catch(() => setSellerPrice(null));
+  }, [product, selectedSellerId]);
+
+  const displayPrice = sellerPrice?.available && sellerPrice.price > 0 ? sellerPrice.price : product.price;
+  const displayListPrice = sellerPrice?.available && sellerPrice.listPrice > 0 ? sellerPrice.listPrice : product.originalPrice;
+  const isUnavailable = sellerPrice !== null && !sellerPrice.available;
+
   return (
-    <div className={`product-card ${featured ? "col-span-2 row-span-2" : ""}`}>
+    <div className={`product-card ${featured ? "col-span-2 row-span-2" : ""} ${isUnavailable ? "opacity-60" : ""}`}>
       {product.isSponsored && (
         <div className="absolute left-2 top-2 z-10">
           <span className="sponsored-badge">{t("brands.sponsored")}</span>
@@ -31,10 +48,10 @@ export default function ProductCard({ product, featured }: ProductCardProps) {
           </span>
         </div>
       )}
-      {product.originalPrice && (
+      {displayListPrice && displayListPrice > displayPrice && !isUnavailable && (
         <div className="absolute right-2 top-2 z-10">
           <span className="inline-flex items-center rounded-sm bg-accent px-2 py-0.5 text-xs font-bold text-accent-foreground">
-            {t("product.save")} ${(product.originalPrice - product.price).toFixed(2)}
+            {t("product.save")} ${(displayListPrice - displayPrice).toFixed(2)}
           </span>
         </div>
       )}
@@ -73,20 +90,27 @@ export default function ProductCard({ product, featured }: ProductCardProps) {
           )}
         </div>
 
-        <div className="mt-2 flex items-center justify-between">
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-lg font-bold text-foreground">${product.price.toFixed(2)}</span>
-            {product.originalPrice && (
-              <span className="text-xs text-muted-foreground line-through">${product.originalPrice.toFixed(2)}</span>
-            )}
+        {isUnavailable ? (
+          <div className="mt-2 flex items-center gap-1.5">
+            <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
+            <span className="text-xs font-medium text-destructive">Unavailable</span>
           </div>
-          <button
-            onClick={() => addItem(product)}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-110 active:scale-95"
-          >
-            <Plus className="h-4 w-4" />
-          </button>
-        </div>
+        ) : (
+          <div className="mt-2 flex items-center justify-between">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-lg font-bold text-foreground">${displayPrice.toFixed(2)}</span>
+              {displayListPrice && displayListPrice > displayPrice && (
+                <span className="text-xs text-muted-foreground line-through">${displayListPrice.toFixed(2)}</span>
+              )}
+            </div>
+            <button
+              onClick={() => addItem(product)}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-110 active:scale-95"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
