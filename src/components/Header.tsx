@@ -38,7 +38,12 @@ export default function Header() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getCategoryTree(2).then(setVtexCategories).catch(console.error);
+    getCategoryTree(3).then((cats) => {
+      const filtered = cats.filter(c =>
+        !['1', 'Test Category', 'Test Category  Test', 'Main Category', 'Mickael', 'gift chuseok test'].includes(c.name)
+      );
+      setVtexCategories(filtered);
+    }).catch(console.error);
   }, []);
 
   const handleSearchInput = (value: string) => {
@@ -146,17 +151,34 @@ export default function Header() {
 
               {categoriesOpen && (
                 <div className="absolute left-0 top-full mt-3 w-72 rounded-xl border border-border bg-card shadow-xl animate-fade-in z-50">
-                  <div className="py-2">
-                    {vtexCategories.length > 0 ? vtexCategories.map((cat) => (
-                      <Link
-                        key={cat.id}
-                        to="/products"
-                        onClick={() => setCategoriesOpen(false)}
-                        className="flex items-center justify-between px-4 py-2.5 text-sm text-primary transition-colors hover:bg-secondary"
-                      >
-                        {cat.name}
-                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-                      </Link>
+                  <div className="max-h-[70vh] overflow-y-auto py-2">
+                    {vtexCategories.length > 0 ? vtexCategories.map((dept) => (
+                      <div key={dept.id}>
+                        <Link
+                          to={`/products?cat=${dept.id}`}
+                          onClick={() => setCategoriesOpen(false)}
+                          className="flex items-center justify-between px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-primary"
+                        >
+                          {dept.name}
+                          {dept.hasChildren && dept.children?.length > 0 && (
+                            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                          )}
+                        </Link>
+                        {dept.hasChildren && dept.children?.length > 0 && (
+                          <div className="bg-secondary/30">
+                            {dept.children.map((sub) => (
+                              <Link
+                                key={sub.id}
+                                to={`/products?cat=${sub.id}`}
+                                onClick={() => setCategoriesOpen(false)}
+                                className="block px-8 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-primary"
+                              >
+                                {sub.name}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     )) : CATEGORY_KEYS.map((key) => (
                       <Link
                         key={key}

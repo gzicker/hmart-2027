@@ -96,6 +96,8 @@ export interface ISFacetValue {
   value: string;
   quantity: number;
   selected: boolean;
+  range?: { from: number; to: number };
+  children?: ISFacetValue[];
 }
 
 export interface ISFacetsResponse {
@@ -133,9 +135,16 @@ export async function autocomplete(query: string): Promise<ISAutocompleteRespons
 
 export async function getFacets(params: { facets?: string; query?: string } = {}): Promise<ISFacetsResponse> {
   const { facets = '', query } = params;
-  const path = facets ? `${IS_BASE}/facets/${facets}` : `${IS_BASE}/facets`;
+  const effectiveQuery = query || (facets ? undefined : ' ');
+  const path = facets
+    ? `${IS_BASE}/facets/${facets}`
+    : `${IS_BASE}/facets`;
   return vtexFetch<ISFacetsResponse>(path, {
-    params: { query: query || undefined, locale: VTEX_CONFIG.locale, sc: VTEX_CONFIG.salesChannel },
+    params: {
+      query: effectiveQuery,
+      locale: VTEX_CONFIG.locale,
+      sc: VTEX_CONFIG.salesChannel,
+    },
   });
 }
 
