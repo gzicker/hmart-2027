@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import { useMemo } from "react";
 import { Product } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getProductName, getProductSubName } from "@/lib/product-utils";
+import { useProductSellerSimulation } from "@/hooks/useSellerSimulation";
 import { Plus, Star, AlertTriangle } from "lucide-react";
 
 interface ProductCardProps {
@@ -18,21 +18,11 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
 
   const displayName = getProductName(product, language);
   const subName = getProductSubName(product, language);
+  const simulation = useProductSellerSimulation(product, selectedSellerId);
 
-  // Check availability from stored sellers data (no API call needed)
-  const sellerMatch = useMemo(() => {
-    const sellers = product._vtex?.sellers;
-    if (!sellers || sellers.length === 0) return null;
-    // Find the selected seller
-    const match = sellers.find(s => s.sellerId === selectedSellerId);
-    if (match) return match;
-    // Fallback: any available seller
-    return sellers.find(s => s.available) || sellers[0];
-  }, [product._vtex?.sellers, selectedSellerId]);
-
-  const isUnavailable = sellerMatch !== null && !sellerMatch.available;
-  const displayPrice = sellerMatch?.available && sellerMatch.price > 0 ? sellerMatch.price : product.price;
-  const displayListPrice = sellerMatch?.available && sellerMatch.listPrice > 0 ? sellerMatch.listPrice : product.originalPrice;
+  const isUnavailable = simulation ? !simulation.available : false;
+  const displayPrice = simulation?.available && simulation.price > 0 ? simulation.price : product.price;
+  const displayListPrice = simulation?.available && simulation.listPrice > 0 ? simulation.listPrice : product.originalPrice;
 
   if (hideIfUnavailable && isUnavailable) return null;
 

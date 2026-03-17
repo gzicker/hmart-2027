@@ -8,6 +8,7 @@ import { vtexProductsToProducts } from "@/api/vtexAdapter";
 import bannerNongshim from "@/assets/banner-nongshim.jpg";
 import bannerCj from "@/assets/banner-cj.jpg";
 import { useCart } from "@/contexts/CartContext";
+import { useProductsSellerSimulations } from "@/hooks/useSellerSimulation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTab } from "@/contexts/TabContext";
 import ProductCard from "@/components/ProductCard";
@@ -48,22 +49,19 @@ export default function HomePage() {
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
 
   useEffect(() => {
-    searchProducts({ query: '', count: 20 })
+    searchProducts({ query: '', count: 60 })
       .then((res) => {
         setVtexProducts(vtexProductsToProducts(res.products));
       })
       .catch(console.error)
       .finally(() => setIsLoadingProducts(false));
   }, []);
-  // Always show 4 items — prefer ones with any available seller, fallback to all
+  const productSimulations = useProductsSellerSimulations(vtexProducts, selectedSellerId);
+
   const chefPicks = useMemo(() => {
-    const available = vtexProducts.filter((p) => {
-      const sellers = p._vtex?.sellers;
-      if (!sellers || sellers.length === 0) return true;
-      return sellers.some((s) => s.available);
-    });
+    const available = vtexProducts.filter((product) => productSimulations[product.id]?.available);
     return (available.length >= 4 ? available : vtexProducts).slice(0, 4);
-  }, [vtexProducts]);
+  }, [vtexProducts, productSimulations]);
 
   if (activeTab === "gifts") return <GiftsHomePage />;
   if (activeTab === "b2b") return <B2BHomePage />;
