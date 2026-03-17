@@ -30,6 +30,7 @@ export interface Product {
   descriptionKo?: string;
   descriptionZh?: string;
   storeName?: string;
+  _vtex?: { productId: string; skuId: string; sellerId: string; linkText: string };
 }
 
 export const products: Product[] = [
