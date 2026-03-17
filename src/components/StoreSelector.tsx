@@ -132,7 +132,9 @@ export default function StoreSelector() {
           {hasSearched && !isSearching && sellers.length > 0 && (
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {sellers.length === 1 ? "Your store" : `${sellers.length} stores serve ZIP ${zipcode}`}
+                {fulfillmentMethod === "delivery"
+                  ? "Your zipcode"
+                  : (sellers.length === 1 ? "Your store" : `${sellers.length} stores serve ZIP ${zipcode}`)}
               </p>
               {sellers.map((seller) => {
                 const isSelected = selectedSellerId === seller.id;
