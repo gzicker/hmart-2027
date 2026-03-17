@@ -30,8 +30,32 @@ export default function Header() {
   const { activeTab, setActiveTab } = useTab();
   const [searchQuery, setSearchQuery] = useState("");
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [vtexCategories, setVtexCategories] = useState<VtexCategory[]>([]);
+  const [suggestions, setSuggestions] = useState<{terms: string[]; products: {name: string; slug: string; thumb: string}[]}>({terms: [], products: []});
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const catRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    getCategoryTree(2).then(setVtexCategories).catch(console.error);
+  }, []);
+
+  const handleSearchInput = (value: string) => {
+    setSearchQuery(value);
+    clearTimeout(debounceRef.current);
+    if (value.length < 2) { setSuggestions({terms: [], products: []}); setShowSuggestions(false); return; }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const data = await vtexAutocomplete(value);
+        setSuggestions({
+          terms: data.searches?.map(s => s.term) || [],
+          products: data.itemsReturned?.map(p => ({ name: p.name, slug: p.slug || p.productId, thumb: p.thumb })) || [],
+        });
+        setShowSuggestions(true);
+      } catch { /* ignore */ }
+    }, 300);
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
