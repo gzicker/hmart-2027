@@ -3,7 +3,6 @@ import React, { createContext, useContext, useState, useCallback, useEffect, use
 import { Product } from "@/data/products";
 import { CartItem } from "@/data/cart";
 import { getOrCreateOrderForm, addToCart as vtexAddToCart, updateCartItems as vtexUpdateItems, redirectToCheckout as vtexRedirectToCheckout, type OrderForm } from "@/api/checkoutApi";
-import { FRANCHISE_STORES, DEFAULT_STORE, type FranchiseStore, type DeliverySLA } from "@/api/stores";
 
 interface CartContextType {
   items: CartItem[];
@@ -20,34 +19,20 @@ interface CartContextType {
   setFulfillmentMethod: (method: "delivery" | "pickup") => void;
   isVtexSynced: boolean;
   selectedSellerId: string;
-  selectedStoreData: FranchiseStore;
-  setSelectedStoreById: (storeId: string) => void;
-  selectedSLA: DeliverySLA | null;
-  setSelectedSLA: (sla: DeliverySLA | null) => void;
+  setSelectedSellerId: (id: string) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
-  const [selectedStore, setSelectedStore] = useState(DEFAULT_STORE.name);
+  const [selectedStore, setSelectedStore] = useState("");
   const [fulfillmentMethod, setFulfillmentMethod] = useState<"delivery" | "pickup">("delivery");
   const [orderFormId, setOrderFormId] = useState<string | null>(null);
   const [isVtexSynced, setIsVtexSynced] = useState(false);
   const initialized = useRef(false);
 
-  const [selectedStoreData, setSelectedStoreData] = useState<FranchiseStore>(DEFAULT_STORE);
-  const [selectedSellerId, setSelectedSellerId] = useState(DEFAULT_STORE.sellerId);
-  const [selectedSLA, setSelectedSLA] = useState<DeliverySLA | null>(null);
-
-  const setSelectedStoreById = useCallback((storeId: string) => {
-    const store = FRANCHISE_STORES.find(s => s.id === storeId);
-    if (store) {
-      setSelectedStoreData(store);
-      setSelectedSellerId(store.sellerId);
-      setSelectedStore(store.name);
-    }
-  }, []);
+  const [selectedSellerId, setSelectedSellerId] = useState("1");
 
   // Initialize orderForm on mount
   useEffect(() => {
@@ -145,8 +130,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         selectedStore, setSelectedStore,
         fulfillmentMethod, setFulfillmentMethod,
         isVtexSynced,
-        selectedSellerId, selectedStoreData, setSelectedStoreById,
-        selectedSLA, setSelectedSLA,
+        selectedSellerId, setSelectedSellerId,
       }}
     >
       {children}

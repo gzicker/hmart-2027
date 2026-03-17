@@ -16,7 +16,7 @@ import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
-  const { addItem, selectedSellerId, selectedStoreData } = useCart();
+  const { addItem, selectedSellerId, selectedStore } = useCart();
   const { t, language } = useLanguage();
   const [quantity, setQuantity] = useState(1);
   const [showPairDrawer, setShowPairDrawer] = useState(false);
@@ -163,13 +163,13 @@ export default function ProductDetailPage() {
               {simulating ? (
                 <div className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Checking price at {selectedStoreData.name}…</span>
+                  <span className="text-sm text-muted-foreground">Checking price at {selectedStore || "your store"}…</span>
                 </div>
               ) : isUnavailable ? (
                 <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3">
                   <AlertTriangle className="h-5 w-5 text-destructive" />
                   <div>
-                    <p className="text-sm font-medium text-destructive">Unavailable at {selectedStoreData.name}</p>
+                    <p className="text-sm font-medium text-destructive">Unavailable at {selectedStore || "your store"}</p>
                     <p className="text-xs text-muted-foreground">Try selecting a different store location.</p>
                   </div>
                 </div>
@@ -188,7 +188,7 @@ export default function ProductDetailPage() {
               )}
               {!isUnavailable && !simulating && (
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Price at <span className="font-medium text-foreground">{selectedStoreData.name}</span> · {product.weight}
+                  Price at <span className="font-medium text-foreground">{selectedStore || "your store"}</span> · {product.weight}
                 </p>
               )}
             </div>
@@ -237,7 +237,7 @@ export default function ProductDetailPage() {
               </div>
               {product.storeName && selectedFulfillment !== "shipping" && (
                 <p className="mt-2 text-xs text-muted-foreground">
-                  {t("detail.from")} <span className="font-medium text-foreground">{selectedStoreData.name}</span>
+                  {t("detail.from")} <span className="font-medium text-foreground">{selectedStore || "your store"}</span>
                 </p>
               )}
             </div>
@@ -272,7 +272,7 @@ export default function ProductDetailPage() {
               >
                 <ShoppingCart className="h-4 w-4" />
                 {isUnavailable
-                  ? `Unavailable at ${selectedStoreData.name}`
+                  ? `Unavailable at ${selectedStore || "your store"}`
                   : `${t("product.addToCart")} — $${(displayPrice * quantity).toFixed(2)}`}
               </button>
 
