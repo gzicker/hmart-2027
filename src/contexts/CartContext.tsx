@@ -67,28 +67,48 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [orderFormId]);
 
   const removeItem = useCallback((productId: string) => {
-    setItems((prev) => {
-      const index = prev.findIndex((i) => i.product.id === productId);
-      if (index >= 0 && orderFormId) {
-        vtexUpdateItems(orderFormId, [{ index, quantity: 0 }]).catch(console.warn);
-      }
-      return prev.filter((i) => i.product.id !== productId);
-    });
-  }, [orderFormId]);
+    // Remove from local state
+    setItems((prev) => prev.filter((i) => i.product.id !== productId));
+
+    // Remove from VTEX - find the item index in the ACTUAL orderForm
+    if (orderFormId) {
+      getOrCreateOrderForm().then((of) => {
+        const vtexData = items.find(i => i.product.id === productId);
+        const skuId = (vtexData?.product as any)?._vtex?.skuId || productId;
+        const vtexIndex = of.items.findIndex(item => item.id === skuId);
+        if (vtexIndex >= 0) {
+          vtexUpdateItems(orderFormId, [{ index: vtexIndex, quantity: 0 }])
+            .then((updatedOf) => setOrderFormId(updatedOf.orderFormId))
+            .catch(console.warn);
+        }
+      }).catch(console.warn);
+    }
+  }, [orderFormId, items]);
 
   const updateQuantity = useCallback((productId: string, quantity: number) => {
     if (quantity <= 0) {
       removeItem(productId);
       return;
     }
-    setItems((prev) => {
-      const index = prev.findIndex((i) => i.product.id === productId);
-      if (index >= 0 && orderFormId) {
-        vtexUpdateItems(orderFormId, [{ index, quantity }]).catch(console.warn);
-      }
-      return prev.map((i) => (i.product.id === productId ? { ...i, quantity } : i));
-    });
-  }, [orderFormId, removeItem]);
+    // Update local state immediately
+    setItems((prev) =>
+      prev.map((i) => (i.product.id === productId ? { ...i, quantity } : i))
+    );
+
+    // Update in VTEX - find correct index from actual orderForm
+    if (orderFormId) {
+      getOrCreateOrderForm().then((of) => {
+        const vtexData = items.find(i => i.product.id === productId);
+        const skuId = (vtexData?.product as any)?._vtex?.skuId || productId;
+        const vtexIndex = of.items.findIndex(item => item.id === skuId);
+        if (vtexIndex >= 0) {
+          vtexUpdateItems(orderFormId, [{ index: vtexIndex, quantity }])
+            .then((updatedOf) => setOrderFormId(updatedOf.orderFormId))
+            .catch(console.warn);
+        }
+      }).catch(console.warn);
+    }
+  }, [orderFormId, items, removeItem]);
 
   const clearCart = useCallback(() => setItems([]), []);
 
