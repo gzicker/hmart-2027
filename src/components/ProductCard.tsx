@@ -48,8 +48,8 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
       )}
 
       <Link to={`/product/${product.id}`}>
-        <div className="product-card-image">
-          <img src={product.image} alt={displayName} loading="lazy" />
+        <div className="product-card-image aspect-square overflow-hidden">
+          <img src={product.image} alt={displayName} loading="lazy" className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105" />
         </div>
       </Link>
 
