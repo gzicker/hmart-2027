@@ -10,9 +10,10 @@ import { Plus, Star, AlertTriangle } from "lucide-react";
 interface ProductCardProps {
   product: Product;
   featured?: boolean;
+  hideIfUnavailable?: boolean;
 }
 
-export default function ProductCard({ product, featured }: ProductCardProps) {
+export default function ProductCard({ product, featured, hideIfUnavailable }: ProductCardProps) {
   const { addItem, selectedSellerId, selectedStore } = useCart();
   const { t, language } = useLanguage();
 
