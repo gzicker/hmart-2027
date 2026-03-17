@@ -163,7 +163,8 @@ export default function StoreSelector() {
                     </div>
                     {isSelected && (
                       <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-primary">
-                        <MapPin className="h-3 w-3" /> {t("store.yourStore")}
+                        <MapPin className="h-3 w-3" />
+                        {fulfillmentMethod === "delivery" ? `Your selected zipcode` : t("store.yourStore")}
                       </div>
                     )}
                   </button>
