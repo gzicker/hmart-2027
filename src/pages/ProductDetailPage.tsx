@@ -224,7 +224,7 @@ export default function ProductDetailPage() {
                   </button>
                 )}
               </div>
-              {product.storeName && selectedFulfillment !== "shipping" && (
+              {product.storeName && (
                 <p className="mt-2 text-xs text-muted-foreground">
                   {t("detail.from")} <span className="font-medium text-foreground">{selectedStore || "your store"}</span>
                 </p>
