@@ -39,7 +39,7 @@ export default function ProductCard({ product, featured }: ProductCardProps) {
         </div>
       )}
 
-      <Link to={`/product/${(product as any)._vtex?.linkText || product.id}`}>
+      <Link to={`/product/${product.id}`}>
         <div className="product-card-image">
           <img src={product.image} alt={displayName} loading="lazy" />
         </div>
