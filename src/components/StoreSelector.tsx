@@ -22,6 +22,7 @@ export default function StoreSelector() {
   const [isSearching, setIsSearching] = useState(false);
   const [sellers, setSellers] = useState<RegionSeller[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [locationLabel, setLocationLabel] = useState("");
 
   const searchByZip = async () => {
     const zip = zipcode.replace(/\D/g, "");
