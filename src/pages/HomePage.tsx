@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Truck, Store, ArrowRight, Star, ChefHat, Play, Clock } from "lucide-react";
 import { Product } from "@/data/products";
 import { searchProducts } from "@/api/searchApi";
@@ -32,7 +32,7 @@ const TIKTOK_VIDEOS = [
 ];
 
 export default function HomePage() {
-  const { addItem } = useCart();
+  const { addItem, selectedSellerId } = useCart();
   const { t } = useLanguage();
   const { activeTab } = useTab();
   const location = useLocation();
@@ -55,12 +55,22 @@ export default function HomePage() {
       .catch(console.error)
       .finally(() => setIsLoadingProducts(false));
   }, []);
+  // Always show 4 available items for the selected seller
+  const chefPicks = useMemo(() => {
+    return vtexProducts
+      .filter((p) => {
+        const sellers = (p as any)._vtex?.sellers;
+        if (!sellers || sellers.length === 0) return true;
+        const match = sellers.find((s: any) => s.sellerId === selectedSellerId);
+        return match ? match.available : sellers.some((s: any) => s.available);
+      })
+      .slice(0, 4);
+  }, [vtexProducts, selectedSellerId]);
 
   if (activeTab === "gifts") return <GiftsHomePage />;
   if (activeTab === "b2b") return <B2BHomePage />;
 
   const sponsoredProducts = vtexProducts.slice(0, 3);
-  const chefPicks = vtexProducts.slice(0, 4);
 
   const categoryImages = [
     { name: t("cat.vegetables"), nameKo: "채소", image: categoryVeg, link: "/products" },
