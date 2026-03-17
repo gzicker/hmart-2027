@@ -65,7 +65,7 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
           </h3>
           {subName && (
             <p
-              className="mt-0.5 text-xs leading-tight text-muted-foreground line-clamp-1 group-hover:line-clamp-2"
+              className="mt-0.5 text-xs leading-tight text-muted-foreground line-clamp-2 group-hover:line-clamp-none"
               title={subName}
             >
               {subName}
