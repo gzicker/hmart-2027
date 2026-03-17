@@ -1,8 +1,10 @@
 import { useParams, Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, Truck, Store, Package, Plus, Minus, ChevronRight, X, ShoppingCart, Clock, ChefHat } from "lucide-react";
-import { products } from "@/data/products";
+import { Star, Truck, Store, Package, Plus, Minus, ChevronRight, X, ShoppingCart, Clock, ChefHat, Loader2 } from "lucide-react";
+import { Product } from "@/data/products";
+import { searchProducts } from "@/api/searchApi";
+import { vtexProductsToProducts } from "@/api/vtexAdapter";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getProductName, getProductSubName, getProductDescription } from "@/lib/product-utils";
@@ -13,20 +15,59 @@ import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
-  const product = products.find((p) => p.id === id) || products[0];
   const { addItem } = useCart();
   const { t, language } = useLanguage();
   const [quantity, setQuantity] = useState(1);
   const [showPairDrawer, setShowPairDrawer] = useState(false);
-  const [selectedFulfillment, setSelectedFulfillment] = useState<"delivery" | "pickup" | "shipping">(
-    product.fulfillment[0] as "delivery" | "pickup" | "shipping"
-  );
+  const [selectedFulfillment, setSelectedFulfillment] = useState<"delivery" | "pickup" | "shipping">("delivery");
 
-  const pairProduct = product.id === "gochujang-001"
-    ? products.find(p => p.id === "tteok-001")
-    : products.find(p => p.id !== product.id && p.id !== "gochujang-001");
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const relatedProducts = products.filter(p => p.id !== product.id).slice(0, 4);
+  useEffect(() => {
+    if (!id) return;
+    setIsLoading(true);
+
+    searchProducts({ query: '', count: 50 })
+      .then((res) => {
+        const allProducts = vtexProductsToProducts(res.products);
+        const found = allProducts.find(p => p.id === id);
+        const p = found || allProducts[0] || null;
+        setProduct(p);
+        if (p) setSelectedFulfillment(p.fulfillment[0] as "delivery" | "pickup" | "shipping");
+        setRelatedProducts(allProducts.filter(pr => pr.id !== (p?.id ?? id)).slice(0, 4));
+      })
+      .catch(console.error)
+      .finally(() => setIsLoading(false));
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="flex items-center justify-center py-32">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="py-32 text-center">
+          <p className="text-lg font-medium text-foreground">Product not found</p>
+          <Link to="/products" className="mt-2 inline-block text-sm text-primary hover:underline">Browse products</Link>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const pairProduct = relatedProducts[0] || null;
 
   const displayName = getProductName(product, language);
   const subName = getProductSubName(product, language);
