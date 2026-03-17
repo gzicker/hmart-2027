@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Truck, Store, ArrowRight, Star, ChefHat, Play, Clock } from "lucide-react";
 import { Product } from "@/data/products";
 import { searchProducts } from "@/api/searchApi";
