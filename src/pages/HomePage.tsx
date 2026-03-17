@@ -1,8 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Truck, Store, Clock, ArrowRight, Star, ChefHat, Play } from "lucide-react";
-import { products } from "@/data/products";
+import { Product } from "@/data/products";
+import { searchProducts } from "@/api/searchApi";
+import { vtexProductsToProducts } from "@/api/vtexAdapter";
 import bannerNongshim from "@/assets/banner-nongshim.jpg";
 import bannerCj from "@/assets/banner-cj.jpg";
 import { useCart } from "@/contexts/CartContext";
