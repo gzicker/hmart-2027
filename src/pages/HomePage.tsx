@@ -8,6 +8,7 @@ import { vtexProductsToProducts } from "@/api/vtexAdapter";
 import bannerNongshim from "@/assets/banner-nongshim.jpg";
 import bannerCj from "@/assets/banner-cj.jpg";
 import { useCart } from "@/contexts/CartContext";
+import { useProductsSellerSimulations } from "@/hooks/useSellerSimulation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTab } from "@/contexts/TabContext";
 import ProductCard from "@/components/ProductCard";
