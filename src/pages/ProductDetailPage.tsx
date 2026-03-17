@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, Truck, Store, Package, Plus, Minus, ChevronRight, X, ShoppingCart, Clock, ChefHat, Loader2, AlertTriangle } from "lucide-react";
+import { Star, Truck, Store, Plus, Minus, ChevronRight, X, ShoppingCart, Clock, ChefHat, Loader2, AlertTriangle } from "lucide-react";
 import { Product } from "@/data/products";
 import { getProductById, searchProducts } from "@/api/searchApi";
 import { vtexProductToProduct, vtexProductsToProducts } from "@/api/vtexAdapter";
