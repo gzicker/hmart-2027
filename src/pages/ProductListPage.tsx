@@ -85,7 +85,7 @@ export default function ProductListPage() {
                   onChange={(e) => { setSortBy(e.target.value as SortOption); setPage(1); }}
                   className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
                 >
-                  <option value="score_desc">Relevance</option>
+                  <option value="">Relevance</option>
                   <option value="price_asc">Price: Low to High</option>
                   <option value="price_desc">Price: High to Low</option>
                   <option value="orders_desc">Best Sellers</option>
