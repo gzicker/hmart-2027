@@ -8,6 +8,8 @@ import logoImg from "@/assets/hmart-logo.png";
 import StoreSelector from "@/components/StoreSelector";
 import LanguageSelector from "@/components/LanguageSelector";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { getCategoryTree, type VtexCategory } from "@/api/catalogApi";
+import { autocomplete as vtexAutocomplete } from "@/api/searchApi";
 
 const SITE_TABS = [
   { id: "hmart", labelKey: "tab.hmart", icon: ShoppingBasket, sublabelKey: null },
