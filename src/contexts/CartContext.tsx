@@ -22,6 +22,8 @@ interface CartContextType {
   selectedSellerId: string;
   selectedStoreData: FranchiseStore;
   setSelectedStoreById: (storeId: string) => void;
+  selectedSLA: DeliverySLA | null;
+  setSelectedSLA: (sla: DeliverySLA | null) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
