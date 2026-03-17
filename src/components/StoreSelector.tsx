@@ -2,7 +2,7 @@ import { useState } from "react";
 import { MapPin, ChevronDown, Check, Search, Loader2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getSellersForZipcode, type RegionSeller } from "@/api/stores";
+import { getSellersForZipcode, STORE_ADDRESSES, type RegionSeller } from "@/api/stores";
 import {
   Dialog,
   DialogContent,
