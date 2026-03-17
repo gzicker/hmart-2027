@@ -1,30 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { SlidersHorizontal, Grid3X3, LayoutList, Star } from "lucide-react";
-import { products, categories } from "@/data/products";
+import { SlidersHorizontal, Grid3X3, LayoutList, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Product } from "@/data/products";
+import { searchProducts, type SortOption } from "@/api/searchApi";
+import { vtexProductsToProducts } from "@/api/vtexAdapter";
+import { getCategoryTree, type VtexCategory } from "@/api/catalogApi";
 
 export default function ProductListPage() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [sortBy, setSortBy] = useState<SortOption>("score_desc");
   const { t } = useLanguage();
 
-  const filteredProducts = products.filter((p) => {
-    const matchesQuery = !query || p.name.toLowerCase().includes(query.toLowerCase()) || p.brand.toLowerCase().includes(query.toLowerCase());
-    const matchesCategory = !selectedCategory || p.category.toLowerCase().includes(selectedCategory.toLowerCase());
-    return matchesQuery && matchesCategory;
-  });
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<VtexCategory[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [totalResults, setTotalResults] = useState(0);
+  const [page, setPage] = useState(1);
 
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (a.isSponsored && !b.isSponsored) return -1;
-    if (!a.isSponsored && b.isSponsored) return 1;
-    return 0;
-  });
+  // Load categories once
+  useEffect(() => {
+    getCategoryTree(2).then(setCategories).catch(console.error);
+  }, []);
+
+  // Search products when query, category, sort or page changes
+  useEffect(() => {
+    setIsLoading(true);
+    const facets = selectedCategory ? `category-1/${selectedCategory}` : '';
+    searchProducts({ query, facets, page, count: 24, sort: sortBy })
+      .then((res) => {
+        setProducts(vtexProductsToProducts(res.products));
+        setTotalResults(res.recordsFiltered);
+      })
+      .catch(console.error)
+      .finally(() => setIsLoading(false));
+  }, [query, selectedCategory, sortBy, page]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -46,7 +62,7 @@ export default function ProductListPage() {
 
               <div className="space-y-1">
                 <button
-                  onClick={() => setSelectedCategory(null)}
+                  onClick={() => { setSelectedCategory(null); setPage(1); }}
                   className={`block w-full rounded-md px-3 py-2 text-left text-sm transition-colors ${!selectedCategory ? "bg-primary/10 font-medium text-primary" : "text-muted-foreground hover:bg-secondary"}`}
                 >
                   {t("list.allCategories")}
@@ -54,41 +70,29 @@ export default function ProductListPage() {
                 {categories.map((cat) => (
                   <button
                     key={cat.id}
-                    onClick={() => setSelectedCategory(cat.name)}
-                    className={`block w-full rounded-md px-3 py-2 text-left text-sm transition-colors ${selectedCategory === cat.name ? "bg-primary/10 font-medium text-primary" : "text-muted-foreground hover:bg-secondary"}`}
+                    onClick={() => { setSelectedCategory(String(cat.id)); setPage(1); }}
+                    className={`block w-full rounded-md px-3 py-2 text-left text-sm transition-colors ${selectedCategory === String(cat.id) ? "bg-primary/10 font-medium text-primary" : "text-muted-foreground hover:bg-secondary"}`}
                   >
-                    {cat.name} <span className="text-xs text-muted-foreground">{cat.nameKo}</span>
+                    {cat.name}
                   </button>
                 ))}
               </div>
 
               <div className="mt-6">
-                <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("list.fulfillment")}</h4>
-                <div className="space-y-2">
-                  {[t("fulfillment.sameDay"), t("fulfillment.curbside"), t("footer.shipHome")].map((opt) => (
-                    <label key={opt} className="flex items-center gap-2 text-sm text-foreground">
-                      <input type="checkbox" defaultChecked className="rounded border-border text-primary accent-primary" />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("list.rating")}</h4>
-                <div className="space-y-2">
-                  {[4, 3, 2].map((r) => (
-                    <label key={r} className="flex items-center gap-2 text-sm text-foreground">
-                      <input type="checkbox" className="rounded border-border text-primary accent-primary" />
-                      <div className="flex items-center gap-0.5">
-                        {Array.from({ length: r }).map((_, i) => (
-                          <Star key={i} className="h-3 w-3 fill-accent text-accent" />
-                        ))}
-                        <span className="ml-1 text-xs text-muted-foreground">{t("list.andUp")}</span>
-                      </div>
-                    </label>
-                  ))}
-                </div>
+                <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Sort</h4>
+                <select
+                  value={sortBy}
+                  onChange={(e) => { setSortBy(e.target.value as SortOption); setPage(1); }}
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                >
+                  <option value="score_desc">Relevance</option>
+                  <option value="price_asc">Price: Low to High</option>
+                  <option value="price_desc">Price: High to Low</option>
+                  <option value="orders_desc">Best Sellers</option>
+                  <option value="name_asc">Name: A-Z</option>
+                  <option value="release_desc">Newest</option>
+                  <option value="discount_desc">Biggest Discount</option>
+                </select>
               </div>
             </div>
           </aside>
@@ -96,7 +100,7 @@ export default function ProductListPage() {
           <main className="flex-1">
             <div className="mb-4 flex items-center justify-between">
               <p className="text-sm text-muted-foreground">
-                <span className="font-semibold text-foreground">{sortedProducts.length}</span> {t("list.products")}
+                <span className="font-semibold text-foreground">{totalResults}</span> {t("list.products")}
               </p>
               <div className="flex items-center gap-2">
                 <button onClick={() => setViewMode("grid")} className={`rounded-md p-1.5 ${viewMode === "grid" ? "bg-secondary text-foreground" : "text-muted-foreground"}`}>
@@ -108,22 +112,37 @@ export default function ProductListPage() {
               </div>
             </div>
 
-            {sortedProducts.some(p => p.isSponsored) && (
-              <div className="mb-6 rounded-lg border border-accent/30 bg-accent/5 p-4">
-                <p className="mb-3 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{t("list.sponsoredResults")}</p>
-                <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-                  {sortedProducts.filter(p => p.isSponsored).map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : products.length === 0 ? (
+              <div className="py-20 text-center">
+                <p className="text-lg font-medium text-foreground">No products found</p>
+                <p className="mt-1 text-sm text-muted-foreground">Try a different search or category</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-              {sortedProducts.filter(p => !p.isSponsored).map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            {/* Pagination */}
+            {totalResults > 24 && (
+              <div className="mt-8 flex items-center justify-center gap-2">
+                {Array.from({ length: Math.min(Math.ceil(totalResults / 24), 5) }, (_, i) => (
+                  <button
+                    key={i + 1}
+                    onClick={() => { setPage(i + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                    className={`h-10 w-10 rounded-lg text-sm font-medium transition-colors ${page === i + 1 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-foreground hover:bg-secondary/80'}`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            )}
           </main>
         </div>
       </div>
