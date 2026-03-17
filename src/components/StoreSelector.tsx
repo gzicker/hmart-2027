@@ -163,7 +163,7 @@ export default function StoreSelector() {
                         <div className="font-medium text-foreground">
                           {fulfillmentMethod === "delivery"
                             ? (locationLabel || `ZIP ${zipcode}`)
-                            : seller.name}
+                            : (STORE_DISPLAY_NAMES[seller.id] || seller.name)}
                         </div>
                         {fulfillmentMethod === "pickup" && STORE_ADDRESSES[seller.id] && (
                           <div className="text-xs text-muted-foreground">{STORE_ADDRESSES[seller.id]}</div>
