@@ -55,17 +55,15 @@ export default function HomePage() {
       .catch(console.error)
       .finally(() => setIsLoadingProducts(false));
   }, []);
-  // Always show 4 available items for the selected seller
+  // Always show 4 items — prefer ones with any available seller, fallback to all
   const chefPicks = useMemo(() => {
-    return vtexProducts
-      .filter((p) => {
-        const sellers = (p as any)._vtex?.sellers;
-        if (!sellers || sellers.length === 0) return true;
-        const match = sellers.find((s: any) => s.sellerId === selectedSellerId);
-        return match ? match.available : sellers.some((s: any) => s.available);
-      })
-      .slice(0, 4);
-  }, [vtexProducts, selectedSellerId]);
+    const available = vtexProducts.filter((p) => {
+      const sellers = p._vtex?.sellers;
+      if (!sellers || sellers.length === 0) return true;
+      return sellers.some((s) => s.available);
+    });
+    return (available.length >= 4 ? available : vtexProducts).slice(0, 4);
+  }, [vtexProducts]);
 
   if (activeTab === "gifts") return <GiftsHomePage />;
   if (activeTab === "b2b") return <B2BHomePage />;
