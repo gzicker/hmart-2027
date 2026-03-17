@@ -135,7 +135,7 @@ export async function getFacets(params: { facets?: string; query?: string } = {}
   const { facets = '', query } = params;
   const path = facets ? `${IS_BASE}/facets/${facets}` : `${IS_BASE}/facets`;
   return vtexFetch<ISFacetsResponse>(path, {
-    params: { query: query || undefined, locale: VTEX_CONFIG.locale },
+    params: { query: query || undefined, locale: VTEX_CONFIG.locale, sc: VTEX_CONFIG.salesChannel },
   });
 }
 
