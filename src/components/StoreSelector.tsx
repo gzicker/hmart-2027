@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MapPin, ChevronDown, Check, Search, Loader2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -10,19 +10,39 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+const DEFAULT_ZIP = "10001";
+
 export default function StoreSelector() {
   const {
     selectedStore, setSelectedStore,
     selectedSellerId, setSelectedSellerId,
     fulfillmentMethod, setFulfillmentMethod,
+    hasConfirmedLocation, setHasConfirmedLocation,
+    promptStoreSelector, setPromptStoreSelector,
   } = useCart();
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
-  const [zipcode, setZipcode] = useState("");
+  const [zipcode, setZipcode] = useState(DEFAULT_ZIP);
   const [isSearching, setIsSearching] = useState(false);
   const [sellers, setSellers] = useState<RegionSeller[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [locationLabel, setLocationLabel] = useState("");
+  const initializedRef = useRef(false);
+
+  // Auto-init with default ZIP on mount
+  useEffect(() => {
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+    runSearch(DEFAULT_ZIP, true);
+  }, []);
+
+  // Open modal when cart prompts for confirmation
+  useEffect(() => {
+    if (promptStoreSelector) {
+      setOpen(true);
+      setPromptStoreSelector(false);
+    }
+  }, [promptStoreSelector, setPromptStoreSelector]);
 
   const searchByZip = async () => {
     const zip = zipcode.replace(/\D/g, "");
