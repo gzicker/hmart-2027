@@ -10,9 +10,10 @@ import { Plus, Star, AlertTriangle } from "lucide-react";
 interface ProductCardProps {
   product: Product;
   featured?: boolean;
+  hideIfUnavailable?: boolean;
 }
 
-export default function ProductCard({ product, featured }: ProductCardProps) {
+export default function ProductCard({ product, featured, hideIfUnavailable }: ProductCardProps) {
   const { addItem, selectedSellerId, selectedStore } = useCart();
   const { t, language } = useLanguage();
 
@@ -33,6 +34,8 @@ export default function ProductCard({ product, featured }: ProductCardProps) {
   const displayPrice = sellerPrice?.available && sellerPrice.price > 0 ? sellerPrice.price : product.price;
   const displayListPrice = sellerPrice?.available && sellerPrice.listPrice > 0 ? sellerPrice.listPrice : product.originalPrice;
   const isUnavailable = sellerPrice !== null && !sellerPrice.available;
+
+  if (hideIfUnavailable && isUnavailable) return null;
 
   return (
     <div className={`product-card ${featured ? "col-span-2 row-span-2" : ""} ${isUnavailable ? "opacity-60" : ""}`}>
