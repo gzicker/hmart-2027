@@ -58,14 +58,14 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
         <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{product.brand}</p>
         <Link to={`/product/${product.id}`}>
           <h3
-            className="mt-0.5 text-sm font-medium leading-tight text-foreground line-clamp-2 group-hover:line-clamp-3 hover:text-primary"
+            className="mt-0.5 text-sm font-medium leading-tight text-foreground overflow-hidden max-h-[2.5rem] group-hover:max-h-[3.75rem] transition-all duration-300 hover:text-primary"
             title={`${displayName}${subName ? ` ${subName}` : ""}`}
           >
             {displayName}
           </h3>
           {subName && (
             <p
-              className="mt-0.5 text-xs leading-tight text-muted-foreground line-clamp-2 group-hover:line-clamp-none"
+              className="mt-0.5 text-xs leading-tight text-muted-foreground overflow-hidden max-h-[2.25rem] group-hover:max-h-40 transition-all duration-300"
               title={subName}
             >
               {subName}
