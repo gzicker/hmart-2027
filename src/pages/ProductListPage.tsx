@@ -15,7 +15,7 @@ export default function ProductListPage() {
   const query = searchParams.get("q") || "";
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [sortBy, setSortBy] = useState<SortOption>("score_desc");
+  const [sortBy, setSortBy] = useState<SortOption>("");
   const { t } = useLanguage();
 
   const [products, setProducts] = useState<Product[]>([]);
