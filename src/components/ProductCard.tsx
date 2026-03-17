@@ -60,7 +60,7 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
             {displayName}
           </h3>
         </Link>
-        <p className="mt-0.5 text-[11px] text-muted-foreground line-clamp-1 group-hover:line-clamp-3 transition-all">
+        <p className="mt-0.5 text-[11px] text-muted-foreground <p className="mt-0.5 text-[11px] text-muted-foreground line-clamp-2 group-hover:line-clamp-4 transition-all"> transition-all">
           {product.weight}
         </p>
 
