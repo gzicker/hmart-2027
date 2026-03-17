@@ -10,7 +10,7 @@ import Footer from "@/components/Footer";
 export default function CheckoutPage() {
   const {
     items, updateQuantity, removeItem, totalPrice,
-    fulfillmentMethod, setFulfillmentMethod, selectedStore,
+    fulfillmentMethod, setFulfillmentMethod, selectedStore, goToCheckout,
   } = useCart();
   const { t, language } = useLanguage();
 
