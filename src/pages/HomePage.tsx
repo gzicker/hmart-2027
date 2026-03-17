@@ -1,8 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Truck, Store, Clock, ArrowRight, Star, ChefHat, Play } from "lucide-react";
-import { products } from "@/data/products";
+import { Product } from "@/data/products";
+import { searchProducts } from "@/api/searchApi";
+import { vtexProductsToProducts } from "@/api/vtexAdapter";
 import bannerNongshim from "@/assets/banner-nongshim.jpg";
 import bannerCj from "@/assets/banner-cj.jpg";
 import { useCart } from "@/contexts/CartContext";
@@ -47,11 +49,23 @@ export default function HomePage() {
     }
   }, [location.hash]);
 
+  const [vtexProducts, setVtexProducts] = useState<Product[]>([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+
+  useEffect(() => {
+    searchProducts({ query: '', count: 20, sort: 'orders_desc' })
+      .then((res) => {
+        setVtexProducts(vtexProductsToProducts(res.products));
+      })
+      .catch(console.error)
+      .finally(() => setIsLoadingProducts(false));
+  }, []);
+
   if (activeTab === "gifts") return <GiftsHomePage />;
   if (activeTab === "b2b") return <B2BHomePage />;
 
-  const sponsoredProducts = products.filter((p) => p.isSponsored);
-  const chefPicks = products.filter((p) => p.rating >= 4.7).slice(0, 4);
+  const sponsoredProducts = vtexProducts.slice(0, 3);
+  const chefPicks = vtexProducts.slice(0, 4);
 
   const categoryImages = [
     { name: t("cat.vegetables"), nameKo: "채소", image: categoryVeg, link: "/products" },
@@ -241,8 +255,8 @@ export default function HomePage() {
               <div className="mt-6 flex gap-3">
                 <button
                   onClick={() => {
-                    const gochujang = products.find(p => p.id === "gochujang-001");
-                    const tteok = products.find(p => p.id === "tteok-001");
+                    const gochujang = vtexProducts[0];
+                    const tteok = vtexProducts[1];
                     if (gochujang) addItem(gochujang);
                     if (tteok) addItem(tteok);
                   }}
