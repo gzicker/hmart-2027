@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Product } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getProductName, getProductSubName } from "@/lib/product-utils";
+import { getProductName } from "@/lib/product-utils";
 import { useProductSellerSimulation } from "@/hooks/useSellerSimulation";
 import { Plus, Star, AlertTriangle } from "lucide-react";
 
