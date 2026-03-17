@@ -2,7 +2,7 @@ import { useState } from "react";
 import { MapPin, ChevronDown, Check, Search, Loader2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getSellersForZipcode, STORE_ADDRESSES, type RegionSeller } from "@/api/stores";
+import { getSellersForZipcode, STORE_ADDRESSES, STORE_DISPLAY_NAMES, type RegionSeller } from "@/api/stores";
 import {
   Dialog,
   DialogContent,
@@ -163,7 +163,7 @@ export default function StoreSelector() {
                         <div className="font-medium text-foreground">
                           {fulfillmentMethod === "delivery"
                             ? (locationLabel || `ZIP ${zipcode}`)
-                            : seller.name}
+                            : (STORE_DISPLAY_NAMES[seller.id] || seller.name)}
                         </div>
                         {fulfillmentMethod === "pickup" && STORE_ADDRESSES[seller.id] && (
                           <div className="text-xs text-muted-foreground">{STORE_ADDRESSES[seller.id]}</div>

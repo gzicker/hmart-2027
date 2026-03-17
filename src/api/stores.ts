@@ -15,6 +15,15 @@ export const STORE_ADDRESSES: Record<string, string> = {
   hmartusqahrh: '11401 Harry Hines Blvd, Dallas, TX 75229',
 };
 
+/** Friendly pickup store names (more specific than what VTEX returns) */
+export const STORE_DISPLAY_NAMES: Record<string, string> = {
+  hmartusqaca: 'H Mart Lakewood',
+  hmartusqanls: 'H Mart Niles',
+  hmartusqahsv: 'H Mart Englewood',
+  hmartusqaord: 'H Mart Orlando',
+  hmartusqahrh: 'H Mart Dallas',
+};
+
 /**
  * Queries VTEX Regions API to find which sellers serve a given ZIP code.
  * Returns the actual sellers configured in VTEX, not a static list.
