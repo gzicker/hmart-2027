@@ -2,7 +2,7 @@ import { useState } from "react";
 import { MapPin, ChevronDown, Check, Search, Loader2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getSellersForZipcode, type RegionSeller } from "@/api/stores";
+import { getSellersForZipcode, STORE_ADDRESSES, type RegionSeller } from "@/api/stores";
 import {
   Dialog,
   DialogContent,
@@ -149,6 +149,9 @@ export default function StoreSelector() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="space-y-1">
                         <div className="font-medium text-foreground">{seller.name}</div>
+                        {fulfillmentMethod === "pickup" && STORE_ADDRESSES[seller.id] && (
+                          <div className="text-xs text-muted-foreground">{STORE_ADDRESSES[seller.id]}</div>
+                        )}
                       </div>
                       {isSelected && (
                         <div className="flex-shrink-0 rounded-full bg-primary p-1">
