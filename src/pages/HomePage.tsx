@@ -22,11 +22,6 @@ import categoryMeat from "@/assets/category-meat.jpg";
 import categoryPantry from "@/assets/category-pantry.jpg";
 import categoryKbeauty from "@/assets/category-kbeauty.jpg";
 import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
-import creator1 from "@/assets/creator-1.jpg";
-import creator2 from "@/assets/creator-2.jpg";
-import creator3 from "@/assets/creator-3.jpg";
-import creator4 from "@/assets/creator-4.jpg";
-import creator5 from "@/assets/creator-5.jpg";
 
 const TIKTOK_VIDEOS = [
   { id: "7364167688190446890", username: "katchaomeow", caption: "Must-have items at H Mart 🛒 #hmart #hmartmusthaves", views: "21.9K" },
