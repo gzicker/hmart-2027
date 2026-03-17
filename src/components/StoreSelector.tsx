@@ -43,7 +43,10 @@ export default function StoreSelector() {
       setSellers(results);
       if (results.length === 1) {
         setSelectedSellerId(results[0].id);
-        setSelectedStore(results[0].name);
+        const label = fulfillmentMethod === "delivery"
+          ? (locationLabel || `ZIP ${zip}`)
+          : (STORE_DISPLAY_NAMES[results[0].id] || results[0].name);
+        setSelectedStore(label);
       }
     } catch (err) {
       console.error("Region lookup failed:", err);
