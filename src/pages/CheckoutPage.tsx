@@ -16,7 +16,7 @@ export default function CheckoutPage() {
 
   const [hmartPlus, setHmartPlus] = useState(false);
   const hmartPlusFee = hmartPlus ? 9.99 : 0;
-  const deliveryFee = fulfillmentMethod === "delivery" ? 5.99 : fulfillmentMethod === "shipping" ? 9.99 : 0;
+  const deliveryFee = fulfillmentMethod === "delivery" ? 5.99 : 0;
   const tax = (totalPrice + hmartPlusFee) * 0.08875;
   const grandTotal = totalPrice + deliveryFee + hmartPlusFee + tax;
 
