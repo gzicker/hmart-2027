@@ -38,7 +38,12 @@ export default function Header() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getCategoryTree(2).then(setVtexCategories).catch(console.error);
+    getCategoryTree(3).then((cats) => {
+      const filtered = cats.filter(c =>
+        !['1', 'Test Category', 'Test Category  Test', 'Main Category', 'Mickael', 'gift chuseok test'].includes(c.name)
+      );
+      setVtexCategories(filtered);
+    }).catch(console.error);
   }, []);
 
   const handleSearchInput = (value: string) => {
