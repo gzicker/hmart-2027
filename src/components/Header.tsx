@@ -8,6 +8,8 @@ import logoImg from "@/assets/hmart-logo.png";
 import StoreSelector from "@/components/StoreSelector";
 import LanguageSelector from "@/components/LanguageSelector";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { getCategoryTree, type VtexCategory } from "@/api/catalogApi";
+import { autocomplete as vtexAutocomplete } from "@/api/searchApi";
 
 const SITE_TABS = [
   { id: "hmart", labelKey: "tab.hmart", icon: ShoppingBasket, sublabelKey: null },
@@ -28,8 +30,32 @@ export default function Header() {
   const { activeTab, setActiveTab } = useTab();
   const [searchQuery, setSearchQuery] = useState("");
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [vtexCategories, setVtexCategories] = useState<VtexCategory[]>([]);
+  const [suggestions, setSuggestions] = useState<{terms: string[]; products: {name: string; slug: string; thumb: string}[]}>({terms: [], products: []});
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const catRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    getCategoryTree(2).then(setVtexCategories).catch(console.error);
+  }, []);
+
+  const handleSearchInput = (value: string) => {
+    setSearchQuery(value);
+    clearTimeout(debounceRef.current);
+    if (value.length < 2) { setSuggestions({terms: [], products: []}); setShowSuggestions(false); return; }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const data = await vtexAutocomplete(value);
+        setSuggestions({
+          terms: data.searches?.map(s => s.term) || [],
+          products: data.itemsReturned?.map(p => ({ name: p.name, slug: p.slug || p.productId, thumb: p.thumb })) || [],
+        });
+        setShowSuggestions(true);
+      } catch { /* ignore */ }
+    }, 300);
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,7 +147,17 @@ export default function Header() {
               {categoriesOpen && (
                 <div className="absolute left-0 top-full mt-3 w-72 rounded-xl border border-border bg-card shadow-xl animate-fade-in z-50">
                   <div className="py-2">
-                    {CATEGORY_KEYS.map((key) => (
+                    {vtexCategories.length > 0 ? vtexCategories.map((cat) => (
+                      <Link
+                        key={cat.id}
+                        to="/products"
+                        onClick={() => setCategoriesOpen(false)}
+                        className="flex items-center justify-between px-4 py-2.5 text-sm text-primary transition-colors hover:bg-secondary"
+                      >
+                        {cat.name}
+                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                      </Link>
+                    )) : CATEGORY_KEYS.map((key) => (
                       <Link
                         key={key}
                         to="/products"
@@ -159,9 +195,45 @@ export default function Header() {
                   type="text"
                   placeholder={t("nav.search")}
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => handleSearchInput(e.target.value)}
+                  onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                   className="w-full rounded-lg border border-border bg-background py-2.5 pl-10 pr-4 text-sm transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 />
+                {showSuggestions && (suggestions.terms.length > 0 || suggestions.products.length > 0) && (
+                  <div className="absolute left-0 top-full mt-1 w-full rounded-lg border border-border bg-card shadow-xl z-50 py-2">
+                    {suggestions.terms.length > 0 && (
+                      <div className="px-2 pb-1">
+                        {suggestions.terms.slice(0, 5).map((term) => (
+                          <button
+                            key={term}
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => { setSearchQuery(term); navigate(`/products?q=${encodeURIComponent(term)}`); setShowSuggestions(false); }}
+                            className="block w-full rounded-md px-3 py-2 text-left text-sm text-foreground hover:bg-secondary"
+                          >
+                            {term}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {suggestions.products.length > 0 && (
+                      <div className="border-t border-border px-2 pt-1">
+                        {suggestions.products.slice(0, 4).map((p) => (
+                          <Link
+                            key={p.slug}
+                            to={`/product/${p.slug}`}
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => setShowSuggestions(false)}
+                            className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-secondary"
+                          >
+                            {p.thumb && <img src={p.thumb} alt="" className="h-8 w-8 rounded object-cover" />}
+                            <span className="text-sm text-foreground">{p.name}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </form>
 
