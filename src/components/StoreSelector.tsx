@@ -36,15 +36,17 @@ export default function StoreSelector() {
         getSellersForZipcode(zip),
         fetch(`https://api.zippopotam.us/us/${zip}`).then(r => r.ok ? r.json() : null).catch(() => null),
       ]);
+      let geoLabel = "";
       if (geoRes?.places?.[0]) {
         const place = geoRes.places[0];
-        setLocationLabel(`${place['place name']}, ${place['state abbreviation']}`);
+        geoLabel = `${place['place name']}, ${place['state abbreviation']}`;
+        setLocationLabel(geoLabel);
       }
       setSellers(results);
       if (results.length === 1) {
         setSelectedSellerId(results[0].id);
         const label = fulfillmentMethod === "delivery"
-          ? (locationLabel || `ZIP ${zip}`)
+          ? (geoLabel || `ZIP ${zip}`)
           : (STORE_DISPLAY_NAMES[results[0].id] || results[0].name);
         setSelectedStore(label);
       }
