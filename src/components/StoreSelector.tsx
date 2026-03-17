@@ -29,8 +29,17 @@ export default function StoreSelector() {
     if (zip.length < 5) return;
     setIsSearching(true);
     setHasSearched(true);
+    setLocationLabel("");
     try {
-      const results = await getSellersForZipcode(zip);
+      // Fetch city/state from ZIP in parallel with seller lookup
+      const [results, geoRes] = await Promise.all([
+        getSellersForZipcode(zip),
+        fetch(`https://api.zippopotam.us/us/${zip}`).then(r => r.ok ? r.json() : null).catch(() => null),
+      ]);
+      if (geoRes?.places?.[0]) {
+        const place = geoRes.places[0];
+        setLocationLabel(`${place['place name']}, ${place['state abbreviation']}`);
+      }
       setSellers(results);
       if (results.length === 1) {
         setSelectedSellerId(results[0].id);
