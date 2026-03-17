@@ -36,14 +36,19 @@ export default function StoreSelector() {
         getSellersForZipcode(zip),
         fetch(`https://api.zippopotam.us/us/${zip}`).then(r => r.ok ? r.json() : null).catch(() => null),
       ]);
+      let geoLabel = "";
       if (geoRes?.places?.[0]) {
         const place = geoRes.places[0];
-        setLocationLabel(`${place['place name']}, ${place['state abbreviation']}`);
+        geoLabel = `${place['place name']}, ${place['state abbreviation']}`;
+        setLocationLabel(geoLabel);
       }
       setSellers(results);
       if (results.length === 1) {
         setSelectedSellerId(results[0].id);
-        setSelectedStore(results[0].name);
+        const label = fulfillmentMethod === "delivery"
+          ? (geoLabel || `ZIP ${zip}`)
+          : (STORE_DISPLAY_NAMES[results[0].id] || results[0].name);
+        setSelectedStore(label);
       }
     } catch (err) {
       console.error("Region lookup failed:", err);
@@ -55,7 +60,10 @@ export default function StoreSelector() {
 
   const selectSeller = (seller: RegionSeller) => {
     setSelectedSellerId(seller.id);
-    setSelectedStore(seller.name);
+    const label = fulfillmentMethod === "delivery"
+      ? (locationLabel || `ZIP ${zipcode}`)
+      : (STORE_DISPLAY_NAMES[seller.id] || seller.name);
+    setSelectedStore(label);
     setOpen(false);
   };
 
