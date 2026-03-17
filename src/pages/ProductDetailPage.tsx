@@ -37,7 +37,8 @@ export default function ProductDetailPage() {
         if (vtexProduct) {
           const p = vtexProductToProduct(vtexProduct);
           setProduct(p);
-          setSelectedFulfillment(p.fulfillment[0] as "delivery" | "pickup" | "shipping");
+          const first = p.fulfillment.find(f => f === "delivery" || f === "pickup") as "delivery" | "pickup" | undefined;
+          setSelectedFulfillment(first || "delivery");
         } else {
           setProduct(null);
         }
