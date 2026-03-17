@@ -127,7 +127,7 @@ export async function searchBySlug(slug: string): Promise<ISProduct | null> {
 
 export async function autocomplete(query: string): Promise<ISAutocompleteResponse> {
   return vtexFetch<ISAutocompleteResponse>(`${IS_BASE}/autocomplete`, {
-    params: { query, locale: VTEX_CONFIG.locale },
+    params: { query, locale: VTEX_CONFIG.locale, sc: VTEX_CONFIG.salesChannel },
   });
 }
 
