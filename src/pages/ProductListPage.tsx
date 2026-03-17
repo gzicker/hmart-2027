@@ -33,7 +33,7 @@ export default function ProductListPage() {
   useEffect(() => {
     setIsLoading(true);
     const facets = selectedCategory ? `category-1/${selectedCategory}` : '';
-    searchProducts({ query, facets, page, count: 24, sort: sortBy })
+    searchProducts({ query, facets, page, count: 50, sort: sortBy })
       .then((res) => {
         setProducts(vtexProductsToProducts(res.products));
         setTotalResults(res.recordsFiltered);
