@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import { Product } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getProductName, getProductSubName } from "@/lib/product-utils";
-import { simulateForSeller } from "@/api/checkoutApi";
 import { Plus, Star, AlertTriangle } from "lucide-react";
 
 interface ProductCardProps {
@@ -14,26 +13,26 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, featured, hideIfUnavailable }: ProductCardProps) {
-  const { addItem, selectedSellerId, selectedStore } = useCart();
+  const { addItem, selectedSellerId } = useCart();
   const { t, language } = useLanguage();
 
   const displayName = getProductName(product, language);
   const subName = getProductSubName(product, language);
 
-  const [sellerPrice, setSellerPrice] = useState<{ price: number; available: boolean; listPrice: number } | null>(null);
+  // Check availability from stored sellers data (no API call needed)
+  const sellerMatch = useMemo(() => {
+    const sellers = product._vtex?.sellers;
+    if (!sellers || sellers.length === 0) return null;
+    // Find the selected seller
+    const match = sellers.find(s => s.sellerId === selectedSellerId);
+    if (match) return match;
+    // Fallback: any available seller
+    return sellers.find(s => s.available) || sellers[0];
+  }, [product._vtex?.sellers, selectedSellerId]);
 
-  useEffect(() => {
-    const skuId = (product as any)._vtex?.skuId;
-    if (!skuId) return;
-
-    simulateForSeller(skuId, selectedSellerId)
-      .then(setSellerPrice)
-      .catch(() => setSellerPrice(null));
-  }, [product, selectedSellerId]);
-
-  const displayPrice = sellerPrice?.available && sellerPrice.price > 0 ? sellerPrice.price : product.price;
-  const displayListPrice = sellerPrice?.available && sellerPrice.listPrice > 0 ? sellerPrice.listPrice : product.originalPrice;
-  const isUnavailable = sellerPrice !== null && !sellerPrice.available;
+  const isUnavailable = sellerMatch !== null && !sellerMatch.available;
+  const displayPrice = sellerMatch?.available && sellerMatch.price > 0 ? sellerMatch.price : product.price;
+  const displayListPrice = sellerMatch?.available && sellerMatch.listPrice > 0 ? sellerMatch.listPrice : product.originalPrice;
 
   if (hideIfUnavailable && isUnavailable) return null;
 
