@@ -32,7 +32,7 @@ export function vtexProductToProduct(vtexProduct: ISProduct): Product {
     isNew: false,
     rating: 4.5,
     reviewCount: 0,
-    fulfillment: ['delivery', 'pickup', 'shipping'] as ("delivery" | "pickup" | "shipping")[],
+    fulfillment: ['delivery', 'pickup'] as ("delivery" | "pickup")[],
     description: vtexProduct.description || vtexProduct.productName,
     storeName: 'H Mart',
     _vtex: {
@@ -40,6 +40,12 @@ export function vtexProductToProduct(vtexProduct: ISProduct): Product {
       skuId: sku?.itemId || '',
       sellerId: seller?.sellerId || '1',
       linkText: vtexProduct.linkText,
+      sellers: sku?.sellers?.map(s => ({
+        sellerId: s.sellerId,
+        price: s.commertialOffer?.Price ?? 0,
+        listPrice: s.commertialOffer?.ListPrice ?? 0,
+        available: (s.commertialOffer?.AvailableQuantity ?? 0) > 0 && (s.commertialOffer?.IsAvailable ?? false),
+      })) || [],
     },
   };
 }
