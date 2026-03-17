@@ -55,23 +55,22 @@ export default function HomePage() {
       .catch(console.error)
       .finally(() => setIsLoadingProducts(false));
   }, []);
-
-  if (activeTab === "gifts") return <GiftsHomePage />;
-  if (activeTab === "b2b") return <B2BHomePage />;
-
-  const sponsoredProducts = vtexProducts.slice(0, 3);
-
   // Always show 4 available items for the selected seller
   const chefPicks = useMemo(() => {
     return vtexProducts
       .filter((p) => {
         const sellers = (p as any)._vtex?.sellers;
-        if (!sellers || sellers.length === 0) return true; // no seller data = show
+        if (!sellers || sellers.length === 0) return true;
         const match = sellers.find((s: any) => s.sellerId === selectedSellerId);
         return match ? match.available : sellers.some((s: any) => s.available);
       })
       .slice(0, 4);
   }, [vtexProducts, selectedSellerId]);
+
+  if (activeTab === "gifts") return <GiftsHomePage />;
+  if (activeTab === "b2b") return <B2BHomePage />;
+
+  const sponsoredProducts = vtexProducts.slice(0, 3);
 
   const categoryImages = [
     { name: t("cat.vegetables"), nameKo: "채소", image: categoryVeg, link: "/products" },
