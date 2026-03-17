@@ -62,8 +62,15 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
             title={`${displayName}${subName ? ` ${subName}` : ""}`}
           >
             {displayName}
-            {subName && <span className="ml-1.5 text-muted-foreground">{subName}</span>}
           </h3>
+          {subName && (
+            <p
+              className="mt-0.5 text-xs leading-tight text-muted-foreground line-clamp-1 group-hover:line-clamp-2"
+              title={subName}
+            >
+              {subName}
+            </p>
+          )}
         </Link>
         <p className="mt-0.5 text-[11px] text-muted-foreground">{product.weight}</p>
 
