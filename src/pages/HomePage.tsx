@@ -207,16 +207,8 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08, duration: 0.4 }}
               className="flex-shrink-0"
-              style={{ width: 325 }}
             >
-              <iframe
-                src={`https://www.tiktok.com/embed/v2/${video.id}`}
-                style={{ width: 325, height: 578, border: 'none', borderRadius: 12, overflow: 'hidden' }}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                loading="lazy"
-                title={video.caption}
-              />
+              <LazyTikTokEmbed videoId={video.id} caption={video.caption} username={video.username} views={video.views} />
             </motion.div>
           ))}
         </div>
