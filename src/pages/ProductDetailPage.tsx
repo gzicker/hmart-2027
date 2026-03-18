@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Truck, Store, Plus, Minus, ChevronRight, X, ShoppingCart, Clock, ChefHat, Loader2, AlertTriangle } from "lucide-react";
 import { Product } from "@/data/products";
@@ -22,66 +23,44 @@ export default function ProductDetailPage() {
   const [showPairDrawer, setShowPairDrawer] = useState(false);
   const [selectedFulfillment, setSelectedFulfillment] = useState<"delivery" | "pickup">("delivery");
 
-  const [product, setProduct] = useState<Product | null>(null);
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // react-query: fetch product
+  const { data: product, isLoading } = useQuery({
+    queryKey: ['product', id],
+    queryFn: async () => {
+      if (!id) return null;
+      const vtexProduct = await getProductById(id);
+      return vtexProduct ? vtexProductToProduct(vtexProduct) : null;
+    },
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000,
+  });
 
-  const [sellerPrice, setSellerPrice] = useState<{ price: number; available: boolean; listPrice: number } | null>(null);
-  const [simulating, setSimulating] = useState(false);
+  // react-query: simulation
+  const { data: sellerPrice, isLoading: simulating } = useQuery({
+    queryKey: ['simulation', product?._vtex?.skuId, selectedSellerId],
+    queryFn: () => simulateForSeller(product!._vtex!.skuId, selectedSellerId),
+    enabled: !!product?._vtex?.skuId,
+    staleTime: 2 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    if (!id) return;
-    setIsLoading(true);
-    getProductById(id)
-      .then((vtexProduct) => {
-        if (vtexProduct) {
-          const p = vtexProductToProduct(vtexProduct);
-          setProduct(p);
-          const first = p.fulfillment.find(f => f === "delivery" || f === "pickup") as "delivery" | "pickup" | undefined;
-          setSelectedFulfillment(first || "delivery");
-        } else {
-          setProduct(null);
-        }
-      })
-      .catch((err) => {
-        console.error('PDP fetch error:', err);
-        setProduct(null);
-      })
-      .finally(() => setIsLoading(false));
-  }, [id]);
-
-  useEffect(() => {
-    if (!product) return;
-    const skuId = (product as any)._vtex?.skuId;
-    if (!skuId) return;
-
-    setSimulating(true);
-    simulateForSeller(skuId, selectedSellerId)
-      .then(setSellerPrice)
-      .catch((err) => {
-        console.error('Simulation error:', err);
-        setSellerPrice(null);
-      })
-      .finally(() => setSimulating(false));
-  }, [product, selectedSellerId]);
-
-  useEffect(() => {
-    searchProducts({ query: '', count: 4 })
-      .then((res) => {
-        const related = vtexProductsToProducts(res.products).filter(p => p.id !== product?.id);
-        setRelatedProducts(related.slice(0, 4));
-      })
-      .catch(console.error);
-  }, [product?.id]);
+  // react-query: related products
+  const { data: relatedProducts = [] } = useQuery({
+    queryKey: ['related-products', product?.id],
+    queryFn: async () => {
+      const res = await searchProducts({ query: '', count: 4 });
+      return vtexProductsToProducts(res.products).filter(p => p.id !== product?.id).slice(0, 4);
+    },
+    enabled: !!product?.id,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const displayPrice = sellerPrice?.available && sellerPrice.price > 0 ? sellerPrice.price : product?.price ?? 0;
   const displayListPrice = sellerPrice?.available && sellerPrice.listPrice > 0 ? sellerPrice.listPrice : product?.originalPrice;
-  const isUnavailable = sellerPrice !== null && !sellerPrice.available;
+  const isUnavailable = sellerPrice !== undefined && sellerPrice !== null && !sellerPrice.available;
 
   const handleAddToCart = (p: Product, qty: number = 1) => {
-    const vtex = (p as any)._vtex;
-    const skuId = vtex?.skuId || p.id;
-    const sellerId = vtex?.sellerId || selectedSellerId;
+    const skuId = p._vtex?.skuId || p.id;
+    const sellerId = p._vtex?.sellerId || selectedSellerId;
     addItem(skuId, qty, sellerId);
   };
 
@@ -111,6 +90,7 @@ export default function ProductDetailPage() {
   }
 
   const pairProduct = relatedProducts[0] || null;
+  const hasRating = product.rating > 0;
 
   const displayName = getProductName(product, language);
   const subName = getProductSubName(product, language);
@@ -154,15 +134,17 @@ export default function ProductDetailPage() {
               {subName && <span className="ml-3 text-xl text-muted-foreground">{subName}</span>}
             </h1>
 
-            <div className="mt-2 flex items-center gap-2">
-              <div className="flex items-center gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className={`h-4 w-4 ${i < Math.floor(product.rating) ? "fill-accent text-accent" : "text-border"}`} />
-                ))}
+            {hasRating && (
+              <div className="mt-2 flex items-center gap-2">
+                <div className="flex items-center gap-0.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className={`h-4 w-4 ${i < Math.floor(product.rating) ? "fill-accent text-accent" : "text-border"}`} />
+                  ))}
+                </div>
+                <span className="text-sm font-medium text-foreground">{product.rating}</span>
+                <span className="text-sm text-muted-foreground">({product.reviewCount.toLocaleString()} {t("product.reviews")})</span>
               </div>
-              <span className="text-sm font-medium text-foreground">{product.rating}</span>
-              <span className="text-sm text-muted-foreground">({product.reviewCount.toLocaleString()} {t("product.reviews")})</span>
-            </div>
+            )}
 
             <div className="mt-4">
               {simulating ? (
@@ -200,40 +182,42 @@ export default function ProductDetailPage() {
 
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{description}</p>
 
-            <div className="mt-6">
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("detail.howToGet")}</h3>
-              <div className="flex flex-wrap gap-2">
-                {product.fulfillment.includes("delivery") && (
-                  <button
-                    onClick={() => setSelectedFulfillment("delivery")}
-                    className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${selectedFulfillment === "delivery" ? "border-primary bg-primary/5 text-primary" : "border-border text-foreground hover:bg-secondary"}`}
-                  >
-                    <Truck className="h-4 w-4" />
-                    <div className="text-left">
-                      <p>{t("product.delivery")}</p>
-                      <p className="text-[10px] font-normal text-muted-foreground">{t("detail.deliveryToday")}</p>
-                    </div>
-                  </button>
-                )}
-                {product.fulfillment.includes("pickup") && (
-                  <button
-                    onClick={() => setSelectedFulfillment("pickup")}
-                    className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${selectedFulfillment === "pickup" ? "border-green-600 bg-green-50 text-green-700" : "border-border text-foreground hover:bg-secondary"}`}
-                  >
-                    <Store className="h-4 w-4" />
-                    <div className="text-left">
-                      <p>{t("product.pickup")}</p>
-                      <p className="text-[10px] font-normal text-muted-foreground">{t("detail.readyIn2h")}</p>
-                    </div>
-                  </button>
+            {product.fulfillment.length > 0 && (
+              <div className="mt-6">
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("detail.howToGet")}</h3>
+                <div className="flex flex-wrap gap-2">
+                  {product.fulfillment.includes("delivery") && (
+                    <button
+                      onClick={() => setSelectedFulfillment("delivery")}
+                      className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${selectedFulfillment === "delivery" ? "border-primary bg-primary/5 text-primary" : "border-border text-foreground hover:bg-secondary"}`}
+                    >
+                      <Truck className="h-4 w-4" />
+                      <div className="text-left">
+                        <p>{t("product.delivery")}</p>
+                        <p className="text-[10px] font-normal text-muted-foreground">{t("detail.deliveryToday")}</p>
+                      </div>
+                    </button>
+                  )}
+                  {product.fulfillment.includes("pickup") && (
+                    <button
+                      onClick={() => setSelectedFulfillment("pickup")}
+                      className={`flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${selectedFulfillment === "pickup" ? "border-green-600 bg-green-50 text-green-700" : "border-border text-foreground hover:bg-secondary"}`}
+                    >
+                      <Store className="h-4 w-4" />
+                      <div className="text-left">
+                        <p>{t("product.pickup")}</p>
+                        <p className="text-[10px] font-normal text-muted-foreground">{t("detail.readyIn2h")}</p>
+                      </div>
+                    </button>
+                  )}
+                </div>
+                {product.storeName && (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {t("detail.from")} <span className="font-medium text-foreground">{selectedStore || "your store"}</span>
+                  </p>
                 )}
               </div>
-              {product.storeName && (
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {t("detail.from")} <span className="font-medium text-foreground">{selectedStore || "your store"}</span>
-                </p>
-              )}
-            </div>
+            )}
 
             <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <div className="flex items-center rounded-lg border border-border">
@@ -366,9 +350,9 @@ export default function ProductDetailPage() {
                 </div>
 
                 <button
-                  onClick={() => {
-                    handleAddToCart(product);
-                    handleAddToCart(pairProduct);
+                  onClick={async () => {
+                    await handleAddToCart(product);
+                    await handleAddToCart(pairProduct);
                     setShowPairDrawer(false);
                   }}
                   className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] active:scale-95"
