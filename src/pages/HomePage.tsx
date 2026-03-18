@@ -61,9 +61,8 @@ export default function HomePage() {
   const { simulations: productSimulations, isLoaded: simulationsLoaded } = useProductsSellerSimulations(vtexProducts, selectedSellerId);
 
   const chefPicks = useMemo(() => {
-    if (!simulationsLoaded) return vtexProducts.slice(0, 4); // show placeholders while loading
-    const available = vtexProducts.filter((product) => productSimulations[product.id]?.available);
-    return (available.length >= 4 ? available : vtexProducts).slice(0, 4);
+    if (!simulationsLoaded) return []; // don't show anything until simulations confirm availability
+    return vtexProducts.filter((product) => productSimulations[product.id]?.available).slice(0, 4);
   }, [vtexProducts, productSimulations, simulationsLoaded]);
 
   if (activeTab === "gifts") return <GiftsHomePage />;
@@ -174,6 +173,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {chefPicks.length > 0 && (
       <section className="bg-card py-12">
         <div className="hmart-container">
           <div className="mb-6 flex items-center gap-2">
@@ -182,11 +182,12 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {chefPicks.map((product) => (
-              <ProductCard key={product.id} product={product} simulationData={simulationsLoaded ? (productSimulations[product.id] ?? null) : undefined} />
+              <ProductCard key={product.id} product={product} simulationData={productSimulations[product.id] ?? null} />
             ))}
           </div>
         </div>
       </section>
+      )}
 
       <section id="trending-tiktok" className="hmart-container py-12 scroll-mt-32">
         <div className="mb-6 flex items-center justify-between">
