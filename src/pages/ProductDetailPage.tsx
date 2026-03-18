@@ -60,7 +60,11 @@ export default function ProductDetailPage() {
 
   const displayPrice = sellerPrice?.available && sellerPrice.price > 0 ? sellerPrice.price : product?.price ?? 0;
   const displayListPrice = sellerPrice?.available && sellerPrice.listPrice > 0 ? sellerPrice.listPrice : product?.originalPrice;
-  const isUnavailable = sellerPrice !== undefined && sellerPrice !== null && !sellerPrice.available;
+  // Availability: simulation takes priority, but fall back to IS API (product.inStock)
+  // to prevent permanent "Unavailable" when simulation endpoint is misconfigured
+  const isUnavailable = sellerPrice != null
+    ? !sellerPrice.available
+    : !product?.inStock;
 
   const handleAddToCart = (p: Product, qty: number = 1) => {
     const skuId = p._vtex?.skuId || p.id;
