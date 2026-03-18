@@ -4,7 +4,7 @@ export const VTEX_CONFIG = {
   salesChannel: '1',
   locale: 'en-US',
   get checkoutUrl() {
-    return `https://${this.account}.vtexcommercestable.com.br/checkout`;
+    return `https://${this.account}.myvtex.com/checkout`;
   },
 };
 
