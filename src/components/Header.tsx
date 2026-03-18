@@ -41,11 +41,25 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const navigate = useNavigate();
 
+  // Filter out test/junk categories by ID pattern instead of brittle name matching.
+  // Categories with numeric-only names or very short names (≤2 chars) are likely test data.
+  // Also exclude known test category IDs if needed via env var.
+  const EXCLUDED_CAT_IDS = new Set(
+    (import.meta.env.VITE_EXCLUDED_CATEGORY_IDS || '').split(',').filter(Boolean)
+  );
+
   useEffect(() => {
     getCategoryTree(3).then((cats) => {
-      const filtered = cats.filter(c =>
-        !['1', 'Test Category', 'Test Category  Test', 'Main Category', 'Mickael', 'gift chuseok test'].includes(c.name)
-      );
+      const filtered = cats.filter(c => {
+        // Exclude by explicit ID blocklist from env
+        if (EXCLUDED_CAT_IDS.has(String(c.id))) return false;
+        // Exclude categories with suspicious test-like names
+        const name = c.name.trim().toLowerCase();
+        if (/^\d+$/.test(name)) return false; // purely numeric
+        if (name.length <= 2) return false; // too short to be real
+        if (/^test\b/i.test(c.name)) return false; // starts with "test"
+        return true;
+      });
       setVtexCategories(filtered);
     }).catch(console.error);
   }, []);

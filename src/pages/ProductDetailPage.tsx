@@ -43,12 +43,16 @@ export default function ProductDetailPage() {
     staleTime: 2 * 60 * 1000,
   });
 
-  // react-query: related products
+  // react-query: related products — use current product's category for relevance
   const { data: relatedProducts = [] } = useQuery({
-    queryKey: ['related-products', product?.id],
+    queryKey: ['related-products', product?.id, product?.category],
     queryFn: async () => {
-      const res = await searchProducts({ query: '', count: 4 });
-      return vtexProductsToProducts(res.products).filter(p => p.id !== product?.id).slice(0, 4);
+      // Search by category for actual related products instead of blank query
+      const searchTerm = product?.category || product?.brand || '';
+      const res = await searchProducts({ query: searchTerm, count: 8 });
+      return vtexProductsToProducts(res.products)
+        .filter(p => p.id !== product?.id)
+        .slice(0, 4);
     },
     enabled: !!product?.id,
     staleTime: 5 * 60 * 1000,
@@ -56,7 +60,11 @@ export default function ProductDetailPage() {
 
   const displayPrice = sellerPrice?.available && sellerPrice.price > 0 ? sellerPrice.price : product?.price ?? 0;
   const displayListPrice = sellerPrice?.available && sellerPrice.listPrice > 0 ? sellerPrice.listPrice : product?.originalPrice;
-  const isUnavailable = sellerPrice !== undefined && sellerPrice !== null && !sellerPrice.available;
+  // Availability: simulation takes priority, but fall back to IS API (product.inStock)
+  // to prevent permanent "Unavailable" when simulation endpoint is misconfigured
+  const isUnavailable = sellerPrice != null
+    ? !sellerPrice.available
+    : !product?.inStock;
 
   const handleAddToCart = (p: Product, qty: number = 1) => {
     const skuId = p._vtex?.skuId || p.id;

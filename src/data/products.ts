@@ -39,6 +39,12 @@ export interface Product {
   };
 }
 
+/**
+ * @deprecated Static demo data — NOT used in VTEX-connected pages.
+ * The VTEX adapter (vtexAdapter.ts) is the authoritative data source for all product pages.
+ * This array exists only for offline development and design previews.
+ * Do NOT rely on it for production logic.
+ */
 export const products: Product[] = [
   {
     id: "gochujang-001",
