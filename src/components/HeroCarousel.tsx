@@ -21,6 +21,7 @@ const slideConfigs = [
     descKey: "hero1.desc",
     ctaLabelKey: "hero1.cta",
     ctaTo: "/products?sort=orders_desc",
+    ctaIcon: ArrowRight,
     secondaryKey: "hero1.secondary",
   },
   {
