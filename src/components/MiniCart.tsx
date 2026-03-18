@@ -27,7 +27,7 @@ export default function MiniCart({ open, onClose }: MiniCartProps) {
     <div className="fixed inset-0 z-[100]">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/40 transition-opacity"
+        className="absolute inset-0 bg-black/40"
         onClick={onClose}
       />
 
@@ -92,12 +92,10 @@ export default function MiniCart({ open, onClose }: MiniCartProps) {
 
                     {/* Details */}
                     <div className="flex-1 min-w-0">
-                      {/* Name */}
                       <p className="text-sm font-medium text-gray-900 line-clamp-2 leading-snug">
                         {item.name}
                       </p>
 
-                      {/* Unit price */}
                       <div className="mt-1 flex items-center gap-2">
                         <span className="text-sm font-medium text-gray-900 tabular-nums">
                           {formatCents(item.sellingPrice)}
@@ -109,7 +107,6 @@ export default function MiniCart({ open, onClose }: MiniCartProps) {
                         )}
                       </div>
 
-                      {/* Quantity + Remove row */}
                       <div className="mt-2 flex items-center justify-between">
                         {/* Quantity stepper */}
                         <div className="flex items-center rounded-lg border border-gray-200">
@@ -160,7 +157,6 @@ export default function MiniCart({ open, onClose }: MiniCartProps) {
         {/* ====== FOOTER (sticky) ====== */}
         {items.length > 0 && (
           <div className="border-t border-gray-200 px-5 py-4 flex-shrink-0 space-y-3">
-            {/* Subtotal */}
             <div className="flex items-center justify-between">
               <span className="text-base font-medium text-gray-700">Subtotal</span>
               <span className="text-lg font-bold text-gray-900 tabular-nums">
@@ -172,7 +168,6 @@ export default function MiniCart({ open, onClose }: MiniCartProps) {
               Shipping and taxes calculated at checkout.
             </p>
 
-            {/* Checkout CTA */}
             <button
               onClick={goToCheckout}
               disabled={isUpdating}
@@ -185,7 +180,6 @@ export default function MiniCart({ open, onClose }: MiniCartProps) {
               )}
             </button>
 
-            {/* Continue shopping */}
             <button
               onClick={onClose}
               className="w-full py-2 text-center text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
