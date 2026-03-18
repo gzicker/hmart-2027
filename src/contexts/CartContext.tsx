@@ -26,7 +26,17 @@ interface CartContextType {
   setPromptStoreSelector: (v: boolean) => void;
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+const NOOP = () => {};
+const DEFAULT_CART: CartContextType = {
+  items: [], addItem: NOOP as any, removeItem: NOOP, updateQuantity: NOOP,
+  clearCart: NOOP, goToCheckout: NOOP, totalItems: 0, totalPrice: 0,
+  selectedStore: "", setSelectedStore: NOOP, fulfillmentMethod: "delivery",
+  setFulfillmentMethod: NOOP, isVtexSynced: false, selectedSellerId: "1",
+  setSelectedSellerId: NOOP, hasConfirmedLocation: false,
+  setHasConfirmedLocation: NOOP, promptStoreSelector: false,
+  setPromptStoreSelector: NOOP,
+};
+const CartContext = createContext<CartContextType>(DEFAULT_CART);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -151,7 +161,5 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useCart() {
-  const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("useCart must be used within CartProvider");
-  return ctx;
+  return useContext(CartContext);
 }
