@@ -323,6 +323,7 @@ export default function Header() {
           </div>
         </div>
       </div>
+      <MiniCart open={miniCartOpen} onClose={() => setMiniCartOpen(false)} />
     </header>
   );
 }
