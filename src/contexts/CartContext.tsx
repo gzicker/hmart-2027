@@ -1,165 +1,215 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
-
-import { Product } from "@/data/products";
-import { CartItem } from "@/data/cart";
-import { getOrCreateOrderForm, addToCart as vtexAddToCart, updateCartItems as vtexUpdateItems, redirectToCheckout as vtexRedirectToCheckout, type OrderForm } from "@/api/checkoutApi";
+import {
+  getOrCreateOrderForm,
+  addItems,
+  updateItems,
+  findItemIndex,
+  redirectToCheckout,
+  getItemCount,
+  getSubtotal,
+  getDiscounts,
+  type OrderForm,
+} from "@/api/checkoutApi";
 
 interface CartContextType {
-  items: CartItem[];
-  addItem: (product: Product, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
-  clearCart: () => void;
-  goToCheckout: () => void;
+  /** The real VTEX orderForm — single source of truth */
+  orderForm: OrderForm | null;
+  /** Is the cart loading (initial load)? */
+  isLoading: boolean;
+  /** Is an operation (add/update/remove) in progress? */
+  isUpdating: boolean;
+  /** Error message if last operation failed */
+  error: string | null;
+
+  /** Cart computed values */
   totalItems: number;
-  totalPrice: number;
+  subtotal: number;      // in cents
+  discounts: number;     // in cents
+  total: number;         // in cents
+
+  /** Add a SKU to cart */
+  addItem: (skuId: string, quantity: number, sellerId: string) => Promise<void>;
+  /** Update quantity of an item by its SKU id */
+  updateQuantity: (skuId: string, quantity: number) => Promise<void>;
+  /** Remove an item by its SKU id */
+  removeItem: (skuId: string) => Promise<void>;
+  /** Clear all items from cart */
+  clearCart: () => Promise<void>;
+  /** Redirect to VTEX native checkout */
+  goToCheckout: () => void;
+  /** Refresh orderForm from server */
+  refresh: () => Promise<void>;
+
+  /** Store/region selection */
   selectedStore: string;
   setSelectedStore: (store: string) => void;
-  fulfillmentMethod: "delivery" | "pickup";
-  setFulfillmentMethod: (method: "delivery" | "pickup") => void;
-  isVtexSynced: boolean;
   selectedSellerId: string;
   setSelectedSellerId: (id: string) => void;
+  fulfillmentMethod: "delivery" | "pickup" | "shipping";
+  setFulfillmentMethod: (method: "delivery" | "pickup" | "shipping") => void;
+
+  /** Location confirmation */
   hasConfirmedLocation: boolean;
   setHasConfirmedLocation: (v: boolean) => void;
   promptStoreSelector: boolean;
   setPromptStoreSelector: (v: boolean) => void;
 }
 
-const NOOP = () => {};
-const DEFAULT_CART: CartContextType = {
-  items: [], addItem: NOOP as any, removeItem: NOOP, updateQuantity: NOOP,
-  clearCart: NOOP, goToCheckout: NOOP, totalItems: 0, totalPrice: 0,
-  selectedStore: "", setSelectedStore: NOOP, fulfillmentMethod: "delivery",
-  setFulfillmentMethod: NOOP, isVtexSynced: false, selectedSellerId: "1",
-  setSelectedSellerId: NOOP, hasConfirmedLocation: false,
-  setHasConfirmedLocation: NOOP, promptStoreSelector: false,
-  setPromptStoreSelector: NOOP,
-};
-const CartContext = createContext<CartContextType>(DEFAULT_CART);
+const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
-  const [selectedStore, setSelectedStore] = useState("");
-  const [fulfillmentMethod, setFulfillmentMethod] = useState<"delivery" | "pickup">("delivery");
-  const [orderFormId, setOrderFormId] = useState<string | null>(null);
-  const [isVtexSynced, setIsVtexSynced] = useState(false);
-  const initialized = useRef(false);
-
+  const [orderForm, setOrderForm] = useState<OrderForm | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedStore, setSelectedStore] = useState("Select store");
   const [selectedSellerId, setSelectedSellerId] = useState("1");
+  const [fulfillmentMethod, setFulfillmentMethod] = useState<"delivery" | "pickup" | "shipping">("delivery");
   const [hasConfirmedLocation, setHasConfirmedLocation] = useState(false);
   const [promptStoreSelector, setPromptStoreSelector] = useState(false);
-  // Initialize orderForm on mount
+  const initialized = useRef(false);
+
+  // --- Initialize: load or create orderForm ---
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
+
     getOrCreateOrderForm()
       .then((of) => {
-        setOrderFormId(of.orderFormId);
-        setIsVtexSynced(true);
+        setOrderForm(of);
+        setIsLoading(false);
       })
       .catch((err) => {
-        console.warn('[Cart] VTEX orderForm init failed, using local cart:', err);
+        console.error('[Cart] Failed to init orderForm:', err);
+        setIsLoading(false);
+        setError('Failed to initialize cart');
       });
   }, []);
 
-  const addItem = useCallback((product: Product, quantity = 1) => {
-    setItems((prev) => {
-      const existing = prev.find((i) => i.product.id === product.id);
-      if (existing) {
-        return prev.map((i) =>
-          i.product.id === product.id ? { ...i, quantity: i.quantity + quantity } : i
-        );
-      }
-      return [...prev, { product, quantity }];
-    });
+  // --- ADD ITEM ---
+  const addItem = useCallback(async (skuId: string, quantity: number, sellerId: string) => {
+    if (!orderForm) return;
+    setIsUpdating(true);
+    setError(null);
 
-    // Prompt location confirmation on first add
     if (!hasConfirmedLocation) {
       setPromptStoreSelector(true);
     }
 
-    if (orderFormId) {
-      const vtexData = (product as any)._vtex;
-      const skuId = vtexData?.skuId || product.id;
-      const sellerId = selectedSellerId;
-      vtexAddToCart(orderFormId, [{ id: skuId, quantity, seller: sellerId }])
-        .then((of) => setOrderFormId(of.orderFormId))
-        .catch((err) => console.warn('[Cart] VTEX add failed:', err));
+    try {
+      const updated = await addItems(orderForm.orderFormId, [
+        { id: skuId, quantity, seller: sellerId || selectedSellerId },
+      ]);
+      setOrderForm(updated);
+    } catch (err: any) {
+      console.error('[Cart] addItem failed:', err);
+      setError('Failed to add item to cart');
+    } finally {
+      setIsUpdating(false);
     }
-  }, [orderFormId, selectedSellerId, hasConfirmedLocation]);
+  }, [orderForm, selectedSellerId, hasConfirmedLocation]);
 
-  const removeItem = useCallback((productId: string) => {
-    setItems((prev) => prev.filter((i) => i.product.id !== productId));
+  // --- UPDATE QUANTITY ---
+  const updateQuantity = useCallback(async (skuId: string, quantity: number) => {
+    if (!orderForm) return;
+    const index = findItemIndex(orderForm, skuId);
+    if (index < 0) return;
 
-    if (orderFormId) {
-      getOrCreateOrderForm().then((of) => {
-        const vtexData = items.find(i => i.product.id === productId);
-        const skuId = (vtexData?.product as any)?._vtex?.skuId || productId;
-        const vtexIndex = of.items.findIndex(item => item.id === skuId);
-        if (vtexIndex >= 0) {
-          vtexUpdateItems(orderFormId, [{ index: vtexIndex, quantity: 0 }])
-            .then((updatedOf) => setOrderFormId(updatedOf.orderFormId))
-            .catch(console.warn);
-        }
-      }).catch(console.warn);
+    setIsUpdating(true);
+    setError(null);
+    try {
+      const updated = await updateItems(orderForm.orderFormId, [
+        { index, quantity: Math.max(0, quantity) },
+      ]);
+      setOrderForm(updated);
+    } catch (err: any) {
+      console.error('[Cart] updateQuantity failed:', err);
+      setError('Failed to update quantity');
+    } finally {
+      setIsUpdating(false);
     }
-  }, [orderFormId, items]);
+  }, [orderForm]);
 
-  const updateQuantity = useCallback((productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeItem(productId);
-      return;
+  // --- REMOVE ITEM ---
+  const removeItem = useCallback(async (skuId: string) => {
+    if (!orderForm) return;
+    const index = findItemIndex(orderForm, skuId);
+    if (index < 0) return;
+
+    setIsUpdating(true);
+    setError(null);
+    try {
+      const updated = await updateItems(orderForm.orderFormId, [
+        { index, quantity: 0 },
+      ]);
+      setOrderForm(updated);
+    } catch (err: any) {
+      console.error('[Cart] removeItem failed:', err);
+      setError('Failed to remove item');
+    } finally {
+      setIsUpdating(false);
     }
-    setItems((prev) =>
-      prev.map((i) => (i.product.id === productId ? { ...i, quantity } : i))
-    );
+  }, [orderForm]);
 
-    if (orderFormId) {
-      getOrCreateOrderForm().then((of) => {
-        const vtexData = items.find(i => i.product.id === productId);
-        const skuId = (vtexData?.product as any)?._vtex?.skuId || productId;
-        const vtexIndex = of.items.findIndex(item => item.id === skuId);
-        if (vtexIndex >= 0) {
-          vtexUpdateItems(orderFormId, [{ index: vtexIndex, quantity }])
-            .then((updatedOf) => setOrderFormId(updatedOf.orderFormId))
-            .catch(console.warn);
-        }
-      }).catch(console.warn);
+  // --- CLEAR CART ---
+  const clearCart = useCallback(async () => {
+    if (!orderForm || orderForm.items.length === 0) return;
+    setIsUpdating(true);
+    setError(null);
+    try {
+      const updates = orderForm.items.map((_, index) => ({ index, quantity: 0 }));
+      const updated = await updateItems(orderForm.orderFormId, updates);
+      setOrderForm(updated);
+    } catch (err: any) {
+      console.error('[Cart] clearCart failed:', err);
+      setError('Failed to clear cart');
+    } finally {
+      setIsUpdating(false);
     }
-  }, [orderFormId, items, removeItem]);
+  }, [orderForm]);
 
-  const clearCart = useCallback(() => setItems([]), []);
-
+  // --- CHECKOUT ---
   const goToCheckout = useCallback(() => {
-    if (orderFormId) {
-      vtexRedirectToCheckout(orderFormId);
-    } else {
-      window.location.href = '/checkout';
-    }
-  }, [orderFormId]);
+    redirectToCheckout(orderForm?.orderFormId);
+  }, [orderForm]);
 
-  const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
-  const totalPrice = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
+  // --- REFRESH ---
+  const refresh = useCallback(async () => {
+    setIsUpdating(true);
+    try {
+      const of = await getOrCreateOrderForm();
+      setOrderForm(of);
+    } catch (err) {
+      console.error('[Cart] refresh failed:', err);
+    } finally {
+      setIsUpdating(false);
+    }
+  }, []);
+
+  // --- Computed values ---
+  const totalItems = orderForm ? getItemCount(orderForm) : 0;
+  const subtotal = orderForm ? getSubtotal(orderForm) : 0;
+  const discounts = orderForm ? getDiscounts(orderForm) : 0;
+  const total = orderForm?.value ?? 0;
 
   return (
-    <CartContext.Provider
-      value={{
-        items, addItem, removeItem, updateQuantity, clearCart, goToCheckout,
-        totalItems, totalPrice,
-        selectedStore, setSelectedStore,
-        fulfillmentMethod, setFulfillmentMethod,
-        isVtexSynced,
-        selectedSellerId, setSelectedSellerId,
-        hasConfirmedLocation, setHasConfirmedLocation,
-        promptStoreSelector, setPromptStoreSelector,
-      }}
-    >
+    <CartContext.Provider value={{
+      orderForm, isLoading, isUpdating, error,
+      totalItems, subtotal, discounts, total,
+      addItem, updateQuantity, removeItem, clearCart, goToCheckout, refresh,
+      selectedStore, setSelectedStore,
+      selectedSellerId, setSelectedSellerId,
+      fulfillmentMethod, setFulfillmentMethod,
+      hasConfirmedLocation, setHasConfirmedLocation,
+      promptStoreSelector, setPromptStoreSelector,
+    }}>
       {children}
     </CartContext.Provider>
   );
 }
 
 export function useCart() {
-  return useContext(CartContext);
+  const ctx = useContext(CartContext);
+  if (!ctx) throw new Error("useCart must be used within CartProvider");
+  return ctx;
 }

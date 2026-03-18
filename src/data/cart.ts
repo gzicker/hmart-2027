@@ -1,6 +1,2 @@
-import { Product } from "./products";
-
-export interface CartItem {
-  product: Product;
-  quantity: number;
-}
+import { OrderFormItem } from "@/api/checkoutApi";
+export type CartItem = OrderFormItem;

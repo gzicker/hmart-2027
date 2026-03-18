@@ -1,5 +1,9 @@
 import { vtexFetch, VTEX_CONFIG } from './vtexConfig';
 
+// ============================================================
+// TYPES — OrderForm structure
+// ============================================================
+
 export interface OrderFormItem {
   id: string;
   productId: string;
@@ -10,74 +14,147 @@ export interface OrderFormItem {
   quantity: number;
   uniqueId: string;
   seller: string;
-  price: number;
-  listPrice: number;
-  sellingPrice: number;
+  sellerName: string;
+  price: number;         // unit price in cents
+  listPrice: number;     // unit list price in cents
+  sellingPrice: number;  // unit selling price in cents (after promos)
+  isGift: boolean;
+  availability: string;
+  measurementUnit: string;
+  unitMultiplier: number;
+}
+
+export interface OrderFormTotalizer {
+  id: string;    // "Items" | "Shipping" | "Discounts"
+  name: string;
+  value: number; // in cents
 }
 
 export interface OrderForm {
   orderFormId: string;
   items: OrderFormItem[];
-  totalizers: { id: string; name: string; value: number }[];
-  value: number;
+  totalizers: OrderFormTotalizer[];
+  value: number;          // grand total in cents
+  salesChannel: string;
+  loggedIn: boolean;
+  canEditData: boolean;
   messages: { code: string | null; status: string; text: string }[];
+  marketingData: unknown;
+  clientProfileData: unknown;
+  shippingData: unknown;
+  paymentData: unknown;
+  ratesAndBenefitsData: unknown;
+  selectableGifts: unknown[];
 }
+
+// ============================================================
+// LOCAL STORAGE — persist orderFormId across sessions
+// ============================================================
 
 const ORDERFORM_KEY = 'vtex_orderFormId';
 
-function getStoredOrderFormId(): string | null {
+function getStoredId(): string | null {
   try { return localStorage.getItem(ORDERFORM_KEY); } catch { return null; }
 }
 
-function storeOrderFormId(id: string): void {
+function storeId(id: string): void {
   try { localStorage.setItem(ORDERFORM_KEY, id); } catch {}
 }
 
+function clearId(): void {
+  try { localStorage.removeItem(ORDERFORM_KEY); } catch {}
+}
+
+// ============================================================
+// ORDERFORM OPERATIONS
+// ============================================================
+
 export async function getOrCreateOrderForm(): Promise<OrderForm> {
-  const storedId = getStoredOrderFormId();
+  const storedId = getStoredId();
+
   if (storedId) {
     try {
-      const of = await vtexFetch<OrderForm>(`/api/checkout/pub/orderForm/${storedId}`, {
-        params: { sc: VTEX_CONFIG.salesChannel },
-      });
-      storeOrderFormId(of.orderFormId);
+      const of = await vtexFetch<OrderForm>(
+        `/api/checkout/pub/orderForm/${storedId}`,
+        { params: { sc: VTEX_CONFIG.salesChannel } }
+      );
+      storeId(of.orderFormId);
       return of;
     } catch {
-      localStorage.removeItem(ORDERFORM_KEY);
+      clearId();
     }
   }
-  const of = await vtexFetch<OrderForm>('/api/checkout/pub/orderForm', {
-    params: { sc: VTEX_CONFIG.salesChannel },
-  });
-  storeOrderFormId(of.orderFormId);
+
+  const of = await vtexFetch<OrderForm>(
+    '/api/checkout/pub/orderForm',
+    { params: { sc: VTEX_CONFIG.salesChannel } }
+  );
+  storeId(of.orderFormId);
   return of;
 }
 
-export async function addToCart(orderFormId: string, items: Array<{ id: string; quantity: number; seller: string }>): Promise<OrderForm> {
-  const of = await vtexFetch<OrderForm>(`/api/checkout/pub/orderForm/${orderFormId}/items`, {
-    method: 'POST',
-    body: { orderItems: items },
-    params: { sc: VTEX_CONFIG.salesChannel },
-  });
-  storeOrderFormId(of.orderFormId);
+export async function addItems(
+  orderFormId: string,
+  items: Array<{ id: string; quantity: number; seller: string }>
+): Promise<OrderForm> {
+  const of = await vtexFetch<OrderForm>(
+    `/api/checkout/pub/orderForm/${orderFormId}/items`,
+    {
+      method: 'POST',
+      body: { orderItems: items },
+      params: { sc: VTEX_CONFIG.salesChannel },
+    }
+  );
+  storeId(of.orderFormId);
   return of;
 }
 
-export async function updateCartItems(orderFormId: string, items: Array<{ index: number; quantity: number }>): Promise<OrderForm> {
-  const of = await vtexFetch<OrderForm>(`/api/checkout/pub/orderForm/${orderFormId}/items`, {
-    method: 'PATCH',
-    body: { orderItems: items },
-  });
-  storeOrderFormId(of.orderFormId);
+export async function updateItems(
+  orderFormId: string,
+  updates: Array<{ index: number; quantity: number }>
+): Promise<OrderForm> {
+  const of = await vtexFetch<OrderForm>(
+    `/api/checkout/pub/orderForm/${orderFormId}/items`,
+    {
+      method: 'PATCH',
+      body: { orderItems: updates },
+    }
+  );
+  storeId(of.orderFormId);
   return of;
+}
+
+export function findItemIndex(orderForm: OrderForm, skuId: string): number {
+  return orderForm.items.findIndex(item => item.id === skuId || item.uniqueId === skuId);
 }
 
 export function redirectToCheckout(orderFormId?: string): void {
-  const id = orderFormId || getStoredOrderFormId();
+  const id = orderFormId || getStoredId();
   if (!id) return;
   window.location.href = `${VTEX_CONFIG.checkoutUrl}/?orderFormId=${id}#/cart`;
 }
 
+// ============================================================
+// HELPERS
+// ============================================================
+
+export function getItemCount(of: OrderForm): number {
+  return of.items.reduce((sum, item) => sum + item.quantity, 0);
+}
+
+export function getSubtotal(of: OrderForm): number {
+  return of.totalizers.find(t => t.id === 'Items')?.value ?? 0;
+}
+
+export function getDiscounts(of: OrderForm): number {
+  return Math.abs(of.totalizers.find(t => t.id === 'Discounts')?.value ?? 0);
+}
+
+export function formatCents(cents: number): string {
+  return `$${(cents / 100).toFixed(2)}`;
+}
+
+/** Keep for backward compat with simulateForSeller in ProductDetailPage */
 export async function simulateForSeller(
   skuId: string,
   sellerId: string,

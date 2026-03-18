@@ -1,26 +1,43 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Truck, Store, Package, Minus, Plus, Trash2, ShieldCheck, CreditCard, MapPin, ChevronRight, Crown } from "lucide-react";
+import { Truck, Store, Minus, Plus, Trash2, ShieldCheck, CreditCard, MapPin, ChevronRight, Crown, Loader2 } from "lucide-react";
+import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getProductName } from "@/lib/product-utils";
+import { formatCents } from "@/api/checkoutApi";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export default function CheckoutPage() {
   const {
-    items, updateQuantity, removeItem, totalPrice,
-    fulfillmentMethod, setFulfillmentMethod, selectedStore, goToCheckout,
+    orderForm, isLoading, isUpdating,
+    updateQuantity, removeItem,
+    totalItems, subtotal, total,
+    goToCheckout,
+    fulfillmentMethod, setFulfillmentMethod, selectedStore,
   } = useCart();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   const [hmartPlus, setHmartPlus] = useState(false);
-  const hmartPlusFee = hmartPlus ? 9.99 : 0;
-  const deliveryFee = fulfillmentMethod === "delivery" ? 5.99 : 0;
-  const tax = (totalPrice + hmartPlusFee) * 0.08875;
-  const grandTotal = totalPrice + deliveryFee + hmartPlusFee + tax;
+  const hmartPlusFee = hmartPlus ? 999 : 0; // cents
+  const deliveryFee = fulfillmentMethod === "delivery" ? 599 : 0; // cents
+  const tax = Math.round((subtotal + hmartPlusFee) * 0.08875);
+  const grandTotal = subtotal + deliveryFee + hmartPlusFee + tax;
 
-  if (items.length === 0) {
+  const items = orderForm?.items || [];
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="flex items-center justify-center py-32">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!items.length) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -106,41 +123,52 @@ export default function CheckoutPage() {
             {/* Cart Items */}
             <div className="rounded-xl border border-border bg-card p-6">
               <h2 className="mb-4 font-display text-lg font-medium text-foreground">
-                {t("checkout.yourItems")} ({items.reduce((s, i) => s + i.quantity, 0)})
+                {t("checkout.yourItems")} ({totalItems})
               </h2>
               <div className="divide-y divide-border">
-                {items.map(({ product, quantity }) => (
-                  <div key={product.id} className="flex gap-4 py-4 first:pt-0 last:pb-0">
-                    <Link to={`/product/${product.id}`}>
-                      <img src={product.image} alt={getProductName(product, language)} className="h-20 w-20 rounded-lg object-cover" />
-                    </Link>
+                {items.map((item) => (
+                  <div key={item.uniqueId} className="flex gap-4 py-4 first:pt-0 last:pb-0">
+                    <img
+                      src={item.imageUrl}
+                      alt={item.name}
+                      className="h-20 w-20 rounded-lg object-cover"
+                    />
                     <div className="flex flex-1 flex-col justify-between">
                       <div>
-                        <p className="text-[11px] text-muted-foreground">{product.brand}</p>
-                        <Link to={`/product/${product.id}`} className="text-sm font-medium text-foreground hover:text-primary">
-                          {getProductName(product, language)}
-                        </Link>
-                        <p className="text-[11px] text-muted-foreground">{product.weight}</p>
+                        <p className="text-[11px] text-muted-foreground">{item.skuName}</p>
+                        <p className="text-sm font-medium text-foreground">{item.name}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="flex items-center rounded border border-border">
-                          <button onClick={() => updateQuantity(product.id, quantity - 1)} className="px-2 py-1 text-muted-foreground hover:text-foreground">
+                          <button
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            disabled={isUpdating}
+                            className="px-2 py-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
+                          >
                             <Minus className="h-3 w-3" />
                           </button>
-                          <span className="min-w-[1.5rem] text-center text-xs font-semibold">{quantity}</span>
-                          <button onClick={() => updateQuantity(product.id, quantity + 1)} className="px-2 py-1 text-muted-foreground hover:text-foreground">
+                          <span className="min-w-[1.5rem] text-center text-xs font-semibold">{item.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            disabled={isUpdating}
+                            className="px-2 py-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
+                          >
                             <Plus className="h-3 w-3" />
                           </button>
                         </div>
-                        <button onClick={() => removeItem(product.id)} className="text-muted-foreground hover:text-destructive">
+                        <button
+                          onClick={() => removeItem(item.id)}
+                          disabled={isUpdating}
+                          className="text-muted-foreground hover:text-destructive disabled:opacity-50"
+                        >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold text-foreground">${(product.price * quantity).toFixed(2)}</p>
-                      {product.originalPrice && (
-                        <p className="text-[11px] text-muted-foreground line-through">${(product.originalPrice * quantity).toFixed(2)}</p>
+                      <p className="text-sm font-bold text-foreground">{formatCents(item.sellingPrice * item.quantity)}</p>
+                      {item.listPrice > item.sellingPrice && (
+                        <p className="text-[11px] text-muted-foreground line-through">{formatCents(item.listPrice * item.quantity)}</p>
                       )}
                     </div>
                   </div>
@@ -170,14 +198,14 @@ export default function CheckoutPage() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t("checkout.subtotal")}</span>
-                  <span className="font-medium text-foreground">${totalPrice.toFixed(2)}</span>
+                  <span className="font-medium text-foreground">{formatCents(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">
                     {fulfillmentMethod === "delivery" ? t("checkout.deliveryFee") : t("checkout.pickup")}
                   </span>
                   <span className={`font-medium ${deliveryFee === 0 ? "text-green-600" : "text-foreground"}`}>
-                    {deliveryFee === 0 ? t("checkout.free") : `$${deliveryFee.toFixed(2)}`}
+                    {deliveryFee === 0 ? t("checkout.free") : formatCents(deliveryFee)}
                   </span>
                 </div>
                 {hmartPlus && (
@@ -188,10 +216,10 @@ export default function CheckoutPage() {
                 )}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t("checkout.tax")}</span>
-                  <span className="font-medium text-foreground">${tax.toFixed(2)}</span>
+                  <span className="font-medium text-foreground">{formatCents(tax)}</span>
                 </div>
 
-                {totalPrice >= 49 && fulfillmentMethod === "delivery" && (
+                {subtotal >= 4900 && fulfillmentMethod === "delivery" && (
                   <div className="rounded-md bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700">
                     {t("checkout.freeDelivery")}
                   </div>
@@ -200,12 +228,17 @@ export default function CheckoutPage() {
                 <div className="border-t border-border pt-2">
                   <div className="flex justify-between">
                     <span className="font-semibold text-foreground">{t("checkout.total")}</span>
-                    <span className="text-xl font-bold text-foreground">${grandTotal.toFixed(2)}</span>
+                    <span className="text-xl font-bold text-foreground">{formatCents(grandTotal)}</span>
                   </div>
                 </div>
               </div>
 
-              <button onClick={goToCheckout} className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] active:scale-95">
+              <button
+                onClick={goToCheckout}
+                disabled={isUpdating}
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+              >
+                {isUpdating ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {t("checkout.placeOrder")} <ChevronRight className="h-4 w-4" />
               </button>
 
@@ -222,7 +255,7 @@ export default function CheckoutPage() {
               <div className="mt-4 rounded-lg bg-accent/10 p-3">
                 <p className="text-xs font-semibold text-foreground">{t("checkout.smartRewards")}</p>
                 <p className="text-[11px] text-muted-foreground">
-                  {t("checkout.earn")} <span className="font-bold text-accent-foreground">{Math.floor(grandTotal)}</span> {t("checkout.earnPoints")}
+                  {t("checkout.earn")} <span className="font-bold text-accent-foreground">{Math.floor(grandTotal / 100)}</span> {t("checkout.earnPoints")}
                 </p>
               </div>
 
