@@ -116,6 +116,7 @@ export function useProductsSellerSimulations(products: Product[], sellerId: stri
 
   useEffect(() => {
     let cancelled = false;
+    setIsLoaded(false);
 
     async function run() {
       // Separate cached vs uncached
