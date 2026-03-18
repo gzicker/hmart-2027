@@ -180,7 +180,7 @@ export default function ProductDetailPage() {
                 </div>
               ) : (
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-foreground">${displayPrice.toFixed(2)}</span>
+                  <span className="text-2xl sm:text-3xl font-bold text-foreground">${displayPrice.toFixed(2)}</span>
                   {displayListPrice && displayListPrice > displayPrice && (
                     <>
                       <span className="text-lg text-muted-foreground line-through">${displayListPrice.toFixed(2)}</span>
