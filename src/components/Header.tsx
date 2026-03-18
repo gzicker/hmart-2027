@@ -235,7 +235,7 @@ export default function Header() {
           {/* Right side: search + utilities */}
           <div className="ml-auto flex items-center gap-2 sm:gap-4">
             {/* Mobile search trigger */}
-            <button onClick={() => setSearchOpen(true)} className="rounded-full p-2 text-foreground lg:hidden">
+            <button onClick={() => setSearchOpen(true)} aria-label="Search" className="rounded-full p-2 text-foreground lg:hidden">
               <Search className="h-5 w-5" />
             </button>
 
