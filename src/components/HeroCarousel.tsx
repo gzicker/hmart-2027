@@ -47,7 +47,7 @@ const slideConfigs = [
     titleKey: "hero3.title",
     descKey: "hero3.desc",
     ctaLabelKey: "hero3.cta",
-    ctaTo: "/products",
+    ctaTo: "/products?q=deals",
     ctaIcon: Tag,
     secondaryKey: "hero3.secondary",
   },
