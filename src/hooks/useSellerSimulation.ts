@@ -77,7 +77,7 @@ export function useProductSellerSimulation(product: Product, sellerId: string) {
   useEffect(() => {
     let cancelled = false;
 
-    if (!cacheKey) {
+    if (!cacheKey || skip) {
       setSimulation(null);
       return;
     }
