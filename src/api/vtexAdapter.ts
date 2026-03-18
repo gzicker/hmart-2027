@@ -1,28 +1,23 @@
 import { Product } from '@/data/products';
-import { ISProduct, getDefaultSku, getBestOffer, getMainImage } from './searchApi';
+import { ISProduct } from './searchApi';
 
 export function vtexProductToProduct(vtexProduct: ISProduct): Product {
-  // Get first SKU
   const sku = vtexProduct.items?.[0];
-  // Get first seller from that SKU
   const seller = sku?.sellers?.[0];
-  // Get commercial offer
   const offer = seller?.commertialOffer;
 
-  // Extract prices - VTEX returns prices as decimals (e.g. 4.99), not cents
   const price = offer?.Price ?? 0;
   const listPrice = offer?.ListPrice ?? 0;
   const hasDiscount = listPrice > 0 && listPrice > price;
   const isAvailable = (offer?.AvailableQuantity ?? 0) > 0;
 
-  // Extract image URL
   const imageUrl = sku?.images?.[0]?.imageUrl ?? '';
 
   return {
     id: vtexProduct.productId,
     name: vtexProduct.productName,
     brand: vtexProduct.brand || 'H Mart',
-    price: price,
+    price,
     originalPrice: hasDiscount ? listPrice : undefined,
     image: imageUrl,
     category: vtexProduct.categories?.[0]?.replace(/^\//, '').replace(/\/$/, '').split('/').pop() || '',
@@ -30,9 +25,11 @@ export function vtexProductToProduct(vtexProduct: ISProduct): Product {
     inStock: isAvailable,
     isSponsored: false,
     isNew: false,
-    rating: 4.5,
+    // No fake ratings — 0 means "no data", UI will hide the rating display
+    rating: 0,
     reviewCount: 0,
-    fulfillment: ['delivery', 'pickup'] as ("delivery" | "pickup")[],
+    // Empty array — actual fulfillment comes from simulation/logistics, not hardcoded
+    fulfillment: [],
     description: vtexProduct.description || vtexProduct.productName,
     storeName: 'H Mart',
     _vtex: {

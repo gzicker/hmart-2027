@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
+import { toast } from "sonner";
 import {
   getOrCreateOrderForm,
   addItems,
@@ -12,43 +13,26 @@ import {
 } from "@/api/checkoutApi";
 
 interface CartContextType {
-  /** The real VTEX orderForm — single source of truth */
   orderForm: OrderForm | null;
-  /** Is the cart loading (initial load)? */
   isLoading: boolean;
-  /** Is an operation (add/update/remove) in progress? */
   isUpdating: boolean;
-  /** Error message if last operation failed */
   error: string | null;
-
-  /** Cart computed values */
   totalItems: number;
-  subtotal: number;      // in cents
-  discounts: number;     // in cents
-  total: number;         // in cents
-
-  /** Add a SKU to cart */
+  subtotal: number;
+  discounts: number;
+  total: number;
   addItem: (skuId: string, quantity: number, sellerId: string) => Promise<void>;
-  /** Update quantity of an item by its SKU id */
   updateQuantity: (skuId: string, quantity: number) => Promise<void>;
-  /** Remove an item by its SKU id */
   removeItem: (skuId: string) => Promise<void>;
-  /** Clear all items from cart */
   clearCart: () => Promise<void>;
-  /** Redirect to VTEX native checkout */
   goToCheckout: () => void;
-  /** Refresh orderForm from server */
   refresh: () => Promise<void>;
-
-  /** Store/region selection */
   selectedStore: string;
   setSelectedStore: (store: string) => void;
   selectedSellerId: string;
   setSelectedSellerId: (id: string) => void;
   fulfillmentMethod: "delivery" | "pickup" | "shipping";
   setFulfillmentMethod: (method: "delivery" | "pickup" | "shipping") => void;
-
-  /** Location confirmation */
   hasConfirmedLocation: boolean;
   setHasConfirmedLocation: (v: boolean) => void;
   promptStoreSelector: boolean;
@@ -69,6 +53,25 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [promptStoreSelector, setPromptStoreSelector] = useState(false);
   const initialized = useRef(false);
 
+  // Ref to always have the latest orderForm in queued operations
+  const orderFormRef = useRef<OrderForm | null>(null);
+  orderFormRef.current = orderForm;
+
+  // Async mutation queue — serializes cart operations to prevent race conditions
+  const queueRef = useRef<Promise<void>>(Promise.resolve());
+  const enqueue = useCallback((fn: () => Promise<void>) => {
+    const next = queueRef.current.then(fn, fn);
+    queueRef.current = next;
+    return next;
+  }, []);
+
+  // --- Show toast on error ---
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
+
   // --- Initialize: load or create orderForm ---
   useEffect(() => {
     if (initialized.current) return;
@@ -88,90 +91,101 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // --- ADD ITEM ---
   const addItem = useCallback(async (skuId: string, quantity: number, sellerId: string) => {
-    if (!orderForm) return;
-    setIsUpdating(true);
-    setError(null);
-
     if (!hasConfirmedLocation) {
       setPromptStoreSelector(true);
     }
 
-    try {
-      const updated = await addItems(orderForm.orderFormId, [
-        { id: skuId, quantity, seller: sellerId || selectedSellerId },
-      ]);
-      setOrderForm(updated);
-    } catch (err: any) {
-      console.error('[Cart] addItem failed:', err);
-      setError('Failed to add item to cart');
-    } finally {
-      setIsUpdating(false);
-    }
-  }, [orderForm, selectedSellerId, hasConfirmedLocation]);
+    return enqueue(async () => {
+      const current = orderFormRef.current;
+      if (!current) return;
+      setIsUpdating(true);
+      setError(null);
+      try {
+        const updated = await addItems(current.orderFormId, [
+          { id: skuId, quantity, seller: sellerId || selectedSellerId },
+        ]);
+        setOrderForm(updated);
+      } catch (err: any) {
+        console.error('[Cart] addItem failed:', err);
+        setError('Failed to add item to cart');
+      } finally {
+        setIsUpdating(false);
+      }
+    });
+  }, [selectedSellerId, hasConfirmedLocation, enqueue]);
 
   // --- UPDATE QUANTITY ---
   const updateQuantity = useCallback(async (skuId: string, quantity: number) => {
-    if (!orderForm) return;
-    const index = findItemIndex(orderForm, skuId);
-    if (index < 0) return;
+    return enqueue(async () => {
+      const current = orderFormRef.current;
+      if (!current) return;
+      const index = findItemIndex(current, skuId);
+      if (index < 0) return;
 
-    setIsUpdating(true);
-    setError(null);
-    try {
-      const updated = await updateItems(orderForm.orderFormId, [
-        { index, quantity: Math.max(0, quantity) },
-      ]);
-      setOrderForm(updated);
-    } catch (err: any) {
-      console.error('[Cart] updateQuantity failed:', err);
-      setError('Failed to update quantity');
-    } finally {
-      setIsUpdating(false);
-    }
-  }, [orderForm]);
+      setIsUpdating(true);
+      setError(null);
+      try {
+        const updated = await updateItems(current.orderFormId, [
+          { index, quantity: Math.max(0, quantity) },
+        ]);
+        setOrderForm(updated);
+      } catch (err: any) {
+        console.error('[Cart] updateQuantity failed:', err);
+        setError('Failed to update quantity');
+      } finally {
+        setIsUpdating(false);
+      }
+    });
+  }, [enqueue]);
 
   // --- REMOVE ITEM ---
   const removeItem = useCallback(async (skuId: string) => {
-    if (!orderForm) return;
-    const index = findItemIndex(orderForm, skuId);
-    if (index < 0) return;
+    return enqueue(async () => {
+      const current = orderFormRef.current;
+      if (!current) return;
+      const index = findItemIndex(current, skuId);
+      if (index < 0) return;
 
-    setIsUpdating(true);
-    setError(null);
-    try {
-      const updated = await updateItems(orderForm.orderFormId, [
-        { index, quantity: 0 },
-      ]);
-      setOrderForm(updated);
-    } catch (err: any) {
-      console.error('[Cart] removeItem failed:', err);
-      setError('Failed to remove item');
-    } finally {
-      setIsUpdating(false);
-    }
-  }, [orderForm]);
+      setIsUpdating(true);
+      setError(null);
+      try {
+        const updated = await updateItems(current.orderFormId, [
+          { index, quantity: 0 },
+        ]);
+        setOrderForm(updated);
+      } catch (err: any) {
+        console.error('[Cart] removeItem failed:', err);
+        setError('Failed to remove item');
+      } finally {
+        setIsUpdating(false);
+      }
+    });
+  }, [enqueue]);
 
   // --- CLEAR CART ---
   const clearCart = useCallback(async () => {
-    if (!orderForm || orderForm.items.length === 0) return;
-    setIsUpdating(true);
-    setError(null);
-    try {
-      const updates = orderForm.items.map((_, index) => ({ index, quantity: 0 }));
-      const updated = await updateItems(orderForm.orderFormId, updates);
-      setOrderForm(updated);
-    } catch (err: any) {
-      console.error('[Cart] clearCart failed:', err);
-      setError('Failed to clear cart');
-    } finally {
-      setIsUpdating(false);
-    }
-  }, [orderForm]);
+    return enqueue(async () => {
+      const current = orderFormRef.current;
+      if (!current || current.items.length === 0) return;
+      setIsUpdating(true);
+      setError(null);
+      try {
+        const updates = current.items.map((_, index) => ({ index, quantity: 0 }));
+        const updated = await updateItems(current.orderFormId, updates);
+        setOrderForm(updated);
+      } catch (err: any) {
+        console.error('[Cart] clearCart failed:', err);
+        setError('Failed to clear cart');
+      } finally {
+        setIsUpdating(false);
+      }
+    });
+  }, [enqueue]);
 
   // --- CHECKOUT ---
   const goToCheckout = useCallback(() => {
-    redirectToCheckout(orderForm?.orderFormId);
-  }, [orderForm]);
+    redirectToCheckout(orderFormRef.current?.orderFormId);
+  }, []);
 
   // --- REFRESH ---
   const refresh = useCallback(async () => {

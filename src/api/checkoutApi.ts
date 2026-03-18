@@ -154,32 +154,51 @@ export function formatCents(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
-/** Keep for backward compat with simulateForSeller in ProductDetailPage */
+// ============================================================
+// SIMULATION — single SKU (backward compat)
+// ============================================================
+
+export interface SimulationResult {
+  price: number;       // in dollars
+  available: boolean;
+  listPrice: number;   // in dollars
+}
+
 export async function simulateForSeller(
   skuId: string,
   sellerId: string,
   quantity = 1
-): Promise<{ price: number; available: boolean; listPrice: number }> {
+): Promise<SimulationResult> {
+  const results = await simulateBatch([{ id: skuId, quantity, seller: sellerId }]);
+  return results.get(skuId) ?? { price: 0, available: false, listPrice: 0 };
+}
+
+// ============================================================
+// SIMULATION — batched (multiple SKUs in one request)
+// ============================================================
+
+export async function simulateBatch(
+  items: Array<{ id: string; quantity: number; seller: string }>
+): Promise<Map<string, SimulationResult>> {
   const data = await vtexFetch<any>(
     '/api/checkout/pub/orderForms/simulation',
     {
       method: 'POST',
       body: {
-        items: [{ id: skuId, quantity, seller: sellerId }],
+        items,
         country: 'USA',
       },
       params: { sc: VTEX_CONFIG.salesChannel },
     }
   );
 
-  const item = data.items?.[0];
-  if (!item || item.availability !== 'available') {
-    return { price: 0, available: false, listPrice: 0 };
+  const results = new Map<string, SimulationResult>();
+  for (const item of data.items || []) {
+    results.set(item.id, {
+      price: item.sellingPrice ? item.sellingPrice / 100 : (item.price ? item.price / 100 : 0),
+      listPrice: item.listPrice ? item.listPrice / 100 : 0,
+      available: item.availability === 'available',
+    });
   }
-
-  return {
-    price: item.sellingPrice ? item.sellingPrice / 100 : item.price || 0,
-    listPrice: item.listPrice ? item.listPrice / 100 : 0,
-    available: true,
-  };
+  return results;
 }

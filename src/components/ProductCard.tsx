@@ -26,11 +26,13 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
   if (hideIfUnavailable && isUnavailable) return null;
 
   const handleAddToCart = () => {
-    const vtex = (product as any)._vtex;
-    const skuId = vtex?.skuId || product.id;
-    const sellerId = vtex?.sellerId || selectedSellerId;
+    const skuId = product._vtex?.skuId || product.id;
+    const sellerId = product._vtex?.sellerId || selectedSellerId;
     addItem(skuId, 1, sellerId);
   };
+
+  const hasRating = product.rating > 0;
+  const hasBadge = product.isSponsored || product.isNew;
 
   return (
     <div className={`product-card group ${featured ? "col-span-2 row-span-2" : ""} ${isUnavailable ? "opacity-60" : ""}`}>
@@ -39,7 +41,7 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
           <span className="sponsored-badge">{t("brands.sponsored")}</span>
         </div>
       )}
-      {product.isNew && (
+      {product.isNew && !product.isSponsored && (
         <div className="absolute left-2 top-2 z-10">
           <span className="inline-flex items-center rounded-sm bg-primary px-2 py-0.5 text-xs font-bold text-primary-foreground">
             {t("product.new")}
@@ -71,20 +73,24 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
           {product.weight}
         </p>
 
-        <div className="mt-1.5 flex items-center gap-1">
-          <Star className="h-3 w-3 fill-accent text-accent" />
-          <span className="text-xs font-medium text-foreground">{product.rating}</span>
-          <span className="text-[10px] text-muted-foreground">({product.reviewCount.toLocaleString()})</span>
-        </div>
+        {hasRating && (
+          <div className="mt-1.5 flex items-center gap-1">
+            <Star className="h-3 w-3 fill-accent text-accent" />
+            <span className="text-xs font-medium text-foreground">{product.rating}</span>
+            <span className="text-[10px] text-muted-foreground">({product.reviewCount.toLocaleString()})</span>
+          </div>
+        )}
 
-        <div className="mt-1.5 flex items-center gap-1.5">
-          {product.fulfillment.includes("delivery") && (
-            <span className="text-[10px] font-medium text-primary">{t("product.delivery")}</span>
-          )}
-          {product.fulfillment.includes("pickup") && (
-            <span className="text-[10px] font-medium text-green-600">{t("product.pickup")}</span>
-          )}
-        </div>
+        {product.fulfillment.length > 0 && (
+          <div className="mt-1.5 flex items-center gap-1.5">
+            {product.fulfillment.includes("delivery") && (
+              <span className="text-[10px] font-medium text-primary">{t("product.delivery")}</span>
+            )}
+            {product.fulfillment.includes("pickup") && (
+              <span className="text-[10px] font-medium text-green-600">{t("product.pickup")}</span>
+            )}
+          </div>
+        )}
 
         {isUnavailable ? (
           <div className="mt-auto flex items-center gap-1.5 pt-2">
