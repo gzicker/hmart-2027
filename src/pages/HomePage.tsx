@@ -13,6 +13,7 @@ import { useProductsSellerSimulations } from "@/hooks/useSellerSimulation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTab } from "@/contexts/TabContext";
 import ProductCard from "@/components/ProductCard";
+import LazyTikTokEmbed from "@/components/LazyTikTokEmbed";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import GiftsHomePage from "./GiftsHomePage";
@@ -155,7 +156,7 @@ export default function HomePage() {
               className="group relative block overflow-hidden rounded-xl border border-border transition-shadow hover:shadow-lg"
             >
               <div className="aspect-[16/8] overflow-hidden">
-                <img src={banner.image} alt={banner.brand} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                <img src={banner.image} alt={banner.brand} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
               </div>
               <span className="absolute left-3 top-3 rounded bg-foreground/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-background backdrop-blur-sm">
                 {t("brands.sponsored")}
@@ -207,16 +208,8 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08, duration: 0.4 }}
               className="flex-shrink-0"
-              style={{ width: 325 }}
             >
-              <iframe
-                src={`https://www.tiktok.com/embed/v2/${video.id}`}
-                style={{ width: 325, height: 578, border: 'none', borderRadius: 12, overflow: 'hidden' }}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                loading="lazy"
-                title={video.caption}
-              />
+              <LazyTikTokEmbed videoId={video.id} caption={video.caption} username={video.username} views={video.views} />
             </motion.div>
           ))}
         </div>
@@ -226,7 +219,7 @@ export default function HomePage() {
         <div className="overflow-hidden rounded-xl bg-card">
           <div className="grid md:grid-cols-2">
             <div className="aspect-[4/3] md:aspect-auto">
-              <img src={recipeTteokbokki} alt="Tteokbokki Recipe" className="h-full w-full object-cover" />
+              <img src={recipeTteokbokki} alt="Tteokbokki Recipe" loading="lazy" className="h-full w-full object-cover" />
             </div>
             <div className="flex flex-col justify-center p-8 md:p-12">
               <p className="font-body text-xs font-semibold uppercase tracking-widest text-primary">{t("recipe.ofTheWeek")}</p>
