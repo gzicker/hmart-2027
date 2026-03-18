@@ -60,8 +60,8 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
         </div>
       </Link>
 
-      <div className="flex flex-1 flex-col p-3">
-        <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{product.brand}</p>
+      <div className="flex flex-1 flex-col p-2 sm:p-3">
+        <p className="text-[10px] sm:text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{product.brand}</p>
         <Link to={`/product/${product.id}`}>
           <h3 className="mt-0.5 text-sm font-medium leading-tight text-foreground hover:text-primary line-clamp-2">
             {displayName}
@@ -101,7 +101,7 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
             </div>
             <button
               onClick={handleAddToCart}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-110 active:scale-95"
+              className="flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-110 active:scale-95"
             >
               <Plus className="h-4 w-4" />
             </button>

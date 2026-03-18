@@ -122,4 +122,7 @@
     border-color: hsl(var(--accent) / 0.3);
     background-color: hsl(var(--accent) / 0.05);
   }
+
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 }
