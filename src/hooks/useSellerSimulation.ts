@@ -112,9 +112,11 @@ export function useProductsSellerSimulations(products: Product[], sellerId: stri
   );
 
   const [simulations, setSimulations] = useState<Record<string, SellerSimulationResult>>({});
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
+    setIsLoaded(false);
 
     async function run() {
       // Separate cached vs uncached
@@ -167,14 +169,17 @@ export function useProductsSellerSimulations(products: Product[], sellerId: stri
         ...cachedResults,
         ...batchResults,
       }));
+      setIsLoaded(true);
     }
 
     if (products.length > 0) {
       run();
+    } else {
+      setIsLoaded(true);
     }
 
     return () => { cancelled = true; };
   }, [productsKey, products, sellerId]);
 
-  return simulations;
+  return { simulations, isLoaded };
 }

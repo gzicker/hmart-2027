@@ -46,11 +46,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedStore, setSelectedStore] = useState("Select store");
-  const [selectedSellerId, setSelectedSellerId] = useState("1");
-  const [fulfillmentMethod, setFulfillmentMethod] = useState<"delivery" | "pickup" | "shipping">("delivery");
-  const [hasConfirmedLocation, setHasConfirmedLocation] = useState(false);
+  const [selectedStore, setSelectedStoreState] = useState(() => localStorage.getItem('hmart-store') || "Select store");
+  const [selectedSellerId, setSelectedSellerIdState] = useState(() => localStorage.getItem('hmart-seller-id') || "1");
+  const [fulfillmentMethod, setFulfillmentMethodState] = useState<"delivery" | "pickup" | "shipping">(() => (localStorage.getItem('hmart-fulfillment') as any) || "delivery");
+  const [hasConfirmedLocation, setHasConfirmedLocationState] = useState(() => localStorage.getItem('hmart-confirmed') === 'true');
   const [promptStoreSelector, setPromptStoreSelector] = useState(false);
+
+  const setSelectedStore = useCallback((v: string) => { setSelectedStoreState(v); localStorage.setItem('hmart-store', v); }, []);
+  const setSelectedSellerId = useCallback((v: string) => { setSelectedSellerIdState(v); localStorage.setItem('hmart-seller-id', v); }, []);
+  const setFulfillmentMethod = useCallback((v: "delivery" | "pickup" | "shipping") => { setFulfillmentMethodState(v); localStorage.setItem('hmart-fulfillment', v); }, []);
+  const setHasConfirmedLocation = useCallback((v: boolean) => { setHasConfirmedLocationState(v); localStorage.setItem('hmart-confirmed', String(v)); }, []);
   const initialized = useRef(false);
 
   // Ref to always have the latest orderForm in queued operations

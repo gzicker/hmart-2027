@@ -58,12 +58,13 @@ export default function HomePage() {
     [searchRes]
   );
 
-  const productSimulations = useProductsSellerSimulations(vtexProducts, selectedSellerId);
+  const { simulations: productSimulations, isLoaded: simulationsLoaded } = useProductsSellerSimulations(vtexProducts, selectedSellerId);
 
   const chefPicks = useMemo(() => {
+    if (!simulationsLoaded) return vtexProducts.slice(0, 4); // show placeholders while loading
     const available = vtexProducts.filter((product) => productSimulations[product.id]?.available);
     return (available.length >= 4 ? available : vtexProducts).slice(0, 4);
-  }, [vtexProducts, productSimulations]);
+  }, [vtexProducts, productSimulations, simulationsLoaded]);
 
   if (activeTab === "gifts") return <GiftsHomePage />;
   if (activeTab === "b2b") return <B2BHomePage />;
@@ -181,7 +182,7 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {chefPicks.map((product) => (
-              <ProductCard key={product.id} product={product} simulationData={productSimulations[product.id] ?? null} />
+              <ProductCard key={product.id} product={product} simulationData={simulationsLoaded ? (productSimulations[product.id] ?? null) : undefined} />
             ))}
           </div>
         </div>
