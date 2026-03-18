@@ -33,7 +33,7 @@ const slideConfigs = [
     titleKey: "hero2.title",
     descKey: "hero2.desc",
     ctaLabelKey: "hero2.cta",
-    ctaTo: "/products",
+    ctaTo: "/products?sort=release_desc",
     ctaIcon: Crown,
     secondaryKey: "hero2.secondary",
   },
