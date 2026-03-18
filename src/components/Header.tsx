@@ -219,7 +219,7 @@ export default function Header() {
               )}
             </div>
 
-            <Link to="/products" className="text-sm font-semibold text-primary transition-colors hover:text-primary/80">
+            <Link to="/products?q=deals" className="text-sm font-semibold text-primary transition-colors hover:text-primary/80">
               {t("nav.weeklyDeals")}
             </Link>
 
