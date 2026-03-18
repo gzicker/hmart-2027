@@ -129,7 +129,7 @@ export default function ProductDetailPage() {
           <span className="text-foreground font-medium">{displayName}</span>
         </nav>
 
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="grid gap-4 sm:gap-8 lg:grid-cols-2">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
