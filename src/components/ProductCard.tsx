@@ -23,11 +23,12 @@ export default function ProductCard({ product, featured, hideIfUnavailable, simu
   const individualSimulation = useProductSellerSimulation(product, simulationData !== undefined ? '__skip__' : selectedSellerId);
   const simulation = simulationData !== undefined ? simulationData : individualSimulation;
 
-  // Availability: simulation takes priority, but fall back to IS API availability
-  // when simulation hasn't loaded or returns no data (prevents permanent "Unavailable" state)
-  const isUnavailable = simulation
+  // Availability: when simulation data was explicitly provided (even if null), trust it fully.
+  // Only fall back to catalog inStock when no simulation was attempted (simulationData is undefined AND individual hasn't loaded).
+  const hasSimulationData = simulation !== null;
+  const isUnavailable = hasSimulationData
     ? !simulation.available
-    : !product.inStock; // fallback to catalog availability
+    : (simulationData === undefined && !individualSimulation) ? !product.inStock : true; // null from batch = unavailable
   const displayPrice = simulation?.available && simulation.price > 0 ? simulation.price : product.price;
   const displayListPrice = simulation?.available && simulation.listPrice > 0 ? simulation.listPrice : product.originalPrice;
 

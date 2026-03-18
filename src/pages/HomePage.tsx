@@ -61,9 +61,8 @@ export default function HomePage() {
   const { simulations: productSimulations, isLoaded: simulationsLoaded } = useProductsSellerSimulations(vtexProducts, selectedSellerId);
 
   const chefPicks = useMemo(() => {
-    if (!simulationsLoaded) return vtexProducts.slice(0, 4); // show placeholders while loading
-    const available = vtexProducts.filter((product) => productSimulations[product.id]?.available);
-    return (available.length >= 4 ? available : vtexProducts).slice(0, 4);
+    if (!simulationsLoaded) return []; // don't show anything until simulations confirm availability
+    return vtexProducts.filter((product) => productSimulations[product.id]?.available).slice(0, 4);
   }, [vtexProducts, productSimulations, simulationsLoaded]);
 
   if (activeTab === "gifts") return <GiftsHomePage />;
