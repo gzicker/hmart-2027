@@ -29,12 +29,12 @@ export default function StoreSelector() {
   const [locationLabel, setLocationLabel] = useState("");
   const initializedRef = useRef(false);
 
-  // Auto-init with default ZIP on mount
+  // Auto-init with default ZIP on mount — skip if user already confirmed a location
   useEffect(() => {
-    if (initializedRef.current) return;
+    if (initializedRef.current || hasConfirmedLocation) return;
     initializedRef.current = true;
     runSearch(DEFAULT_ZIP, true);
-  }, []);
+  }, [hasConfirmedLocation]);
 
   // Open modal when cart prompts for confirmation
   useEffect(() => {

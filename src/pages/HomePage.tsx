@@ -182,7 +182,7 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {chefPicks.map((product) => (
-              <ProductCard key={product.id} product={product} simulationData={productSimulations[product.id] ?? null} />
+              <ProductCard key={product.id} product={product} simulationData={simulationsLoaded ? (productSimulations[product.id] ?? null) : undefined} />
             ))}
           </div>
         </div>
