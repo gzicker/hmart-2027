@@ -6,42 +6,50 @@ const sampleVtexProduct: ISProduct = {
   productId: '123',
   productName: 'Test Gochujang',
   brand: 'CJ',
-  brandId: '1',
+  brandId: 1,
+  link: '/test-gochujang/p',
   linkText: 'test-gochujang',
-  productReference: 'GCJ-001',
-  categoryId: '10',
-  categories: ['/Sauces/Gochujang/'],
-  categoriesIds: ['/10/20/'],
   description: 'A spicy paste',
+  categories: ['/Sauces/Gochujang/'],
+  categoryId: '10',
+  priceRange: {
+    sellingPrice: { highPrice: 8.99, lowPrice: 8.99 },
+    listPrice: { highPrice: 10.99, lowPrice: 10.99 },
+  },
   items: [
     {
       itemId: 'sku-456',
       name: '500g',
       nameComplete: 'Test Gochujang 500g',
+      ean: '',
+      referenceId: [],
       images: [
-        { imageId: 'img1', imageUrl: 'https://example.com/img.jpg', imageLabel: 'main' },
+        { imageId: 'img1', imageUrl: 'https://example.com/img.jpg', imageLabel: 'main', imageText: '' },
       ],
+      variations: [],
       sellers: [
         {
           sellerId: '1',
           sellerName: 'H Mart',
+          sellerDefault: true,
           commertialOffer: {
             Price: 8.99,
             ListPrice: 10.99,
             AvailableQuantity: 50,
             IsAvailable: true,
-            PriceWithoutDiscount: 10.99,
+            Installments: [],
           },
         },
         {
           sellerId: '2',
           sellerName: 'Partner',
+          sellerDefault: false,
           commertialOffer: {
             Price: 9.49,
             ListPrice: 9.49,
             AvailableQuantity: 0,
             IsAvailable: false,
-            PriceWithoutDiscount: 9.49,
+            Installments: [],
           },
         },
       ],
@@ -65,7 +73,7 @@ describe('vtexProductToProduct', () => {
   });
 
   it('sets originalPrice to undefined when no discount', () => {
-    const noDiscount = {
+    const noDiscount: ISProduct = {
       ...sampleVtexProduct,
       items: [{
         ...sampleVtexProduct.items[0],
@@ -76,7 +84,7 @@ describe('vtexProductToProduct', () => {
             ListPrice: 8.99,
             AvailableQuantity: 10,
             IsAvailable: true,
-            PriceWithoutDiscount: 8.99,
+            Installments: [],
           },
         }],
       }],
@@ -119,7 +127,7 @@ describe('vtexProductToProduct', () => {
   });
 
   it('handles empty items array gracefully', () => {
-    const empty = { ...sampleVtexProduct, items: [] as any[] };
+    const empty: ISProduct = { ...sampleVtexProduct, items: [] };
     const result = vtexProductToProduct(empty);
     expect(result.image).toBe('');
     expect(result.price).toBe(0);
