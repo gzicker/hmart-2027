@@ -257,7 +257,7 @@ export default function ProductDetailPage() {
               <button
                 onClick={() => handleAddToCart(product, quantity)}
                 disabled={isUnavailable}
-                className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-6 py-3 font-body text-sm font-semibold transition-transform ${
+                className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 sm:px-6 py-3 font-body text-sm font-semibold transition-transform ${
                   isUnavailable
                     ? "bg-muted text-muted-foreground cursor-not-allowed"
                     : "bg-primary text-primary-foreground hover:scale-[1.02] active:scale-95"
