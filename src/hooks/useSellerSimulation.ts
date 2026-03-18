@@ -112,6 +112,7 @@ export function useProductsSellerSimulations(products: Product[], sellerId: stri
   );
 
   const [simulations, setSimulations] = useState<Record<string, SellerSimulationResult>>({});
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
