@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight, Package, MapPin, CreditCard, LogOut, ShoppingBasket, Menu, X as XIcon } from "lucide-react";
+import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight, Package, MapPin, CreditCard, LogOut, ShoppingBasket, Menu, X as XIcon, Sparkles, Star } from "lucide-react";
+import { toast } from "sonner";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTab } from "@/contexts/TabContext";
