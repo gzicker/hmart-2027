@@ -219,7 +219,7 @@ export default function HomePage() {
         <div className="overflow-hidden rounded-xl bg-card">
           <div className="grid md:grid-cols-2">
             <div className="aspect-[4/3] md:aspect-auto">
-              <img src={recipeTteokbokki} alt="Tteokbokki Recipe" className="h-full w-full object-cover" />
+              <img src={recipeTteokbokki} alt="Tteokbokki Recipe" loading="lazy" className="h-full w-full object-cover" />
             </div>
             <div className="flex flex-col justify-center p-8 md:p-12">
               <p className="font-body text-xs font-semibold uppercase tracking-widest text-primary">{t("recipe.ofTheWeek")}</p>

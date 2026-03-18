@@ -112,6 +112,9 @@ export default function HeroCarousel() {
           key={slide.id}
           src={slide.image}
           alt={slide.alt}
+          // @ts-ignore — fetchPriority is valid HTML but not yet in React's types
+          fetchPriority={current === 0 ? "high" : "low"}
+          loading={current === 0 ? "eager" : "lazy"}
           initial={{ opacity: 0, scale: 1.05 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}

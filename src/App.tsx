@@ -27,13 +27,15 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <ScrollToTop />
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/products" element={<ProductListPage />} />
-                <Route path="/product/:id" element={<ProductDetailPage />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>}>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/products" element={<ProductListPage />} />
+                  <Route path="/product/:id" element={<ProductDetailPage />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
             </BrowserRouter>
           </CartProvider>
         </TabProvider>
