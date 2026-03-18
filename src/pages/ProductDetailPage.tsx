@@ -149,7 +149,7 @@ export default function ProductDetailPage() {
             )}
 
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{product.brand}</p>
-            <h1 className="mt-1 font-display text-3xl font-medium text-foreground">
+            <h1 className="mt-1 font-display text-xl sm:text-3xl font-medium text-foreground">
               {displayName}
               {subName && <span className="ml-3 text-xl text-muted-foreground">{subName}</span>}
             </h1>
