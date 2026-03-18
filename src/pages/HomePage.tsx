@@ -58,12 +58,13 @@ export default function HomePage() {
     [searchRes]
   );
 
-  const productSimulations = useProductsSellerSimulations(vtexProducts, selectedSellerId);
+  const { simulations: productSimulations, isLoaded: simulationsLoaded } = useProductsSellerSimulations(vtexProducts, selectedSellerId);
 
   const chefPicks = useMemo(() => {
+    if (!simulationsLoaded) return vtexProducts.slice(0, 4); // show placeholders while loading
     const available = vtexProducts.filter((product) => productSimulations[product.id]?.available);
     return (available.length >= 4 ? available : vtexProducts).slice(0, 4);
-  }, [vtexProducts, productSimulations]);
+  }, [vtexProducts, productSimulations, simulationsLoaded]);
 
   if (activeTab === "gifts") return <GiftsHomePage />;
   if (activeTab === "b2b") return <B2BHomePage />;
