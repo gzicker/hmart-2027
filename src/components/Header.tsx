@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from "react";
 import logoImg from "@/assets/hmart-logo.png";
 import StoreSelector from "@/components/StoreSelector";
 import LanguageSelector from "@/components/LanguageSelector";
+import MiniCart from "@/components/MiniCart";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { getCategoryTree, type VtexCategory } from "@/api/catalogApi";
 import { autocomplete as vtexAutocomplete } from "@/api/searchApi";
