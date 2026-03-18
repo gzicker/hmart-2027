@@ -107,7 +107,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setOrderForm(updated);
       } catch (err: any) {
         console.error('[Cart] addItem failed:', err);
-        setError('Failed to add item to cart');
+        const vtexMsg = err?.response?.data?.error?.message || err?.message || '';
+        setError(vtexMsg ? `Failed to add item: ${vtexMsg}` : 'Failed to add item to cart');
       } finally {
         setIsUpdating(false);
       }

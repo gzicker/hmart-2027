@@ -97,7 +97,7 @@ export function useProductSellerSimulation(product: Product, sellerId: string) {
       });
 
     return () => { cancelled = true; };
-  }, [cacheKey, product, sellerId]);
+  }, [cacheKey, product, sellerId, skip]);
 
   return simulation;
 }

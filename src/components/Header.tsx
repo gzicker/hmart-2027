@@ -408,7 +408,7 @@ export default function Header() {
                 </div>
                 <div>
                   <p className="text-sm font-bold text-foreground">Account</p>
-                  <p className="text-xs text-muted-foreground">Sign in / Register</p>
+                  <button onClick={() => toast.info("Sign in coming soon")} className="text-xs text-primary hover:underline">Sign in / Register</button>
                 </div>
               </div>
             </div>

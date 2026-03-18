@@ -115,6 +115,7 @@ export default function ProductCard({ product, featured, hideIfUnavailable, simu
             </div>
             <button
               onClick={handleAddToCart}
+              aria-label={t("product.addToCart")}
               className="flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-110 active:scale-95"
             >
               <Plus className="h-4 w-4" />
