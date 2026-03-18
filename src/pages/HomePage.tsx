@@ -156,7 +156,7 @@ export default function HomePage() {
               className="group relative block overflow-hidden rounded-xl border border-border transition-shadow hover:shadow-lg"
             >
               <div className="aspect-[16/8] overflow-hidden">
-                <img src={banner.image} alt={banner.brand} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                <img src={banner.image} alt={banner.brand} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
               </div>
               <span className="absolute left-3 top-3 rounded bg-foreground/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-background backdrop-blur-sm">
                 {t("brands.sponsored")}
