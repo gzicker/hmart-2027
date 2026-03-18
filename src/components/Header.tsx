@@ -297,7 +297,7 @@ export default function Header() {
             <div className="hidden items-center gap-3 lg:flex">
               <Popover>
                 <PopoverTrigger asChild>
-                  <button className="rounded-full p-2 transition-colors hover:bg-secondary">
+                  <button aria-label="Account" className="rounded-full p-2 transition-colors hover:bg-secondary">
                     <User className="h-5 w-5 text-foreground" />
                   </button>
                 </PopoverTrigger>
