@@ -173,6 +173,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {chefPicks.length > 0 && (
       <section className="bg-card py-12">
         <div className="hmart-container">
           <div className="mb-6 flex items-center gap-2">
@@ -181,11 +182,12 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {chefPicks.map((product) => (
-              <ProductCard key={product.id} product={product} simulationData={simulationsLoaded ? (productSimulations[product.id] ?? null) : undefined} />
+              <ProductCard key={product.id} product={product} simulationData={productSimulations[product.id] ?? null} />
             ))}
           </div>
         </div>
       </section>
+      )}
 
       <section id="trending-tiktok" className="hmart-container py-12 scroll-mt-32">
         <div className="mb-6 flex items-center justify-between">
