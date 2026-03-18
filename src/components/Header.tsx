@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight, Package, MapPin, CreditCard, LogOut, ShoppingBasket, Menu, X as XIcon } from "lucide-react";
+import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight, Package, MapPin, CreditCard, LogOut, ShoppingBasket, Menu, X as XIcon, Sparkles, Star } from "lucide-react";
+import { toast } from "sonner";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTab } from "@/contexts/TabContext";
@@ -152,7 +153,7 @@ export default function Header() {
       <div className="border-b border-border">
         <div className="hmart-container flex items-center gap-3 py-2.5 sm:gap-4 sm:py-3 lg:gap-6">
           {/* Mobile hamburger */}
-          <button onClick={() => setMobileMenuOpen(true)} className="rounded-md p-2 text-foreground lg:hidden">
+          <button onClick={() => setMobileMenuOpen(true)} aria-label="Open menu" className="rounded-md p-2 text-foreground lg:hidden">
             <Menu className="h-5 w-5" />
           </button>
 
@@ -219,7 +220,7 @@ export default function Header() {
               )}
             </div>
 
-            <Link to="/products" className="text-sm font-semibold text-primary transition-colors hover:text-primary/80">
+            <Link to="/products?q=deals" className="text-sm font-semibold text-primary transition-colors hover:text-primary/80">
               {t("nav.weeklyDeals")}
             </Link>
 
@@ -235,7 +236,7 @@ export default function Header() {
           {/* Right side: search + utilities */}
           <div className="ml-auto flex items-center gap-2 sm:gap-4">
             {/* Mobile search trigger */}
-            <button onClick={() => setSearchOpen(true)} className="rounded-full p-2 text-foreground lg:hidden">
+            <button onClick={() => setSearchOpen(true)} aria-label="Search" className="rounded-full p-2 text-foreground lg:hidden">
               <Search className="h-5 w-5" />
             </button>
 
@@ -297,7 +298,7 @@ export default function Header() {
             <div className="hidden items-center gap-3 lg:flex">
               <Popover>
                 <PopoverTrigger asChild>
-                  <button className="rounded-full p-2 transition-colors hover:bg-secondary">
+                  <button aria-label="Account" className="rounded-full p-2 transition-colors hover:bg-secondary">
                     <User className="h-5 w-5 text-foreground" />
                   </button>
                 </PopoverTrigger>
@@ -309,7 +310,7 @@ export default function Header() {
                       </div>
                       <div>
                         <p className="text-sm font-bold text-foreground">Account</p>
-                        <p className="text-xs text-muted-foreground">Sign in</p>
+                        <button onClick={() => toast.info("Sign in coming soon")} className="text-xs text-primary hover:underline">Sign in</button>
                       </div>
                     </div>
                   </div>
@@ -330,7 +331,7 @@ export default function Header() {
             </div>
 
             {/* Cart — always visible */}
-            <button onClick={() => setMiniCartOpen(true)} className="relative rounded-full p-2 transition-colors hover:bg-secondary">
+            <button onClick={() => setMiniCartOpen(true)} aria-label="Shopping cart" className="relative rounded-full p-2 transition-colors hover:bg-secondary">
               <ShoppingCart className="h-5 w-5 text-foreground" />
               {totalItems > 0 && (
                 <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
@@ -407,7 +408,7 @@ export default function Header() {
                 </div>
                 <div>
                   <p className="text-sm font-bold text-foreground">Account</p>
-                  <p className="text-xs text-muted-foreground">Sign in / Register</p>
+                  <button onClick={() => toast.info("Sign in coming soon")} className="text-xs text-primary hover:underline">Sign in / Register</button>
                 </div>
               </div>
             </div>
@@ -430,9 +431,17 @@ export default function Header() {
 
             {/* Links */}
             <div className="border-b border-border py-2">
-              <Link to="/products" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-primary">
+              <Link to="/products?q=deals" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-primary">
                 <Flame className="h-4 w-4" />
                 Weekly Deals
+              </Link>
+              <Link to="/products?sort=release_desc" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-secondary">
+                <Sparkles className="h-4 w-4 text-muted-foreground" />
+                New Arrivals
+              </Link>
+              <Link to="/products?sort=orders_desc" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-secondary">
+                <Star className="h-4 w-4 text-muted-foreground" />
+                Best Sellers
               </Link>
             </div>
 

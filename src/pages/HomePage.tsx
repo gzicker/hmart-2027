@@ -78,10 +78,10 @@ export default function HomePage() {
   const featuredProducts = vtexProducts.slice(0, 3);
 
   const categoryImages = [
-    { name: t("cat.vegetables"), nameKo: "채소", image: categoryVeg, link: "/products" },
-    { name: t("cat.meat"), nameKo: "육류 & 해산물", image: categoryMeat, link: "/products" },
-    { name: t("cat.pantry"), nameKo: "식료품", image: categoryPantry, link: "/products" },
-    { name: t("cat.kbeauty"), nameKo: "뷰티", image: categoryKbeauty, link: "/products" },
+    { name: t("cat.vegetables"), nameKo: "채소", image: categoryVeg, link: "/products?q=vegetables" },
+    { name: t("cat.meat"), nameKo: "육류 & 해산물", image: categoryMeat, link: "/products?q=meat+seafood" },
+    { name: t("cat.pantry"), nameKo: "식료품", image: categoryPantry, link: "/products?q=pantry" },
+    { name: t("cat.kbeauty"), nameKo: "뷰티", image: categoryKbeauty, link: "/products?q=k-beauty" },
   ];
 
   return (
@@ -181,7 +181,7 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {chefPicks.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} simulationData={productSimulations[product.id] ?? null} />
             ))}
           </div>
         </div>

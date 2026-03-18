@@ -67,7 +67,9 @@ async function fetchSimulation(product: Product, sellerId: string): Promise<Sell
 }
 
 export function useProductSellerSimulation(product: Product, sellerId: string) {
-  const cacheKey = useMemo(() => getCacheKey(product, sellerId), [product, sellerId]);
+  // '__skip__' sentinel: when batch simulation data is passed as prop, skip individual call
+  const skip = sellerId === '__skip__';
+  const cacheKey = useMemo(() => skip ? '' : getCacheKey(product, sellerId), [product, sellerId, skip]);
   const [simulation, setSimulation] = useState<SellerSimulationResult | null>(() => {
     return cacheKey ? getCachedResult(cacheKey) : null;
   });
@@ -75,7 +77,7 @@ export function useProductSellerSimulation(product: Product, sellerId: string) {
   useEffect(() => {
     let cancelled = false;
 
-    if (!cacheKey) {
+    if (!cacheKey || skip) {
       setSimulation(null);
       return;
     }
@@ -95,7 +97,7 @@ export function useProductSellerSimulation(product: Product, sellerId: string) {
       });
 
     return () => { cancelled = true; };
-  }, [cacheKey, product, sellerId]);
+  }, [cacheKey, product, sellerId, skip]);
 
   return simulation;
 }

@@ -20,8 +20,7 @@ const slideConfigs = [
     titleKey: "hero1.title",
     descKey: "hero1.desc",
     ctaLabelKey: "hero1.cta",
-    ctaTo: "/products",
-    ctaIcon: ArrowRight,
+    ctaTo: "/products?sort=orders_desc",
     secondaryKey: "hero1.secondary",
   },
   {
@@ -34,7 +33,7 @@ const slideConfigs = [
     titleKey: "hero2.title",
     descKey: "hero2.desc",
     ctaLabelKey: "hero2.cta",
-    ctaTo: "/products",
+    ctaTo: "/products?sort=release_desc",
     ctaIcon: Crown,
     secondaryKey: "hero2.secondary",
   },
@@ -48,7 +47,7 @@ const slideConfigs = [
     titleKey: "hero3.title",
     descKey: "hero3.desc",
     ctaLabelKey: "hero3.cta",
-    ctaTo: "/products",
+    ctaTo: "/products?q=deals",
     ctaIcon: Tag,
     secondaryKey: "hero3.secondary",
   },
@@ -62,7 +61,7 @@ const slideConfigs = [
     titleKey: "hero4.title",
     descKey: "hero4.desc",
     ctaLabelKey: "hero4.cta",
-    ctaTo: "/products",
+    ctaTo: "/products?q=k-beauty",
     ctaIcon: Sparkles,
     secondaryKey: "hero4.secondary",
   },
@@ -120,7 +119,9 @@ export default function HeroCarousel() {
         />
       </AnimatePresence>
 
+      {/* Overlay — stronger on mobile for text legibility */}
       <div className={`absolute inset-0 ${slide.overlay}`} />
+      <div className="absolute inset-0 bg-gradient-to-t from-hmart-charcoal/60 via-transparent to-transparent sm:from-hmart-charcoal/30" />
 
       <div className="hmart-container relative flex h-full flex-col justify-center">
         <AnimatePresence mode="wait" custom={direction}>
@@ -134,13 +135,13 @@ export default function HeroCarousel() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="max-w-xl"
           >
-            <p className={`mb-1 sm:mb-2 font-body text-[10px] sm:text-xs font-medium uppercase tracking-widest ${slide.eyebrowColor}`}>
+            <p className={`mb-1 sm:mb-2 font-body text-[10px] sm:text-xs font-medium uppercase tracking-widest ${slide.eyebrowColor} [text-shadow:0_1px_4px_rgba(0,0,0,0.5)]`}>
               {t(slide.eyebrowKey)}
             </p>
-            <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-medium leading-tight text-card">
+            <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-medium leading-tight text-card [text-shadow:0_2px_8px_rgba(0,0,0,0.7)]">
               {t(slide.titleKey)}
             </h1>
-            <p className="mt-2 sm:mt-3 font-body text-xs sm:text-sm md:text-base leading-relaxed text-card/80 max-w-md">
+            <p className="mt-2 sm:mt-3 font-body text-xs sm:text-sm md:text-base leading-relaxed text-card/90 max-w-md [text-shadow:0_1px_4px_rgba(0,0,0,0.5)]">
               {t(slide.descKey)}
             </p>
             <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row gap-2 sm:gap-3">

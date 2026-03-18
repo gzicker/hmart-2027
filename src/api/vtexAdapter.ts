@@ -30,7 +30,10 @@ export function vtexProductToProduct(vtexProduct: ISProduct): Product {
     reviewCount: 0,
     // Empty array — actual fulfillment comes from simulation/logistics, not hardcoded
     fulfillment: [],
-    description: vtexProduct.description || vtexProduct.productName,
+    // Only use description if it differs from the product name (avoid duplication)
+    description: vtexProduct.description && vtexProduct.description !== vtexProduct.productName
+      ? vtexProduct.description
+      : '',
     storeName: 'H Mart',
     _vtex: {
       productId: vtexProduct.productId,

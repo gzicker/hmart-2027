@@ -106,6 +106,17 @@ export interface ISFacetsResponse {
 
 export type SortOption = '' | 'price_asc' | 'price_desc' | 'orders_desc' | 'name_asc' | 'name_desc' | 'release_desc' | 'discount_desc';
 
+/** Map our internal sort keys to VTEX Intelligent Search `sort` parameter format */
+const SORT_MAP: Record<string, string> = {
+  price_asc: 'price:asc',
+  price_desc: 'price:desc',
+  orders_desc: 'orders:desc',
+  name_asc: 'name:asc',
+  name_desc: 'name:desc',
+  release_desc: 'release:desc',
+  discount_desc: 'discount:desc',
+};
+
 export async function searchProducts(params: {
   query?: string;
   facets?: string;
@@ -115,8 +126,9 @@ export async function searchProducts(params: {
 } = {}): Promise<ISSearchResponse> {
   const { query = '', facets = '', page = 1, count = 20, sort = '' } = params;
   const path = facets ? `${IS_BASE}/product_search/${facets}` : `${IS_BASE}/product_search`;
+  const mappedSort = sort ? SORT_MAP[sort] || sort : undefined;
   return vtexFetch<ISSearchResponse>(path, {
-    params: { query: query || undefined, page, count, sort: sort || undefined, locale: VTEX_CONFIG.locale, sc: VTEX_CONFIG.salesChannel },
+    params: { query: query || undefined, page, count, sort: mappedSort, locale: VTEX_CONFIG.locale, sc: VTEX_CONFIG.salesChannel },
   });
 }
 

@@ -10,14 +10,18 @@ interface ProductCardProps {
   product: Product;
   featured?: boolean;
   hideIfUnavailable?: boolean;
+  /** Pre-fetched simulation from batch hook — skips individual simulation call when provided */
+  simulationData?: import("@/hooks/useSellerSimulation").SellerSimulationResult | null;
 }
 
-export default function ProductCard({ product, featured, hideIfUnavailable }: ProductCardProps) {
+export default function ProductCard({ product, featured, hideIfUnavailable, simulationData }: ProductCardProps) {
   const { addItem, selectedSellerId } = useCart();
   const { t, language } = useLanguage();
 
   const displayName = getProductName(product, language);
-  const simulation = useProductSellerSimulation(product, selectedSellerId);
+  // Skip individual simulation call when batch data is provided via prop
+  const individualSimulation = useProductSellerSimulation(product, simulationData !== undefined ? '__skip__' : selectedSellerId);
+  const simulation = simulationData !== undefined ? simulationData : individualSimulation;
 
   // Availability: simulation takes priority, but fall back to IS API availability
   // when simulation hasn't loaded or returns no data (prevents permanent "Unavailable" state)
@@ -111,6 +115,7 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
             </div>
             <button
               onClick={handleAddToCart}
+              aria-label={t("product.addToCart")}
               className="flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-110 active:scale-95"
             >
               <Plus className="h-4 w-4" />

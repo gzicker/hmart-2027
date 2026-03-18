@@ -188,9 +188,11 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{description}</p>
+            {description && (
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{description}</p>
+            )}
 
-            {product.fulfillment.length > 0 && (
+            {!isUnavailable && product.fulfillment.length > 0 && (
               <div className="mt-6">
                 <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("detail.howToGet")}</h3>
                 <div className="flex flex-wrap gap-2">

@@ -12,9 +12,9 @@ export default function Footer() {
             <h4 className="mb-4 font-display text-sm font-semibold text-foreground">{t("footer.shop")}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link to="/products" className="transition-colors hover:text-primary">{t("footer.allProducts")}</Link></li>
-              <li><Link to="/products" className="transition-colors hover:text-primary">{t("footer.dealsPromo")}</Link></li>
-              <li><Link to="/products" className="transition-colors hover:text-primary">{t("footer.newArrivals")}</Link></li>
-              <li><Link to="/products" className="transition-colors hover:text-primary">{t("footer.bestSellers")}</Link></li>
+              <li><Link to="/products?q=deals" className="transition-colors hover:text-primary">{t("footer.dealsPromo")}</Link></li>
+              <li><Link to="/products?sort=release_desc" className="transition-colors hover:text-primary">{t("footer.newArrivals")}</Link></li>
+              <li><Link to="/products?sort=orders_desc" className="transition-colors hover:text-primary">{t("footer.bestSellers")}</Link></li>
             </ul>
           </div>
           <div>
