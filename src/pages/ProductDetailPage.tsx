@@ -160,26 +160,29 @@ export default function ProductDetailPage() {
                   <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Checking price at {selectedStore || "your store"}…</span>
                 </div>
-              ) : isUnavailable ? (
-                <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3">
-                  <AlertTriangle className="h-5 w-5 text-destructive" />
-                  <div>
-                    <p className="text-sm font-medium text-destructive">Unavailable at {selectedStore || "your store"}</p>
-                    <p className="text-xs text-muted-foreground">Try selecting a different store location.</p>
-                  </div>
-                </div>
               ) : (
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl sm:text-3xl font-bold text-foreground">${displayPrice.toFixed(2)}</span>
-                  {displayListPrice && displayListPrice > displayPrice && (
-                    <>
-                      <span className="text-lg text-muted-foreground line-through">${displayListPrice.toFixed(2)}</span>
-                      <span className="rounded-sm bg-accent/20 px-2 py-0.5 text-sm font-semibold text-accent-foreground">
-                        {t("product.save")} ${(displayListPrice - displayPrice).toFixed(2)}
-                      </span>
-                    </>
+                <>
+                  {isUnavailable && (
+                    <div className="mb-3 flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3">
+                      <AlertTriangle className="h-5 w-5 text-destructive" />
+                      <div>
+                        <p className="text-sm font-medium text-destructive">Unavailable at {selectedStore || "your store"}</p>
+                        <p className="text-xs text-muted-foreground">Try selecting a different store location.</p>
+                      </div>
+                    </div>
                   )}
-                </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl sm:text-3xl font-bold text-foreground">${displayPrice.toFixed(2)}</span>
+                    {displayListPrice && displayListPrice > displayPrice && (
+                      <>
+                        <span className="text-lg text-muted-foreground line-through">${displayListPrice.toFixed(2)}</span>
+                        <span className="rounded-sm bg-accent/20 px-2 py-0.5 text-sm font-semibold text-accent-foreground">
+                          {t("product.save")} ${(displayListPrice - displayPrice).toFixed(2)}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </>
               )}
               {!isUnavailable && !simulating && (
                 <p className="mt-1 text-xs text-muted-foreground">
