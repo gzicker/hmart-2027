@@ -106,7 +106,7 @@ export default function HeroCarousel() {
   };
 
   return (
-    <section className="relative h-[70vh] min-h-[500px] overflow-hidden">
+    <section className="relative h-[50vh] min-h-[320px] sm:h-[60vh] sm:min-h-[400px] md:h-[70vh] md:min-h-[500px] overflow-hidden">
       <AnimatePresence mode="popLayout">
         <motion.img
           key={slide.id}
@@ -134,23 +134,23 @@ export default function HeroCarousel() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="max-w-xl"
           >
-            <p className={`mb-2 font-body text-sm font-medium uppercase tracking-widest ${slide.eyebrowColor}`}>
+            <p className={`mb-1 sm:mb-2 font-body text-[10px] sm:text-xs font-medium uppercase tracking-widest ${slide.eyebrowColor}`}>
               {t(slide.eyebrowKey)}
             </p>
-            <h1 className="font-display text-5xl font-medium leading-tight text-card md:text-6xl">
+            <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-medium leading-tight text-card">
               {t(slide.titleKey)}
             </h1>
-            <p className="mt-4 font-body text-base leading-relaxed text-card/80">
+            <p className="mt-2 sm:mt-3 font-body text-xs sm:text-sm md:text-base leading-relaxed text-card/80 max-w-md">
               {t(slide.descKey)}
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row gap-2 sm:gap-3">
               <Link
                 to={slide.ctaTo}
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-body text-sm font-semibold text-primary-foreground transition-transform hover:scale-105 active:scale-95"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 sm:px-6 py-2.5 sm:py-3 font-body text-xs sm:text-sm font-semibold text-primary-foreground transition-transform hover:scale-105 active:scale-95"
               >
                 {t(slide.ctaLabelKey)} <Icon className="h-4 w-4" />
               </Link>
-              <button className="inline-flex items-center gap-2 rounded-lg border border-card/30 bg-card/10 px-6 py-3 font-body text-sm font-medium text-card backdrop-blur-sm transition-colors hover:bg-card/20">
+              <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-card/30 bg-card/10 px-4 sm:px-6 py-2.5 sm:py-3 font-body text-xs sm:text-sm font-medium text-card backdrop-blur-sm transition-colors hover:bg-card/20">
                 {t(slide.secondaryKey)}
               </button>
             </div>
@@ -160,20 +160,20 @@ export default function HeroCarousel() {
 
       <button
         onClick={prev}
-        className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-card/10 p-2 text-card backdrop-blur-sm transition-colors hover:bg-card/20"
+        className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-card/10 p-2 text-card backdrop-blur-sm transition-colors hover:bg-card/20"
         aria-label="Previous slide"
       >
         <ChevronLeft className="h-5 w-5" />
       </button>
       <button
         onClick={next}
-        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-card/10 p-2 text-card backdrop-blur-sm transition-colors hover:bg-card/20"
+        className="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-card/10 p-2 text-card backdrop-blur-sm transition-colors hover:bg-card/20"
         aria-label="Next slide"
       >
         <ChevronRight className="h-5 w-5" />
       </button>
 
-      <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2">
+      <div className="absolute bottom-4 sm:bottom-6 left-1/2 flex -translate-x-1/2 gap-2">
         {slideConfigs.map((s, i) => (
           <button
             key={s.id}

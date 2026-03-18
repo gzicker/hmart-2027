@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight, Package, MapPin, CreditCard, LogOut, ShoppingBasket } from "lucide-react";
+import { Search, ShoppingCart, User, ChevronDown, Gift, Building2, Flame, ChevronRight, Package, MapPin, CreditCard, LogOut, ShoppingBasket, Menu, X as XIcon } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTab } from "@/contexts/TabContext";
@@ -37,6 +37,8 @@ export default function Header() {
   const catRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const [miniCartOpen, setMiniCartOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -89,13 +91,13 @@ export default function Header() {
         : activeTab === "b2b" ? "bg-gray-800"
         : "bg-primary"
       }>
-        <div className="hmart-container flex items-center justify-center gap-4 py-1.5 text-xs font-medium text-white sm:gap-6">
+        <div className="hmart-container flex items-center justify-center gap-4 py-1 text-[10px] font-medium text-white text-center sm:py-1.5 sm:text-xs sm:gap-6">
           <span>{t("promo.join")} <strong>{t("promo.hmartPlus")}</strong> {t("promo.freeShipping")}</span>
           <span className="hidden sm:inline">·</span>
           <span className="hidden sm:inline">{t("promo.rewards")}</span>
           <span className="hidden md:inline">·</span>
           <span className="hidden md:inline">{t("promo.deals")}</span>
-          <Link to="/products" className="ml-2 rounded-sm bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider transition-colors hover:bg-white/30">
+          <Link to="/products" className="hidden sm:inline-flex ml-2 rounded-sm bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider transition-colors hover:bg-white/30">
             {t("promo.learnMore")}
           </Link>
         </div>
@@ -107,19 +109,19 @@ export default function Header() {
         : activeTab === "b2b" ? "bg-gray-700"
         : "bg-primary/90"
       }>
-        <div className="hmart-container flex items-end gap-1 pt-1">
+        <div className="hmart-container flex items-end gap-0.5 pt-1 overflow-x-auto scrollbar-none">
           {SITE_TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 rounded-t-lg px-5 py-2 text-sm font-semibold transition-colors ${
+              className={`flex items-center gap-1.5 rounded-t-lg px-3 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap sm:px-5 sm:py-2 sm:text-sm sm:gap-2 ${
                 activeTab === tab.id
                   ? "bg-card text-foreground shadow-sm"
                   : "bg-white/10 text-white hover:bg-white/20"
               }`}
             >
               {tab.icon && <tab.icon className="h-3.5 w-3.5" />}
-              <span>{tab.id === "b2b" ? `${t("tab.hmart")} B2B` : tab.id === "gifts" ? t("tab.giftsLabel") : t("tab.hmart")}</span>
+              <span>{tab.id === "b2b" ? "B2B" : tab.id === "gifts" ? "Gifts" : t("tab.hmart")}</span>
               {tab.sublabelKey && (
                 <span className={`hidden text-[10px] font-normal sm:inline ${
                   activeTab === tab.id ? "text-muted-foreground" : "text-white/70"
@@ -134,12 +136,18 @@ export default function Header() {
 
       {/* Main header */}
       <div className="border-b border-border">
-        <div className="hmart-container flex items-center gap-4 py-3 lg:gap-6">
+        <div className="hmart-container flex items-center gap-3 py-2.5 sm:gap-4 sm:py-3 lg:gap-6">
+          {/* Mobile hamburger */}
+          <button onClick={() => setMobileMenuOpen(true)} className="rounded-md p-2 text-foreground lg:hidden">
+            <Menu className="h-5 w-5" />
+          </button>
+
+          {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <img src={logoImg} alt="H Mart" className="h-10 w-auto" />
+            <img src={logoImg} alt="H Mart" className="h-8 w-auto sm:h-10" />
           </Link>
 
-          {/* Nav items between logo and search */}
+          {/* Desktop nav */}
           <nav className="hidden items-center gap-5 lg:flex">
             <div ref={catRef} className="relative">
               <button
@@ -210,9 +218,15 @@ export default function Header() {
             </Link>
           </nav>
 
-          {/* Search + Store + User/Cart pushed right */}
-          <div className="ml-auto flex items-center gap-4">
-            <form onSubmit={handleSearch} className="flex items-center">
+          {/* Right side: search + utilities */}
+          <div className="ml-auto flex items-center gap-2 sm:gap-4">
+            {/* Mobile search trigger */}
+            <button onClick={() => setSearchOpen(true)} className="rounded-full p-2 text-foreground lg:hidden">
+              <Search className="h-5 w-5" />
+            </button>
+
+            {/* Desktop search */}
+            <form onSubmit={handleSearch} className="hidden items-center lg:flex">
               <div className="relative w-64">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
@@ -261,9 +275,12 @@ export default function Header() {
               </div>
             </form>
 
-            <StoreSelector />
+            <div className="hidden lg:block">
+              <StoreSelector />
+            </div>
 
-            <div className="flex items-center gap-3">
+            {/* User menu — desktop only */}
+            <div className="hidden items-center gap-3 lg:flex">
               <Popover>
                 <PopoverTrigger asChild>
                   <button className="rounded-full p-2 transition-colors hover:bg-secondary">
@@ -277,15 +294,10 @@ export default function Header() {
                         <User className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-foreground">VINCE COLATRIANO</p>
-                        <p className="text-xs text-muted-foreground">vince@hmart.com</p>
+                        <p className="text-sm font-bold text-foreground">Account</p>
+                        <p className="text-xs text-muted-foreground">Sign in</p>
                       </div>
                     </div>
-                  </div>
-                  <div className="px-4 py-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                      <Flame className="h-3 w-3" /> {t("user.plusMember")}
-                    </span>
                   </div>
                   <div className="border-t border-border">
                     <button className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
@@ -296,33 +308,133 @@ export default function Header() {
                       <Gift className="h-4 w-4 text-muted-foreground" /> {t("user.exclusiveOffers")}
                       <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
                     </button>
-                    <button className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
-                      <CreditCard className="h-4 w-4 text-muted-foreground" /> {t("user.subscription")}
-                      <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
-                    </button>
-                  </div>
-                  <div className="border-t border-border p-3">
-                    <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
-                      <LogOut className="h-4 w-4" /> {t("user.signOut")}
-                    </button>
                   </div>
                 </PopoverContent>
               </Popover>
 
               <LanguageSelector />
-
-              <button onClick={() => setMiniCartOpen(true)} className="relative rounded-full p-2 transition-colors hover:bg-secondary">
-                <ShoppingCart className="h-5 w-5 text-foreground" />
-                {totalItems > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                    {totalItems}
-                  </span>
-                )}
-              </button>
             </div>
+
+            {/* Cart — always visible */}
+            <button onClick={() => setMiniCartOpen(true)} className="relative rounded-full p-2 transition-colors hover:bg-secondary">
+              <ShoppingCart className="h-5 w-5 text-foreground" />
+              {totalItems > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                  {totalItems}
+                </span>
+              )}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile search overlay */}
+      {searchOpen && (
+        <div className="fixed inset-0 z-[60] bg-background">
+          <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+            <button onClick={() => setSearchOpen(false)} className="p-1">
+              <XIcon className="h-5 w-5 text-foreground" />
+            </button>
+            <form onSubmit={(e) => { handleSearch(e); setSearchOpen(false); }} className="flex-1">
+              <input
+                type="text"
+                placeholder={t("nav.search")}
+                value={searchQuery}
+                onChange={(e) => handleSearchInput(e.target.value)}
+                autoFocus
+                className="w-full rounded-lg border border-border bg-background py-2.5 px-4 text-base focus:border-primary focus:outline-none"
+              />
+            </form>
+          </div>
+          <div className="overflow-y-auto px-4 py-2">
+            {suggestions.terms.map((term) => (
+              <button
+                key={term}
+                onClick={() => { setSearchQuery(term); navigate(`/products?q=${encodeURIComponent(term)}`); setSearchOpen(false); }}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm text-foreground hover:bg-secondary"
+              >
+                <Search className="h-4 w-4 text-muted-foreground" />
+                {term}
+              </button>
+            ))}
+            {suggestions.products.map((p) => (
+              <Link
+                key={p.slug}
+                to={`/product/${p.slug}`}
+                onClick={() => setSearchOpen(false)}
+                className="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-secondary"
+              >
+                {p.thumb && <img src={p.thumb} alt="" className="h-10 w-10 rounded object-cover" />}
+                <span className="text-sm text-foreground">{p.name}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile menu drawer */}
+      {mobileMenuOpen && (
+        <>
+          <div className="fixed inset-0 z-[60] bg-foreground/40" onClick={() => setMobileMenuOpen(false)} />
+          <div className="fixed inset-y-0 left-0 z-[61] w-[85%] max-w-sm overflow-y-auto bg-card shadow-2xl">
+            {/* Menu header */}
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <img src={logoImg} alt="H Mart" className="h-8 w-auto" />
+              <button onClick={() => setMobileMenuOpen(false)} className="p-1.5">
+                <XIcon className="h-5 w-5 text-foreground" />
+              </button>
+            </div>
+
+            {/* Account */}
+            <div className="border-b border-border px-4 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <User className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-foreground">Account</p>
+                  <p className="text-xs text-muted-foreground">Sign in / Register</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Categories */}
+            <div className="border-b border-border py-2">
+              <p className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Categories</p>
+              {vtexCategories.map((dept) => (
+                <Link
+                  key={dept.id}
+                  to={`/products?cat=${dept.id}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-4 py-3 text-sm font-medium text-foreground hover:bg-secondary"
+                >
+                  {dept.name}
+                  {dept.hasChildren && <ChevronRight className="h-4 w-4 text-muted-foreground" />}
+                </Link>
+              ))}
+            </div>
+
+            {/* Links */}
+            <div className="border-b border-border py-2">
+              <Link to="/products" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-primary">
+                <Flame className="h-4 w-4" />
+                Weekly Deals
+              </Link>
+            </div>
+
+            {/* Store selector */}
+            <div className="border-b border-border px-4 py-3">
+              <StoreSelector />
+            </div>
+
+            {/* Language */}
+            <div className="px-4 py-3">
+              <LanguageSelector />
+            </div>
+          </div>
+        </>
+      )}
+
       <MiniCart open={miniCartOpen} onClose={() => setMiniCartOpen(false)} />
     </header>
   );

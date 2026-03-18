@@ -129,7 +129,7 @@ export default function ProductDetailPage() {
           <span className="text-foreground font-medium">{displayName}</span>
         </nav>
 
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="grid gap-4 sm:gap-8 lg:grid-cols-2">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -149,7 +149,7 @@ export default function ProductDetailPage() {
             )}
 
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{product.brand}</p>
-            <h1 className="mt-1 font-display text-3xl font-medium text-foreground">
+            <h1 className="mt-1 font-display text-xl sm:text-3xl font-medium text-foreground">
               {displayName}
               {subName && <span className="ml-3 text-xl text-muted-foreground">{subName}</span>}
             </h1>
@@ -180,7 +180,7 @@ export default function ProductDetailPage() {
                 </div>
               ) : (
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-foreground">${displayPrice.toFixed(2)}</span>
+                  <span className="text-2xl sm:text-3xl font-bold text-foreground">${displayPrice.toFixed(2)}</span>
                   {displayListPrice && displayListPrice > displayPrice && (
                     <>
                       <span className="text-lg text-muted-foreground line-through">${displayListPrice.toFixed(2)}</span>
@@ -235,7 +235,7 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            <div className="mt-6 flex items-center gap-3">
+            <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <div className="flex items-center rounded-lg border border-border">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -257,7 +257,7 @@ export default function ProductDetailPage() {
               <button
                 onClick={() => handleAddToCart(product, quantity)}
                 disabled={isUnavailable}
-                className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-6 py-3 font-body text-sm font-semibold transition-transform ${
+                className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 sm:px-6 py-3 font-body text-sm font-semibold transition-transform ${
                   isUnavailable
                     ? "bg-muted text-muted-foreground cursor-not-allowed"
                     : "bg-primary text-primary-foreground hover:scale-[1.02] active:scale-95"
