@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from "react";
 import logoImg from "@/assets/hmart-logo.png";
 import StoreSelector from "@/components/StoreSelector";
 import LanguageSelector from "@/components/LanguageSelector";
+import MiniCart from "@/components/MiniCart";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { getCategoryTree, type VtexCategory } from "@/api/catalogApi";
 import { autocomplete as vtexAutocomplete } from "@/api/searchApi";
@@ -35,6 +36,7 @@ export default function Header() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const catRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const [miniCartOpen, setMiniCartOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -309,18 +311,19 @@ export default function Header() {
 
               <LanguageSelector />
 
-              <Link to="/checkout" className="relative rounded-full p-2 transition-colors hover:bg-secondary">
+              <button onClick={() => setMiniCartOpen(true)} className="relative rounded-full p-2 transition-colors hover:bg-secondary">
                 <ShoppingCart className="h-5 w-5 text-foreground" />
                 {totalItems > 0 && (
                   <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
                     {totalItems}
                   </span>
                 )}
-              </Link>
+              </button>
             </div>
           </div>
         </div>
       </div>
+      <MiniCart open={miniCartOpen} onClose={() => setMiniCartOpen(false)} />
     </header>
   );
 }
