@@ -430,9 +430,17 @@ export default function Header() {
 
             {/* Links */}
             <div className="border-b border-border py-2">
-              <Link to="/products" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-primary">
+              <Link to="/products?q=deals" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-primary">
                 <Flame className="h-4 w-4" />
                 Weekly Deals
+              </Link>
+              <Link to="/products?sort=release_desc" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-secondary">
+                <Sparkles className="h-4 w-4 text-muted-foreground" />
+                New Arrivals
+              </Link>
+              <Link to="/products?sort=orders_desc" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-foreground hover:bg-secondary">
+                <Star className="h-4 w-4 text-muted-foreground" />
+                Best Sellers
               </Link>
             </div>
 
