@@ -36,6 +36,7 @@ export default function Header() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const catRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const [miniCartOpen, setMiniCartOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
