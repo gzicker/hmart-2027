@@ -1,10 +1,7 @@
-import { Link } from "react-router-dom";
-import { X, Plus, Minus, Trash2, ShoppingBag, Truck, Tag, ArrowRight } from "lucide-react";
-import { useCart } from "@/contexts/CartContext";
-import { formatCents } from "@/api/checkoutApi";
-import { Progress } from "@/components/ui/progress";
-
-const FREE_SHIPPING_THRESHOLD = 4900; // $49.00 in cents
+import { Link } from 'react-router-dom';
+import { X, Plus, Minus, Trash2, ShoppingBag, Loader2 } from 'lucide-react';
+import { useCart } from '@/contexts/CartContext';
+import { formatCents } from '@/api/checkoutApi';
 
 interface MiniCartProps {
   open: boolean;
@@ -13,198 +10,188 @@ interface MiniCartProps {
 
 export default function MiniCart({ open, onClose }: MiniCartProps) {
   const {
-    orderForm, totalItems, subtotal, discounts, total,
-    updateQuantity, removeItem, goToCheckout, isUpdating,
+    orderForm,
+    totalItems,
+    total,
+    updateQuantity,
+    removeItem,
+    goToCheckout,
+    isUpdating,
   } = useCart();
 
   const items = orderForm?.items || [];
-  const shippingProgress = Math.min((subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100);
-  const amountToFreeShipping = FREE_SHIPPING_THRESHOLD - subtotal;
-  const hasFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
 
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-[100]">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 animate-fade-in" onClick={onClose} />
+      <div
+        className="absolute inset-0 bg-black/40 transition-opacity"
+        onClick={onClose}
+      />
 
-      {/* Drawer */}
-      <div className="absolute right-0 bottom-0 w-full max-h-[75vh] rounded-t-2xl lg:top-0 lg:bottom-auto lg:h-full lg:max-h-full lg:max-w-md lg:rounded-none bg-card shadow-2xl flex flex-col animate-slide-in-right">
-
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <div className="flex items-center gap-3">
-            <ShoppingBag className="h-5 w-5 text-primary" />
-            <div>
-              <span className="text-base font-bold text-foreground">Your Cart</span>
-              {totalItems > 0 && (
-                <span className="ml-2 text-sm text-muted-foreground">
-                  ({totalItems} {totalItems === 1 ? "item" : "items"})
-                </span>
-              )}
-            </div>
+      {/* Desktop: right drawer / Mobile: bottom sheet */}
+      <div
+        className="
+          absolute inset-x-0 bottom-0 max-h-[85vh] rounded-t-2xl
+          lg:inset-y-0 lg:left-auto lg:right-0 lg:max-h-full lg:w-[420px] lg:max-w-md lg:rounded-none
+          bg-white shadow-2xl flex flex-col
+        "
+      >
+        {/* ====== HEADER ====== */}
+        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <span className="text-lg font-semibold text-gray-900">Cart</span>
+            {totalItems > 0 && (
+              <span className="text-sm font-medium text-gray-500">
+                ({totalItems})
+              </span>
+            )}
           </div>
-          <button onClick={onClose} className="rounded-full p-2 transition-colors hover:bg-secondary">
-            <X className="h-5 w-5 text-foreground" />
+          <button
+            onClick={onClose}
+            className="flex h-10 w-10 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 transition-colors"
+            aria-label="Close cart"
+          >
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Free shipping progress */}
-        {totalItems > 0 && (
-          <div className="border-b border-border px-5 py-3">
-            {hasFreeShipping ? (
-              <div className="flex items-center gap-2 text-sm font-medium text-green-600">
-                <Truck className="h-4 w-4" />
-                You've got free shipping!
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1.5">
-                    <Truck className="h-3.5 w-3.5" />
-                    Add {formatCents(amountToFreeShipping)} for free shipping
-                  </span>
-                  <span>{formatCents(FREE_SHIPPING_THRESHOLD)}</span>
-                </div>
-                <Progress value={shippingProgress} className="h-2" />
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Items */}
-        <div className="flex-1 overflow-y-auto">
+        {/* ====== ITEMS ====== */}
+        <div className="flex-1 overflow-y-auto overscroll-contain">
           {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-4 py-16 px-6 text-center">
-              <ShoppingBag className="h-16 w-16 text-muted-foreground/30" />
-              <p className="text-lg font-semibold text-foreground">Your cart is empty</p>
-              <p className="text-sm text-muted-foreground">Add items to get started</p>
+            <div className="flex flex-col items-center justify-center gap-4 px-6 py-20 text-center">
+              <ShoppingBag className="h-16 w-16 text-gray-300" />
+              <p className="text-lg font-semibold text-gray-900">Your cart is empty</p>
+              <p className="text-sm text-gray-500">Add items to get started.</p>
               <Link
                 to="/products"
                 onClick={onClose}
-                className="mt-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                className="mt-2 rounded-lg bg-gray-900 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
               >
                 Browse Products
               </Link>
             </div>
           ) : (
-            <div className="divide-y divide-border">
-              {items.map((item) => (
-                <div key={item.uniqueId} className="px-5 py-4">
-                  <div className="flex gap-4">
-                    {/* Image */}
-                    <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-border bg-secondary">
-                      <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
+            <div className="divide-y divide-gray-100">
+              {items.map((item) => {
+                const lineTotal = item.sellingPrice * item.quantity;
+                const hasDiscount = item.listPrice > item.sellingPrice;
+
+                return (
+                  <div key={item.uniqueId} className="flex gap-4 px-5 py-4">
+                    {/* Thumbnail */}
+                    <div className="h-[72px] w-[72px] flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="h-full w-full object-cover"
+                      />
                     </div>
 
                     {/* Details */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground line-clamp-2">{item.name}</p>
+                      {/* Name */}
+                      <p className="text-sm font-medium text-gray-900 line-clamp-2 leading-snug">
+                        {item.name}
+                      </p>
 
-                      {item.sellerName && (
-                        <p className="mt-0.5 text-xs text-muted-foreground">
-                          Sold by {item.sellerName}
-                        </p>
-                      )}
-
-                      {/* Price */}
-                      <div className="mt-1.5 flex items-center gap-2">
-                        <span className="text-sm font-bold text-foreground">
-                          {formatCents(item.sellingPrice * item.quantity)}
+                      {/* Unit price */}
+                      <div className="mt-1 flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-900 tabular-nums">
+                          {formatCents(item.sellingPrice)}
                         </span>
-                        {item.listPrice > item.sellingPrice && (
-                          <span className="text-xs text-muted-foreground line-through">
-                            {formatCents(item.listPrice * item.quantity)}
-                          </span>
-                        )}
-                        {item.quantity > 1 && (
-                          <span className="text-xs text-muted-foreground">
-                            ({formatCents(item.sellingPrice)} each)
+                        {hasDiscount && (
+                          <span className="text-xs text-gray-400 line-through tabular-nums">
+                            {formatCents(item.listPrice)}
                           </span>
                         )}
                       </div>
 
-                      {/* Quantity controls */}
+                      {/* Quantity + Remove row */}
                       <div className="mt-2 flex items-center justify-between">
-                        <div className="flex items-center gap-1 rounded-lg border border-border">
+                        {/* Quantity stepper */}
+                        <div className="flex items-center rounded-lg border border-gray-200">
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
                             disabled={isUpdating}
-                            className="p-1.5 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
+                            className="flex h-8 w-8 items-center justify-center text-gray-500 hover:text-gray-900 disabled:opacity-30 transition-colors"
+                            aria-label="Decrease quantity"
                           >
                             <Minus className="h-3.5 w-3.5" />
                           </button>
-                          <span className="min-w-[2rem] text-center text-sm font-medium text-foreground">
+                          <span className="w-8 text-center text-sm font-medium text-gray-900 tabular-nums">
                             {item.quantity}
                           </span>
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
                             disabled={isUpdating}
-                            className="p-1.5 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
+                            className="flex h-8 w-8 items-center justify-center text-gray-500 hover:text-gray-900 disabled:opacity-30 transition-colors"
+                            aria-label="Increase quantity"
                           >
                             <Plus className="h-3.5 w-3.5" />
                           </button>
                         </div>
-                        <button
-                          onClick={() => removeItem(item.id)}
-                          disabled={isUpdating}
-                          className="p-1.5 text-muted-foreground hover:text-red-500 transition-colors disabled:opacity-40"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+
+                        {/* Line total + remove */}
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm font-semibold text-gray-900 tabular-nums">
+                            {formatCents(lineTotal)}
+                          </span>
+                          <button
+                            onClick={() => removeItem(item.id)}
+                            disabled={isUpdating}
+                            className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-red-50 hover:text-red-500 disabled:opacity-30 transition-colors"
+                            aria-label="Remove item"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-
-                  {/* Gift badge */}
-                  {item.isGift && (
-                    <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
-                      <Tag className="h-3 w-3" /> Free gift
-                    </div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
 
-        {/* Footer */}
+        {/* ====== FOOTER (sticky) ====== */}
         {items.length > 0 && (
-          <div className="border-t border-border px-5 py-4 space-y-3">
-            {discounts > 0 && (
-              <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-1.5 text-green-600">
-                  <Tag className="h-3.5 w-3.5" /> Discounts
-                </span>
-                <span className="text-green-600">-{formatCents(discounts)}</span>
-              </div>
-            )}
-
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <span className="text-base font-bold text-foreground">Subtotal</span>
-                <span className="text-base font-bold text-foreground">{formatCents(total)}</span>
-              </div>
-              <p className="text-xs text-muted-foreground">Shipping and taxes calculated at checkout</p>
+          <div className="border-t border-gray-200 px-5 py-4 flex-shrink-0 space-y-3">
+            {/* Subtotal */}
+            <div className="flex items-center justify-between">
+              <span className="text-base font-medium text-gray-700">Subtotal</span>
+              <span className="text-lg font-bold text-gray-900 tabular-nums">
+                {formatCents(total)}
+              </span>
             </div>
 
-            <div className="space-y-2">
-              <button
-                onClick={goToCheckout}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                Checkout
-                <ArrowRight className="h-4 w-4" />
-              </button>
-              <Link
-                to="/checkout"
-                onClick={onClose}
-                className="block w-full rounded-lg border border-border px-4 py-2.5 text-center text-sm font-medium text-foreground transition-colors hover:bg-secondary"
-              >
-                View full cart
-              </Link>
-            </div>
+            <p className="text-xs text-gray-400">
+              Shipping and taxes calculated at checkout.
+            </p>
+
+            {/* Checkout CTA */}
+            <button
+              onClick={goToCheckout}
+              disabled={isUpdating}
+              className="flex w-full items-center justify-center rounded-lg bg-gray-900 py-3.5 text-sm font-bold text-white transition-colors hover:bg-gray-800 disabled:opacity-60"
+            >
+              {isUpdating ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                'Checkout'
+              )}
+            </button>
+
+            {/* Continue shopping */}
+            <button
+              onClick={onClose}
+              className="w-full py-2 text-center text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+            >
+              Continue Shopping
+            </button>
           </div>
         )}
       </div>
