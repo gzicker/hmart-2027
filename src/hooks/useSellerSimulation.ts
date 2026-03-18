@@ -135,7 +135,7 @@ export function useProductsSellerSimulations(products: Product[], sellerId: stri
           uncachedItems.push({
             id: skuId,
             quantity: 1,
-            seller: product._vtex?.sellerId || sellerId,
+            seller: sellerId,
             productId: product.id,
           });
         }

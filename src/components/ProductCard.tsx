@@ -36,8 +36,7 @@ export default function ProductCard({ product, featured, hideIfUnavailable, simu
 
   const handleAddToCart = () => {
     const skuId = product._vtex?.skuId || product.id;
-    const sellerId = product._vtex?.sellerId || selectedSellerId;
-    addItem(skuId, 1, sellerId);
+    addItem(skuId, 1, selectedSellerId);
   };
 
   const hasRating = product.rating > 0;
