@@ -30,7 +30,7 @@ export default function MiniCart({ open, onClose }: MiniCartProps) {
       <div className="absolute inset-0 bg-black/50 animate-fade-in" onClick={onClose} />
 
       {/* Drawer */}
-      <div className="absolute right-0 top-0 h-full w-full max-w-md bg-card shadow-2xl flex flex-col animate-slide-in-right">
+      <div className="absolute right-0 bottom-0 w-full max-h-[75vh] rounded-t-2xl lg:top-0 lg:bottom-auto lg:h-full lg:max-h-full lg:max-w-md lg:rounded-none bg-card shadow-2xl flex flex-col animate-slide-in-right">
 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
