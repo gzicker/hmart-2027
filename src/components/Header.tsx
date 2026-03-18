@@ -152,7 +152,7 @@ export default function Header() {
       <div className="border-b border-border">
         <div className="hmart-container flex items-center gap-3 py-2.5 sm:gap-4 sm:py-3 lg:gap-6">
           {/* Mobile hamburger */}
-          <button onClick={() => setMobileMenuOpen(true)} className="rounded-md p-2 text-foreground lg:hidden">
+          <button onClick={() => setMobileMenuOpen(true)} aria-label="Open menu" className="rounded-md p-2 text-foreground lg:hidden">
             <Menu className="h-5 w-5" />
           </button>
 
