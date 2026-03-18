@@ -25,6 +25,13 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
 
   if (hideIfUnavailable && isUnavailable) return null;
 
+  const handleAddToCart = () => {
+    const vtex = (product as any)._vtex;
+    const skuId = vtex?.skuId || product.id;
+    const sellerId = vtex?.sellerId || selectedSellerId;
+    addItem(skuId, 1, sellerId);
+  };
+
   return (
     <div className={`product-card group ${featured ? "col-span-2 row-span-2" : ""} ${isUnavailable ? "opacity-60" : ""}`}>
       {product.isSponsored && (
@@ -93,7 +100,7 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
               )}
             </div>
             <button
-              onClick={() => addItem(product)}
+              onClick={handleAddToCart}
               className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-110 active:scale-95"
             >
               <Plus className="h-4 w-4" />

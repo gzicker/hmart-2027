@@ -50,7 +50,6 @@ export default function ProductDetailPage() {
       .finally(() => setIsLoading(false));
   }, [id]);
 
-  // Simulate price/availability for selected franchise seller
   useEffect(() => {
     if (!product) return;
     const skuId = (product as any)._vtex?.skuId;
@@ -75,10 +74,16 @@ export default function ProductDetailPage() {
       .catch(console.error);
   }, [product?.id]);
 
-  // Determine display price: use simulation result when available, fallback to IS price
   const displayPrice = sellerPrice?.available && sellerPrice.price > 0 ? sellerPrice.price : product?.price ?? 0;
   const displayListPrice = sellerPrice?.available && sellerPrice.listPrice > 0 ? sellerPrice.listPrice : product?.originalPrice;
   const isUnavailable = sellerPrice !== null && !sellerPrice.available;
+
+  const handleAddToCart = (p: Product, qty: number = 1) => {
+    const vtex = (p as any)._vtex;
+    const skuId = vtex?.skuId || p.id;
+    const sellerId = vtex?.sellerId || selectedSellerId;
+    addItem(skuId, qty, sellerId);
+  };
 
   if (isLoading) {
     return (
@@ -159,7 +164,6 @@ export default function ProductDetailPage() {
               <span className="text-sm text-muted-foreground">({product.reviewCount.toLocaleString()} {t("product.reviews")})</span>
             </div>
 
-            {/* Price section with simulation data */}
             <div className="mt-4">
               {simulating ? (
                 <div className="flex items-center gap-2">
@@ -251,7 +255,7 @@ export default function ProductDetailPage() {
               </div>
 
               <button
-                onClick={() => addItem(product, quantity)}
+                onClick={() => handleAddToCart(product, quantity)}
                 disabled={isUnavailable}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-6 py-3 font-body text-sm font-semibold transition-transform ${
                   isUnavailable
@@ -363,8 +367,8 @@ export default function ProductDetailPage() {
 
                 <button
                   onClick={() => {
-                    addItem(product);
-                    addItem(pairProduct);
+                    handleAddToCart(product);
+                    handleAddToCart(pairProduct);
                     setShowPairDrawer(false);
                   }}
                   className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] active:scale-95"

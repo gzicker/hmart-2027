@@ -66,6 +66,13 @@ export default function HomePage() {
   if (activeTab === "gifts") return <GiftsHomePage />;
   if (activeTab === "b2b") return <B2BHomePage />;
 
+  const handleAddToCart = (p: Product) => {
+    const vtex = (p as any)._vtex;
+    const skuId = vtex?.skuId || p.id;
+    const sellerId = vtex?.sellerId || selectedSellerId;
+    addItem(skuId, 1, sellerId);
+  };
+
   const sponsoredProducts = vtexProducts.slice(0, 3);
 
   const categoryImages = [
@@ -79,10 +86,8 @@ export default function HomePage() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero Carousel */}
       <HeroCarousel />
 
-      {/* Fulfillment bar */}
       <section className="border-b border-border bg-card">
         <div className="hmart-container grid grid-cols-1 gap-0 divide-y divide-border sm:grid-cols-2 md:grid-cols-4 sm:divide-x sm:divide-y-0">
           {[
@@ -102,7 +107,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Categories */}
       <section className="hmart-container py-12">
         <h2 className="font-display text-2xl font-medium text-foreground">{t("cat.shopBy")}</h2>
         <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -113,10 +117,7 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1, duration: 0.5 }}
             >
-              <Link
-                to={cat.link}
-                className="group relative block overflow-hidden rounded-xl"
-              >
+              <Link to={cat.link} className="group relative block overflow-hidden rounded-xl">
                 <div className="aspect-[4/3] overflow-hidden">
                   <img src={cat.image} alt={cat.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
                 </div>
@@ -131,7 +132,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Retail Media Shelf - Sponsored Brand Banners */}
       <section className="hmart-container pb-12">
         <div className="mb-4 flex items-center justify-between">
           <div>
@@ -171,7 +171,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Chef's Picks */}
       <section className="bg-card py-12">
         <div className="hmart-container">
           <div className="mb-6 flex items-center gap-2">
@@ -186,19 +185,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Creator Reels / TikTok Shelf */}
       <section id="trending-tiktok" className="hmart-container py-12 scroll-mt-32">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Play className="h-5 w-5 text-primary" />
             <h2 className="font-display text-2xl font-medium text-foreground">{t("tiktok.title")}</h2>
           </div>
-          <a
-            href="https://www.tiktok.com/tag/hmart"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-medium text-primary hover:underline"
-          >
+          <a href="https://www.tiktok.com/tag/hmart" target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-primary hover:underline">
             {t("tiktok.swipe")} →
           </a>
         </div>
@@ -225,7 +218,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Editorial / Recipe Section */}
       <section className="hmart-container py-12">
         <div className="overflow-hidden rounded-xl bg-card">
           <div className="grid md:grid-cols-2">
@@ -250,8 +242,8 @@ export default function HomePage() {
                   onClick={() => {
                     const gochujang = vtexProducts[0];
                     const tteok = vtexProducts[1];
-                    if (gochujang) addItem(gochujang);
-                    if (tteok) addItem(tteok);
+                    if (gochujang) handleAddToCart(gochujang);
+                    if (tteok) handleAddToCart(tteok);
                   }}
                   className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-105 active:scale-95"
                 >
@@ -266,7 +258,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Newsletter */}
       <section className="border-t border-border bg-secondary/50 py-10">
         <div className="hmart-container text-center">
           <h3 className="font-display text-xl font-medium text-foreground">{t("newsletter.title")}</h3>
