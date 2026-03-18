@@ -311,14 +311,14 @@ export default function Header() {
 
               <LanguageSelector />
 
-              <Link to="/checkout" className="relative rounded-full p-2 transition-colors hover:bg-secondary">
+              <button onClick={() => setMiniCartOpen(true)} className="relative rounded-full p-2 transition-colors hover:bg-secondary">
                 <ShoppingCart className="h-5 w-5 text-foreground" />
                 {totalItems > 0 && (
                   <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
                     {totalItems}
                   </span>
                 )}
-              </Link>
+              </button>
             </div>
           </div>
         </div>
