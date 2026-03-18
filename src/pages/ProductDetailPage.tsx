@@ -235,7 +235,7 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            <div className="mt-6 flex items-center gap-3">
+            <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <div className="flex items-center rounded-lg border border-border">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
