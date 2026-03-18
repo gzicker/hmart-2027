@@ -61,7 +61,7 @@ const slideConfigs = [
     titleKey: "hero4.title",
     descKey: "hero4.desc",
     ctaLabelKey: "hero4.cta",
-    ctaTo: "/products",
+    ctaTo: "/products?q=k-beauty",
     ctaIcon: Sparkles,
     secondaryKey: "hero4.secondary",
   },
