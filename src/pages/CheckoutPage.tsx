@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Truck, Store, Minus, Plus, Trash2, ShieldCheck, CreditCard, MapPin, ChevronRight, Crown, Loader2 } from "lucide-react";
+import { Truck, Store, Minus, Plus, Trash2, ShieldCheck, MapPin, ChevronRight, Crown, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -20,8 +20,10 @@ export default function CheckoutPage() {
   const [hmartPlus, setHmartPlus] = useState(false);
   const hmartPlusFee = hmartPlus ? 999 : 0; // cents
   const deliveryFee = fulfillmentMethod === "delivery" ? 599 : 0; // cents
-  const tax = Math.round((subtotal + hmartPlusFee) * 0.08875);
-  const grandTotal = subtotal + deliveryFee + hmartPlusFee + tax;
+
+  // Tax is NOT computed client-side — it will be calculated by VTEX at checkout.
+  // Showing an estimate disclaimer instead of a hardcoded rate.
+  const grandTotal = subtotal + deliveryFee + hmartPlusFee;
 
   const items = orderForm?.items || [];
 
@@ -175,19 +177,6 @@ export default function CheckoutPage() {
                 ))}
               </div>
             </div>
-
-            {/* Payment */}
-            <div className="rounded-xl border border-border bg-card p-6">
-              <h2 className="mb-4 font-display text-lg font-medium text-foreground">{t("checkout.paymentMethod")}</h2>
-              <div className="flex items-center gap-3 rounded-lg border border-border p-3">
-                <CreditCard className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium text-foreground">•••• •••• •••• 4242</p>
-                  <p className="text-[11px] text-muted-foreground">Visa · Expires 12/28</p>
-                </div>
-                <button className="ml-auto text-xs font-medium text-primary">{t("checkout.change")}</button>
-              </div>
-            </div>
           </div>
 
           {/* Order Summary */}
@@ -216,7 +205,7 @@ export default function CheckoutPage() {
                 )}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t("checkout.tax")}</span>
-                  <span className="font-medium text-foreground">{formatCents(tax)}</span>
+                  <span className="text-xs font-medium text-muted-foreground italic">Calculated at checkout</span>
                 </div>
 
                 {subtotal >= 4900 && fulfillmentMethod === "delivery" && (
@@ -228,7 +217,10 @@ export default function CheckoutPage() {
                 <div className="border-t border-border pt-2">
                   <div className="flex justify-between">
                     <span className="font-semibold text-foreground">{t("checkout.total")}</span>
-                    <span className="text-xl font-bold text-foreground">{formatCents(grandTotal)}</span>
+                    <div className="text-right">
+                      <span className="text-xl font-bold text-foreground">{formatCents(grandTotal)}</span>
+                      <p className="text-[10px] text-muted-foreground">+ tax</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -240,11 +232,6 @@ export default function CheckoutPage() {
               >
                 {isUpdating ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {t("checkout.placeOrder")} <ChevronRight className="h-4 w-4" />
-              </button>
-
-              <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-foreground py-3.5 text-sm font-semibold text-background transition-transform hover:scale-[1.02] active:scale-95">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.72 7.54c-.46.53-1.21.94-1.94.88-.09-.76.28-1.56.72-2.06.46-.53 1.26-.92 1.91-.95.08.79-.23 1.57-.69 2.13zm.69 1.08c-1.07-.06-1.99.61-2.5.61-.51 0-1.29-.58-2.13-.56-1.1.02-2.11.64-2.67 1.62-1.14 1.97-.29 4.89.81 6.49.55.79 1.19 1.67 2.05 1.64.82-.03 1.13-.53 2.12-.53s1.27.53 2.13.51c.88-.01 1.44-.8 1.98-1.59.62-.91.88-1.79.89-1.84-.02-.01-1.71-.66-1.73-2.61-.01-1.63 1.33-2.41 1.39-2.45-.76-1.12-1.94-1.24-2.34-1.29z"/></svg>
-                {t("checkout.pay")}
               </button>
 
               <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">

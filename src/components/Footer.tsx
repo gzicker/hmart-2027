@@ -20,28 +20,28 @@ export default function Footer() {
           <div>
             <h4 className="mb-4 font-display text-sm font-semibold text-foreground">{t("footer.fulfillment")}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>{t("footer.delivery")}</li>
-              <li>{t("footer.pickup")}</li>
-              <li>{t("footer.shipHome")}</li>
-              <li>{t("footer.deliveryAreas")}</li>
+              <li><Link to="/products" className="transition-colors hover:text-primary">{t("footer.delivery")}</Link></li>
+              <li><Link to="/products" className="transition-colors hover:text-primary">{t("footer.pickup")}</Link></li>
+              <li><Link to="/products" className="transition-colors hover:text-primary">{t("footer.shipHome")}</Link></li>
+              <li><Link to="/products" className="transition-colors hover:text-primary">{t("footer.deliveryAreas")}</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="mb-4 font-display text-sm font-semibold text-foreground">{t("footer.about")}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>{t("footer.ourStory")}</li>
-              <li>{t("footer.storeLocator")}</li>
-              <li>{t("footer.careers")}</li>
-              <li>{t("footer.smartRewards")}</li>
+              <li><Link to="/" className="transition-colors hover:text-primary">{t("footer.ourStory")}</Link></li>
+              <li><Link to="/" className="transition-colors hover:text-primary">{t("footer.storeLocator")}</Link></li>
+              <li><Link to="/" className="transition-colors hover:text-primary">{t("footer.careers")}</Link></li>
+              <li><Link to="/" className="transition-colors hover:text-primary">{t("footer.smartRewards")}</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="mb-4 font-display text-sm font-semibold text-foreground">{t("footer.help")}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>{t("footer.customerService")}</li>
-              <li>{t("footer.faq")}</li>
-              <li>{t("footer.returnPolicy")}</li>
-              <li>{t("footer.contactUs")}</li>
+              <li><Link to="/" className="transition-colors hover:text-primary">{t("footer.customerService")}</Link></li>
+              <li><Link to="/" className="transition-colors hover:text-primary">{t("footer.faq")}</Link></li>
+              <li><Link to="/" className="transition-colors hover:text-primary">{t("footer.returnPolicy")}</Link></li>
+              <li><Link to="/" className="transition-colors hover:text-primary">{t("footer.contactUs")}</Link></li>
             </ul>
           </div>
         </div>

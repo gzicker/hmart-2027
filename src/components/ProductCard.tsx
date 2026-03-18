@@ -19,7 +19,11 @@ export default function ProductCard({ product, featured, hideIfUnavailable }: Pr
   const displayName = getProductName(product, language);
   const simulation = useProductSellerSimulation(product, selectedSellerId);
 
-  const isUnavailable = simulation ? !simulation.available : false;
+  // Availability: simulation takes priority, but fall back to IS API availability
+  // when simulation hasn't loaded or returns no data (prevents permanent "Unavailable" state)
+  const isUnavailable = simulation
+    ? !simulation.available
+    : !product.inStock; // fallback to catalog availability
   const displayPrice = simulation?.available && simulation.price > 0 ? simulation.price : product.price;
   const displayListPrice = simulation?.available && simulation.listPrice > 0 ? simulation.listPrice : product.originalPrice;
 

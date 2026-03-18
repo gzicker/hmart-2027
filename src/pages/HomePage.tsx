@@ -47,11 +47,10 @@ export default function HomePage() {
     }
   }, [location.hash]);
 
-  // react-query replaces useEffect+useState — with caching, deduplication, retry for free
   const { data: searchRes, isLoading: isLoadingProducts } = useQuery({
     queryKey: ['homepage-products'],
     queryFn: () => searchProducts({ query: '', count: 60 }),
-    staleTime: 5 * 60 * 1000, // 5 min cache
+    staleTime: 5 * 60 * 1000,
   });
 
   const vtexProducts = useMemo(
@@ -75,7 +74,8 @@ export default function HomePage() {
     addItem(skuId, 1, sellerId);
   };
 
-  const sponsoredProducts = vtexProducts.slice(0, 3);
+  // Featured products — labeled honestly, not "Sponsored" (no ad integration exists)
+  const featuredProducts = vtexProducts.slice(0, 3);
 
   const categoryImages = [
     { name: t("cat.vegetables"), nameKo: "채소", image: categoryVeg, link: "/products" },
@@ -240,18 +240,13 @@ export default function HomePage() {
                 <span>{t("recipe.ingredients")}</span>
               </div>
               <div className="mt-6 flex gap-3">
-                <button
-                  onClick={() => {
-                    const gochujang = vtexProducts[0];
-                    const tteok = vtexProducts[1];
-                    if (gochujang) handleAddToCart(gochujang);
-                    if (tteok) handleAddToCart(tteok);
-                  }}
+                <Link
+                  to="/products?q=tteokbokki"
                   className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-105 active:scale-95"
                 >
                   {t("recipe.addAll")}
-                </button>
-                <Link to={`/product/gochujang-001`} className="inline-flex items-center gap-1 rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
+                </Link>
+                <Link to="/products?q=gochujang" className="inline-flex items-center gap-1 rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
                   {t("recipe.viewRecipe")}
                 </Link>
               </div>

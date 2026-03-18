@@ -43,12 +43,16 @@ export default function ProductDetailPage() {
     staleTime: 2 * 60 * 1000,
   });
 
-  // react-query: related products
+  // react-query: related products — use current product's category for relevance
   const { data: relatedProducts = [] } = useQuery({
-    queryKey: ['related-products', product?.id],
+    queryKey: ['related-products', product?.id, product?.category],
     queryFn: async () => {
-      const res = await searchProducts({ query: '', count: 4 });
-      return vtexProductsToProducts(res.products).filter(p => p.id !== product?.id).slice(0, 4);
+      // Search by category for actual related products instead of blank query
+      const searchTerm = product?.category || product?.brand || '';
+      const res = await searchProducts({ query: searchTerm, count: 8 });
+      return vtexProductsToProducts(res.products)
+        .filter(p => p.id !== product?.id)
+        .slice(0, 4);
     },
     enabled: !!product?.id,
     staleTime: 5 * 60 * 1000,
