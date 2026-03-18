@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Truck, Store, ArrowRight, Star, ChefHat, Play, Clock, Package } from "lucide-react";
 import { Product } from "@/data/products";
 import { searchProducts } from "@/api/searchApi";
@@ -23,6 +24,7 @@ import categoryMeat from "@/assets/category-meat.jpg";
 import categoryPantry from "@/assets/category-pantry.jpg";
 import categoryKbeauty from "@/assets/category-kbeauty.jpg";
 import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
+import { useEffect } from "react";
 
 const TIKTOK_VIDEOS = [
   { id: "7364167688190446890", username: "katchaomeow", caption: "Must-have items at H Mart 🛒 #hmart #hmartmusthaves", views: "21.9K" },
@@ -45,17 +47,18 @@ export default function HomePage() {
     }
   }, [location.hash]);
 
-  const [vtexProducts, setVtexProducts] = useState<Product[]>([]);
-  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  // react-query replaces useEffect+useState — with caching, deduplication, retry for free
+  const { data: searchRes, isLoading: isLoadingProducts } = useQuery({
+    queryKey: ['homepage-products'],
+    queryFn: () => searchProducts({ query: '', count: 60 }),
+    staleTime: 5 * 60 * 1000, // 5 min cache
+  });
 
-  useEffect(() => {
-    searchProducts({ query: '', count: 60 })
-      .then((res) => {
-        setVtexProducts(vtexProductsToProducts(res.products));
-      })
-      .catch(console.error)
-      .finally(() => setIsLoadingProducts(false));
-  }, []);
+  const vtexProducts = useMemo(
+    () => searchRes ? vtexProductsToProducts(searchRes.products) : [],
+    [searchRes]
+  );
+
   const productSimulations = useProductsSellerSimulations(vtexProducts, selectedSellerId);
 
   const chefPicks = useMemo(() => {
@@ -67,9 +70,8 @@ export default function HomePage() {
   if (activeTab === "b2b") return <B2BHomePage />;
 
   const handleAddToCart = (p: Product) => {
-    const vtex = (p as any)._vtex;
-    const skuId = vtex?.skuId || p.id;
-    const sellerId = vtex?.sellerId || selectedSellerId;
+    const skuId = p._vtex?.skuId || p.id;
+    const sellerId = p._vtex?.sellerId || selectedSellerId;
     addItem(skuId, 1, sellerId);
   };
 

@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { SlidersHorizontal, Grid3X3, LayoutList, Loader2, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
@@ -18,39 +19,38 @@ export default function ProductListPage() {
   const [sortBy, setSortBy] = useState<SortOption>("");
   const { t } = useLanguage();
 
-  const [products, setProducts] = useState<Product[]>([]);
-  const [facets, setFacets] = useState<ISFacet[]>([]);
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [totalResults, setTotalResults] = useState(0);
   const [page, setPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  useEffect(() => {
-    setIsLoading(true);
-    const baseFacetPath = catParam ? `category-1/${catParam}` : '';
-    const selectedFacetPairs: { key: string; value: string }[] = [];
-    Object.entries(selectedFilters).forEach(([key, values]) => {
-      values.forEach(val => selectedFacetPairs.push({ key, value: val }));
-    });
-    const facetsPath = selectedFacetPairs.length > 0
-      ? selectedFacetPairs.map(f => `${f.key}/${f.value}`).join('/')
-      : baseFacetPath;
-    const effectiveFacets = facetsPath || baseFacetPath;
+  // Fix: compose facet path instead of replacing — category + filters combined
+  const baseFacetPath = catParam ? `category-1/${catParam}` : '';
+  const selectedFacetPairs: { key: string; value: string }[] = [];
+  Object.entries(selectedFilters).forEach(([key, values]) => {
+    values.forEach(val => selectedFacetPairs.push({ key, value: val }));
+  });
+  const facetsPath = [
+    baseFacetPath,
+    ...selectedFacetPairs.map(f => `${f.key}/${f.value}`),
+  ].filter(Boolean).join('/');
 
-    Promise.all([
-      searchProducts({ query, facets: effectiveFacets, page, count: 50, sort: sortBy }),
-      getFacets({ query, facets: effectiveFacets }),
-    ]).then(([searchRes, facetsRes]) => {
-      setProducts(vtexProductsToProducts(searchRes.products));
-      setTotalResults(searchRes.recordsFiltered);
-      const visibleFacets = (facetsRes.facets || []).filter(
-        f => !f.hidden && f.values && f.values.length > 0
-      );
-      setFacets(visibleFacets);
-    }).catch(console.error)
-      .finally(() => setIsLoading(false));
-  }, [query, catParam, sortBy, page, selectedFilters]);
+  const { data: searchData, isLoading } = useQuery({
+    queryKey: ['products', query, facetsPath, page, sortBy],
+    queryFn: () => searchProducts({ query, facets: facetsPath, page, count: 50, sort: sortBy }),
+    staleTime: 2 * 60 * 1000,
+  });
+
+  const { data: facetsData } = useQuery({
+    queryKey: ['facets', query, facetsPath],
+    queryFn: () => getFacets({ query, facets: facetsPath }),
+    staleTime: 2 * 60 * 1000,
+  });
+
+  const products = searchData ? vtexProductsToProducts(searchData.products) : [];
+  const totalResults = searchData?.recordsFiltered ?? 0;
+  const facets = (facetsData?.facets || []).filter(
+    (f: ISFacet) => !f.hidden && f.values && f.values.length > 0
+  );
 
   const toggleFilter = (facetKey: string, value: string) => {
     setSelectedFilters(prev => {
