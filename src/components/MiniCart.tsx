@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Minus, Trash2, ShoppingBag, Loader2, X } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { formatCents } from '@/api/checkoutApi';
@@ -22,9 +22,10 @@ interface MiniCartProps {
 }
 
 function CartContent({ onClose }: { onClose: () => void }) {
+  const navigate = useNavigate();
   const {
     orderForm, totalItems, total,
-    updateQuantity, removeItem, goToCheckout, isUpdating,
+    updateQuantity, removeItem, isUpdating,
   } = useCart();
 
   const items = orderForm?.items || [];
@@ -122,7 +123,7 @@ function CartContent({ onClose }: { onClose: () => void }) {
         </div>
 
         <button
-          onClick={goToCheckout}
+          onClick={() => { onClose(); navigate('/checkout'); }}
           disabled={isUpdating}
           className="flex w-full items-center justify-center rounded-lg bg-red-600 py-3.5 text-sm font-bold text-white transition-colors hover:bg-red-700 disabled:opacity-60"
         >
