@@ -282,14 +282,15 @@ export default function ProductDetailPage() {
                   : `${t("product.addToCart")} — $${(displayPrice * quantity).toFixed(2)}`}
               </button>
 
-              <button
-                onClick={() => setShowPairDrawer(true)}
-                className="flex h-12 w-12 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-primary hover:bg-primary/5 hover:text-primary"
-                title={t("detail.perfectPair")}
-              >
-                <Plus className="h-5 w-5" />
-              </button>
-            </div>
+              {hasPair && (
+                <button
+                  onClick={() => setShowPairDrawer(true)}
+                  className="flex h-12 w-12 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-primary hover:bg-primary/5 hover:text-primary"
+                  title={t("detail.perfectPair")}
+                >
+                  <Plus className="h-5 w-5" />
+                </button>
+              )}
           </motion.div>
         </div>
 
