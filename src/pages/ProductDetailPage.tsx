@@ -306,7 +306,7 @@ export default function ProductDetailPage() {
 
       {/* Perfect Pair Drawer */}
       <AnimatePresence>
-        {showPairDrawer && pairProduct && (
+        {showPairDrawer && hasPair && pairProduct && (
           <>
             <motion.div
               initial={{ opacity: 0 }}
