@@ -43,11 +43,27 @@ export default function ProductDetailPage() {
     staleTime: 2 * 60 * 1000,
   });
 
+  // Pairing rule for this product
+  const pairingRule = product ? findPairingRule(product.name, product.category) : null;
+  const matchedRecipe = product ? findRecipeForProduct(product.name, product.category) : null;
+
+  // react-query: fetch the paired product based on pairing rule
+  const { data: pairProduct = null } = useQuery({
+    queryKey: ['pair-product', product?.id, pairingRule?.pairSearchTerm],
+    queryFn: async () => {
+      if (!pairingRule) return null;
+      const res = await searchProducts({ query: pairingRule.pairSearchTerm, count: 4 });
+      const candidates = vtexProductsToProducts(res.products).filter(p => p.id !== product?.id);
+      return candidates[0] || null;
+    },
+    enabled: !!product?.id && !!pairingRule,
+    staleTime: 5 * 60 * 1000,
+  });
+
   // react-query: related products — use current product's category for relevance
   const { data: relatedProducts = [] } = useQuery({
     queryKey: ['related-products', product?.id, product?.category],
     queryFn: async () => {
-      // Search by category for actual related products instead of blank query
       const searchTerm = product?.category || product?.brand || '';
       const res = await searchProducts({ query: searchTerm, count: 8 });
       return vtexProductsToProducts(res.products)
