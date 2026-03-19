@@ -291,6 +291,7 @@ export default function ProductDetailPage() {
                   <Plus className="h-5 w-5" />
                 </button>
               )}
+            </div>
           </motion.div>
         </div>
 
