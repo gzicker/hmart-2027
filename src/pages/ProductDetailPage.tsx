@@ -354,21 +354,23 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
-                <div className="mt-4 overflow-hidden rounded-xl">
-                  <img src={recipeTteokbokki} alt="Tteokbokki" className="aspect-video w-full object-cover" />
-                  <div className="bg-secondary/50 p-4">
-                    <div className="flex items-center gap-1.5 text-primary">
-                      <ChefHat className="h-4 w-4" />
-                      <span className="text-[11px] font-semibold uppercase tracking-wider">{t("detail.suggestedRecipe")}</span>
-                    </div>
-                    <h4 className="mt-1 font-display text-lg font-medium text-foreground">{t("recipe.title")} 떡볶이</h4>
-                    <p className="mt-1 text-xs text-muted-foreground">{t("recipe.desc").slice(0, 80)}...</p>
-                    <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {t("recipe.time")}</span>
-                      <span>{t("detail.serves")}</span>
+                {matchedRecipe && (
+                  <div className="mt-4 overflow-hidden rounded-xl">
+                    <img src={matchedRecipe.image} alt={matchedRecipe.title} className="aspect-video w-full object-cover" loading="lazy" />
+                    <div className="bg-secondary/50 p-4">
+                      <div className="flex items-center gap-1.5 text-primary">
+                        <ChefHat className="h-4 w-4" />
+                        <span className="text-[11px] font-semibold uppercase tracking-wider">{t("detail.suggestedRecipe")}</span>
+                      </div>
+                      <h4 className="mt-1 font-display text-lg font-medium text-foreground">{matchedRecipe.title} {matchedRecipe.titleKo}</h4>
+                      <p className="mt-1 text-xs text-muted-foreground">{matchedRecipe.description.slice(0, 80)}...</p>
+                      <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {matchedRecipe.time}</span>
+                        <span>{matchedRecipe.serves}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 <div className="mt-6 rounded-lg bg-secondary/50 p-3">
                   <div className="flex items-center justify-between text-sm">
