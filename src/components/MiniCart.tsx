@@ -123,7 +123,7 @@ function CartContent({ onClose }: { onClose: () => void }) {
         </div>
 
         <button
-          onClick={goToCheckout}
+          onClick={() => { onClose(); navigate('/checkout'); }}
           disabled={isUpdating}
           className="flex w-full items-center justify-center rounded-lg bg-red-600 py-3.5 text-sm font-bold text-white transition-colors hover:bg-red-700 disabled:opacity-60"
         >
