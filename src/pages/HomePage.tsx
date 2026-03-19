@@ -24,7 +24,7 @@ import categoryVeg from "@/assets/category-vegetables.jpg";
 import categoryMeat from "@/assets/category-meat.jpg";
 import categoryPantry from "@/assets/category-pantry.jpg";
 import categoryKbeauty from "@/assets/category-kbeauty.jpg";
-import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
+import { getWeeklyRecipe } from "@/data/recipes-and-pairings";
 import { useEffect } from "react";
 
 const TIKTOK_VIDEOS = [
