@@ -113,8 +113,8 @@ export default function ProductDetailPage() {
     );
   }
 
-  const pairProduct = relatedProducts[0] || null;
   const hasRating = product.rating > 0;
+  const hasPair = !!pairProduct && !!pairingRule;
 
   const displayName = getProductName(product, language);
   const subName = getProductSubName(product, language);
