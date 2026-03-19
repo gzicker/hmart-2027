@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Minus, Trash2, ShoppingBag, Loader2, X } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { formatCents } from '@/api/checkoutApi';
