@@ -24,7 +24,7 @@ import categoryVeg from "@/assets/category-vegetables.jpg";
 import categoryMeat from "@/assets/category-meat.jpg";
 import categoryPantry from "@/assets/category-pantry.jpg";
 import categoryKbeauty from "@/assets/category-kbeauty.jpg";
-import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
+import { getWeeklyRecipe } from "@/data/recipes-and-pairings";
 import { useEffect } from "react";
 
 const TIKTOK_VIDEOS = [
@@ -215,40 +215,45 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="hmart-container py-12">
-        <div className="overflow-hidden rounded-xl bg-card">
-          <div className="grid md:grid-cols-2">
-            <div className="aspect-[4/3] md:aspect-auto">
-              <img src={recipeTteokbokki} alt="Tteokbokki Recipe" loading="lazy" className="h-full w-full object-cover" />
-            </div>
-            <div className="flex flex-col justify-center p-8 md:p-12">
-              <p className="font-body text-xs font-semibold uppercase tracking-widest text-primary">{t("recipe.ofTheWeek")}</p>
-              <h2 className="mt-2 font-display text-3xl font-medium text-foreground">
-                {t("recipe.title")}
-              </h2>
-              <p className="mt-3 font-body text-sm leading-relaxed text-muted-foreground">
-                {t("recipe.desc")}
-              </p>
-              <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {t("recipe.time")}</span>
-                <span className="flex items-center gap-1"><Star className="h-3.5 w-3.5 fill-accent text-accent" /> 4.9</span>
-                <span>{t("recipe.ingredients")}</span>
+      {(() => {
+        const weeklyRecipe = getWeeklyRecipe();
+        return (
+          <section className="hmart-container py-12">
+            <div className="overflow-hidden rounded-xl bg-card">
+              <div className="grid md:grid-cols-2">
+                <div className="aspect-[4/3] md:aspect-auto">
+                  <img src={weeklyRecipe.image} alt={weeklyRecipe.title} loading="lazy" className="h-full w-full object-cover" />
+                </div>
+                <div className="flex flex-col justify-center p-8 md:p-12">
+                  <p className="font-body text-xs font-semibold uppercase tracking-widest text-primary">{t("recipe.ofTheWeek")}</p>
+                  <h2 className="mt-2 font-display text-3xl font-medium text-foreground">
+                    {weeklyRecipe.title} {weeklyRecipe.titleKo}
+                  </h2>
+                  <p className="mt-3 font-body text-sm leading-relaxed text-muted-foreground">
+                    {weeklyRecipe.description}
+                  </p>
+                  <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {weeklyRecipe.time}</span>
+                    <span className="flex items-center gap-1"><Star className="h-3.5 w-3.5 fill-accent text-accent" /> {weeklyRecipe.rating}</span>
+                    <span>{weeklyRecipe.serves}</span>
+                  </div>
+                  <div className="mt-6 flex gap-3">
+                    <Link
+                      to={`/products?q=${weeklyRecipe.ctaSearch}`}
+                      className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-105 active:scale-95"
+                    >
+                      {t("recipe.addAll")}
+                    </Link>
+                    <Link to={`/products?q=${weeklyRecipe.ingredientSearchTerms[0]}`} className="inline-flex items-center gap-1 rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
+                      {t("recipe.viewRecipe")}
+                    </Link>
+                  </div>
+                </div>
               </div>
-              <div className="mt-6 flex gap-3">
-                <Link
-                  to="/products?q=tteokbokki"
-                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-105 active:scale-95"
-                >
-                  {t("recipe.addAll")}
-                </Link>
-                <Link to="/products?q=gochujang" className="inline-flex items-center gap-1 rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary">
-                  {t("recipe.viewRecipe")}
-                </Link>
-              </div>
             </div>
-          </div>
-        </div>
-      </section>
+          </section>
+        );
+      })()}
 
       <section className="border-t border-border bg-secondary/50 py-10">
         <div className="hmart-container text-center">

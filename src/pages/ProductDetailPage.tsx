@@ -10,10 +10,10 @@ import { simulateForSeller } from "@/api/checkoutApi";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getProductName, getProductSubName, getProductDescription } from "@/lib/product-utils";
+import { findPairingRule, findRecipeForProduct } from "@/data/recipes-and-pairings";
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -43,11 +43,27 @@ export default function ProductDetailPage() {
     staleTime: 2 * 60 * 1000,
   });
 
+  // Pairing rule for this product
+  const pairingRule = product ? findPairingRule(product.name, product.category) : null;
+  const matchedRecipe = product ? findRecipeForProduct(product.name, product.category) : null;
+
+  // react-query: fetch the paired product based on pairing rule
+  const { data: pairProduct = null } = useQuery({
+    queryKey: ['pair-product', product?.id, pairingRule?.pairSearchTerm],
+    queryFn: async () => {
+      if (!pairingRule) return null;
+      const res = await searchProducts({ query: pairingRule.pairSearchTerm, count: 4 });
+      const candidates = vtexProductsToProducts(res.products).filter(p => p.id !== product?.id);
+      return candidates[0] || null;
+    },
+    enabled: !!product?.id && !!pairingRule,
+    staleTime: 5 * 60 * 1000,
+  });
+
   // react-query: related products — use current product's category for relevance
   const { data: relatedProducts = [] } = useQuery({
     queryKey: ['related-products', product?.id, product?.category],
     queryFn: async () => {
-      // Search by category for actual related products instead of blank query
       const searchTerm = product?.category || product?.brand || '';
       const res = await searchProducts({ query: searchTerm, count: 8 });
       return vtexProductsToProducts(res.products)
@@ -97,8 +113,8 @@ export default function ProductDetailPage() {
     );
   }
 
-  const pairProduct = relatedProducts[0] || null;
   const hasRating = product.rating > 0;
+  const hasPair = !!pairProduct && !!pairingRule;
 
   const displayName = getProductName(product, language);
   const subName = getProductSubName(product, language);
@@ -266,13 +282,15 @@ export default function ProductDetailPage() {
                   : `${t("product.addToCart")} — $${(displayPrice * quantity).toFixed(2)}`}
               </button>
 
-              <button
-                onClick={() => setShowPairDrawer(true)}
-                className="flex h-12 w-12 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-primary hover:bg-primary/5 hover:text-primary"
-                title={t("detail.perfectPair")}
-              >
-                <Plus className="h-5 w-5" />
-              </button>
+              {hasPair && (
+                <button
+                  onClick={() => setShowPairDrawer(true)}
+                  className="flex h-12 w-12 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-primary hover:bg-primary/5 hover:text-primary"
+                  title={t("detail.perfectPair")}
+                >
+                  <Plus className="h-5 w-5" />
+                </button>
+              )}
             </div>
           </motion.div>
         </div>
@@ -289,7 +307,7 @@ export default function ProductDetailPage() {
 
       {/* Perfect Pair Drawer */}
       <AnimatePresence>
-        {showPairDrawer && pairProduct && (
+        {showPairDrawer && hasPair && pairProduct && (
           <>
             <motion.div
               initial={{ opacity: 0 }}
@@ -337,21 +355,23 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
-                <div className="mt-4 overflow-hidden rounded-xl">
-                  <img src={recipeTteokbokki} alt="Tteokbokki" className="aspect-video w-full object-cover" />
-                  <div className="bg-secondary/50 p-4">
-                    <div className="flex items-center gap-1.5 text-primary">
-                      <ChefHat className="h-4 w-4" />
-                      <span className="text-[11px] font-semibold uppercase tracking-wider">{t("detail.suggestedRecipe")}</span>
-                    </div>
-                    <h4 className="mt-1 font-display text-lg font-medium text-foreground">{t("recipe.title")} 떡볶이</h4>
-                    <p className="mt-1 text-xs text-muted-foreground">{t("recipe.desc").slice(0, 80)}...</p>
-                    <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {t("recipe.time")}</span>
-                      <span>{t("detail.serves")}</span>
+                {matchedRecipe && (
+                  <div className="mt-4 overflow-hidden rounded-xl">
+                    <img src={matchedRecipe.image} alt={matchedRecipe.title} className="aspect-video w-full object-cover" loading="lazy" />
+                    <div className="bg-secondary/50 p-4">
+                      <div className="flex items-center gap-1.5 text-primary">
+                        <ChefHat className="h-4 w-4" />
+                        <span className="text-[11px] font-semibold uppercase tracking-wider">{t("detail.suggestedRecipe")}</span>
+                      </div>
+                      <h4 className="mt-1 font-display text-lg font-medium text-foreground">{matchedRecipe.title} {matchedRecipe.titleKo}</h4>
+                      <p className="mt-1 text-xs text-muted-foreground">{matchedRecipe.description.slice(0, 80)}...</p>
+                      <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {matchedRecipe.time}</span>
+                        <span>{matchedRecipe.serves}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 <div className="mt-6 rounded-lg bg-secondary/50 p-3">
                   <div className="flex items-center justify-between text-sm">
