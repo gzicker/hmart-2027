@@ -22,9 +22,10 @@ interface MiniCartProps {
 }
 
 function CartContent({ onClose }: { onClose: () => void }) {
+  const navigate = useNavigate();
   const {
     orderForm, totalItems, total,
-    updateQuantity, removeItem, goToCheckout, isUpdating,
+    updateQuantity, removeItem, isUpdating,
   } = useCart();
 
   const items = orderForm?.items || [];
