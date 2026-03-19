@@ -10,10 +10,10 @@ import { simulateForSeller } from "@/api/checkoutApi";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getProductName, getProductSubName, getProductDescription } from "@/lib/product-utils";
+import { findPairingRule, findRecipeForProduct } from "@/data/recipes-and-pairings";
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import recipeTteokbokki from "@/assets/recipe-tteokbokki.jpg";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
