@@ -13,7 +13,7 @@ import { useProductsSellerSimulations } from "@/hooks/useSellerSimulation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTab } from "@/contexts/TabContext";
 import ProductCard from "@/components/ProductCard";
-import LazyTikTokEmbed from "@/components/LazyTikTokEmbed";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import GiftsHomePage from "./GiftsHomePage";
